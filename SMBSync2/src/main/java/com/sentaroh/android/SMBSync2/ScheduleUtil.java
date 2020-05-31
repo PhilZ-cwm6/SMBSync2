@@ -486,10 +486,10 @@ public class ScheduleUtil {
             cal.set(Calendar.YEAR, c_year);
             cal.set(Calendar.MONTH, c_month);
             s_day_last_day=cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-            if (s_day==99) {
+            if (s_day==99) { //in settings/spinner, last day of month is set at a 99 value.
                 s_day_temp=s_day_last_day;
             } else {
-                if (s_day>s_day_last_day) {
+                if (s_day>s_day_last_day) { //will skip sync also if month has 30 and user selected 31 for exp.
                     return 0;
                 } else {
                     s_day_temp=s_day;

@@ -255,7 +255,7 @@ public class ScheduleItemEditor {
 
         ctv_sched_enabled.setChecked(mSched.scheduleEnabled);
 
-        ctv_last_day.setChecked(mSched.scheduleDay.equals("99"));
+        ctv_last_day.setChecked(mSched.scheduleDay.equals("99")); //we set last day of month as 99. Later in code, if selected day is 99, we set schedule date to last day of selected month by calling s_day_last_day=cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         if(ctv_last_day.isChecked()) {
             CommonDialog.setViewEnabled(mActivity, sp_sched_day, false);
         } else {
@@ -882,7 +882,7 @@ public class ScheduleItemEditor {
         sp.scheduleType=getScheduleTypeFromSpinner(sp_sched_type);
 
         if (ctv_last_day.isChecked()) {
-            sp.scheduleDay = "99";
+            sp.scheduleDay = "99"; //we set last day of month as 99. Later in code, if selected day is 99, we set schedule date to last day of selected month by calling s_day_last_day=cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         } else {
             sp.scheduleDay = sp_sched_day.getSelectedItem().toString();
         }

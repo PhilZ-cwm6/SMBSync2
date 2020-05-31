@@ -7,12 +7,10 @@ import android.os.Bundle;
 import android.view.Window;
 
 public class ActivityIntentHandler extends Activity {
-
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(new GlobalParameters().setNewLocale(base, false));
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -269,7 +269,7 @@ public final class CommonUtilities {
         out.add("  Screen theme language="+gp.settingScreenThemeLanguage);
         out.add("  Screen theme language value="+gp.settingScreenThemeLanguageValue);
         out.add("  Screen theme="+gp.settingScreenTheme);
-        out.add("  Screen on if screen on at start of the sync="+gp.settingScreenOnIfScreenOnAtStartOfSync);
+        out.add("  Screen on if screen on at start of the sync="+gp.settingScreenOnIfScreenOnAtStartOfSync); //should be: Force Screen on at start of the sync="...", unlike the variable name suggests
 
         out.add("");
         out.add("  Security use app startup="+gp.settingSecurityApplicationPasswordUseAppStartup);

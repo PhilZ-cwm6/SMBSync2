@@ -214,7 +214,7 @@ public class AdapterSyncHistory extends ArrayAdapter<SyncHistoryItem> {
                 holder.tv_time.setText(o.sync_time);
                 holder.tv_prof.setText(o.sync_prof);
 
-                holder.tv_req.setText(o.sync_req);
+                holder.tv_req.setText(o.sync_req); //the translated sync_rec
 
                 String st_text = "";
                 if (o.sync_status == SyncHistoryItem.SYNC_STATUS_SUCCESS) {
