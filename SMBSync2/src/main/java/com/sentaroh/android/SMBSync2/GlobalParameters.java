@@ -83,10 +83,10 @@ import static com.sentaroh.android.SMBSync2.Constants.LOG_FILE_NAME;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_ALWAYS;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_RINGTONE_NOTIFICATION_ALWAYS;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SCREEN_THEME_BLACK;
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SCREEN_THEME_LIGHT;
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SCREEN_THEME_STANDARD;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SCREEN_THEME_LANGUAGE_INIT;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SCREEN_THEME_LANGUAGE_SYSTEM;
+import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SCREEN_THEME_LIGHT;
+import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SCREEN_THEME_STANDARD;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_VIBRATE_WHEN_SYNC_ENDED_ALWAYS;
 import static com.sentaroh.android.SMBSync2.ScheduleConstants.SCHEDULER_ENABLED_KEY;
 
@@ -132,14 +132,13 @@ public class GlobalParameters extends CommonGlobalParms {
 
 //    public boolean themeIsLight = true;
     public String settingScreenTheme =SMBSYNC2_SCREEN_THEME_STANDARD;
+    public int applicationTheme = -1;
+    public ThemeColorList themeColorList = null;
 
     public static String settingScreenThemeLanguage = SMBSYNC2_SCREEN_THEME_LANGUAGE_SYSTEM;//holds language code (fr, en... or "0" for system default)
     public static String settingScreenThemeLanguageValue = SMBSYNC2_SCREEN_THEME_LANGUAGE_SYSTEM;//language value (array index) in listPreferences: "0" for system default, "1" for english...
     public static String onStartSettingScreenThemeLanguageValue = SMBSYNC2_SCREEN_THEME_LANGUAGE_INIT;//on first App start, it will be assigned the active language value
     private static final boolean LANGUAGE_LOCALE_USE_NEW_API = true;//set false to force using deprecated setLocale() and not createConfigurationContext() in attachBaseContext
-
-    public int applicationTheme = -1;
-    public ThemeColorList themeColorList = null;
 
 //	public boolean scheduleSyncEnabled=false;
 //	public ArrayList<ScheduleItem> scheduleInfoList =new ArrayList<ScheduleItem>();
@@ -588,8 +587,8 @@ public class GlobalParameters extends CommonGlobalParms {
 //        } else {
 //            applicationTheme = R.style.MainBlack;
 //        }
-
         loadLanguagePreference();
+
         settingForceDeviceTabletViewInLandscape = prefs.getBoolean(appContext.getString(R.string.settings_device_orientation_landscape_tablet), false);
 
         settingFixDeviceOrientationToPortrait = prefs.getBoolean(appContext.getString(R.string.settings_device_orientation_portrait), false);

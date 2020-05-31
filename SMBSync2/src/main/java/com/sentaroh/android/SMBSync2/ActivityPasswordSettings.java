@@ -3,7 +3,6 @@ package com.sentaroh.android.SMBSync2;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -51,7 +50,7 @@ public class ActivityPasswordSettings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mContext = this;
+        mContext = getApplicationContext();
         mGp= GlobalWorkArea.getGlobalParameters(mContext);
         mActivity = ActivityPasswordSettings.this;
         setTheme(mGp.applicationTheme);
@@ -66,7 +65,7 @@ public class ActivityPasswordSettings extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        mUtil = new CommonUtilities(mContext, "AppPswd", mGp, getSupportFragmentManager());//use current activity context for short living stuff and UI
+        mUtil = new CommonUtilities(mActivity.getApplicationContext(), "AppPswd", mGp, getSupportFragmentManager());
 
         commonDlg = new CommonDialog(mActivity, getSupportFragmentManager());
         setResult(RESULT_OK);

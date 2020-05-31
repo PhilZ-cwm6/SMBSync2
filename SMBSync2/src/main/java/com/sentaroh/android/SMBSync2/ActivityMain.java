@@ -183,20 +183,21 @@ public class ActivityMain extends AppCompatActivity {
         else restartType = RESTART_BY_DESTROYED;
     }
 
-    /**
-     * Called when the activity is first created.
-     */
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(new GlobalParameters().setNewLocale(base, true));
     }
 
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        mContext = this;//use AppActivity context
+        mContext = getApplicationContext();
         mGp= GlobalWorkArea.getGlobalParameters(mContext);
         mGp.loadSettingsParms();
         mActivity = ActivityMain.this;
@@ -217,7 +218,7 @@ public class ActivityMain extends AppCompatActivity {
 
         ccMenu = new CustomContextMenu(getResources(), getSupportFragmentManager());
         mCommonDlg = new CommonDialog(mActivity, getSupportFragmentManager());
-        mTaskUtil = new SyncTaskUtil(mUtil, mActivity, mContext, mCommonDlg, ccMenu, mGp, getSupportFragmentManager());//provide context for UI in SyncTaskUtil
+        mTaskUtil = new SyncTaskUtil(mUtil, mActivity, mCommonDlg, ccMenu, mGp, getSupportFragmentManager());
         mGp.msgListAdapter = new AdapterSyncMessage(mActivity, R.layout.msg_list_item_view, mGp.msgList, mGp);
 
         mGp.syncTabScheduleList = ScheduleUtil.loadScheduleData(mGp);
@@ -2032,7 +2033,7 @@ public class ActivityMain extends AppCompatActivity {
             LogUtil.closeLog(mContext, mGp);
         }
 
-        if (!p_theme.equals(mGp.settingScreenTheme)) {
+        if (!p_theme.equals(mGp.settingScreenTheme) || checkThemeLanguageChanged()) {
 //            setTheme(mGp.applicationTheme);
 //            mGp.themeColorList = ThemeUtil.getThemeColorList(mActivity);
 //            reloadScreen(false);
@@ -2053,7 +2054,8 @@ public class ActivityMain extends AppCompatActivity {
         else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         checkJcifsOptionChanged();
-        checkThemeLanguageChanged();
+
+//        checkThemeLanguageChanged();
     }
 
     private void listSettingsOption() {
@@ -4908,6 +4910,7 @@ public class ActivityMain extends AppCompatActivity {
 
         return changed;
     }
+
     //restart app when language is changed
     final private boolean checkThemeLanguageChanged() {// when language is changed, Preferences activity is terminated -> ActivityMain onActivityResult() calls checkThemeLanguageChanged()
         boolean changed = false;
@@ -4916,22 +4919,22 @@ public class ActivityMain extends AppCompatActivity {
 
         if (!mGp.settingScreenThemeLanguageValue.equals(mGp.onStartSettingScreenThemeLanguageValue)) changed = true;
 
-        if (changed) {
-            listSettingsOption();
-            NotifyEvent ntfy=new NotifyEvent(mContext);
-            ntfy.setListener(new NotifyEventListener() {
-                @Override
-                public void positiveResponse(Context context, Object[] objects) {
-                    mUtil.flushLog();
-                    mGp.settingExitClean=true;
-                    finish();
-                }
-                @Override
-                public void negativeResponse(Context context, Object[] objects) {}
-            });
-            mUtil.showCommonDialog(false, "W",
-                    mContext.getString(R.string.msgs_smbsync_ui_settings_language_changed_restart), "", ntfy);
-        }
+//        if (changed) {
+//            listSettingsOption();
+//            NotifyEvent ntfy=new NotifyEvent(mContext);
+//            ntfy.setListener(new NotifyEventListener() {
+//                @Override
+//                public void positiveResponse(Context context, Object[] objects) {
+//                    mUtil.flushLog();
+//                    mGp.settingExitClean=true;
+//                    finish();
+//                }
+//                @Override
+//                public void negativeResponse(Context context, Object[] objects) {}
+//            });
+//            mUtil.showCommonDialog(false, "W",
+//                    mContext.getString(R.string.msgs_smbsync_ui_settings_language_changed_restart), "", ntfy);
+//        }
         return changed;
     }
 

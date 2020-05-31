@@ -35,8 +35,7 @@ import android.os.Parcelable;
 public class ShortcutMakeAutoSync extends Activity {
     private ShortcutMakeAutoSync mActivity=null;
     private Context mContext=null;
-    @TargetApi(25)
-    @SuppressLint("NewApi")
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(new GlobalParameters().setNewLocale(base, true));
@@ -48,7 +47,7 @@ public class ShortcutMakeAutoSync extends Activity {
 //        setContentView(R.layout.main);
 
         mActivity=ShortcutMakeAutoSync.this;
-        mContext=this;
+        mContext=mActivity.getApplicationContext();
         Intent shortcutIntent = new Intent(Intent.ACTION_VIEW);
         shortcutIntent.setClassName(mActivity, ShortcutAutoSync.class.getName());
         String shortcutName = getString(R.string.app_name_auto_sync);
