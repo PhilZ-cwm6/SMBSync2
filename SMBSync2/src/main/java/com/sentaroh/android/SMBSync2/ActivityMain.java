@@ -107,6 +107,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.crypto.SecretKey;
 
@@ -2034,20 +2035,11 @@ public class ActivityMain extends AppCompatActivity {
         }
 
         if (!p_theme.equals(mGp.settingScreenTheme) || checkThemeLanguageChanged()) {
-//            setTheme(mGp.applicationTheme);
-//            mGp.themeColorList = ThemeUtil.getThemeColorList(mActivity);
-//            reloadScreen(false);
-//            listSettingsOption();
-//            try {
-//                mSvcClient.aidlReloadLocale();
-//            } catch(Exception e) {
-//                e.printStackTrace();
-//            }
             NotifyEvent ntfy=new NotifyEvent(mContext);
             ntfy.setListener(new NotifyEventListener() {
                 @Override
                 public void positiveResponse(Context context, Object[] objects) {
-//                  mUtil.flushLog();
+                    mUtil.flushLog();
                     mGp.settingExitClean=false;
                     finish();
                     mUiHandler.postDelayed(new Runnable(){
@@ -2062,7 +2054,7 @@ public class ActivityMain extends AppCompatActivity {
                 @Override
                 public void negativeResponse(Context context, Object[] objects) {}
             });
-            mUtil.showCommonDialog(false, "W",
+            mUtil.showCommonDialog(true, "W",
                     mContext.getString(R.string.msgs_smbsync_ui_settings_language_changed_restart), "", ntfy);
         }
 
@@ -4927,6 +4919,7 @@ public class ActivityMain extends AppCompatActivity {
 
         return changed;
     }
+
     //restart app when language is changed
     final private boolean checkThemeLanguageChanged() {// when language is changed, Preferences activity is terminated -> ActivityMain onActivityResult() calls checkThemeLanguageChanged()
         boolean changed = false;
@@ -4937,23 +4930,6 @@ public class ActivityMain extends AppCompatActivity {
             changed = true;
             mGp.onStartSettingScreenThemeLanguageValue = mGp.settingScreenThemeLanguageValue;//App will be restarted after this without being killed, avoid a new app restart on next app load
         }
-
-//        if (changed) {
-//            listSettingsOption();
-//            NotifyEvent ntfy=new NotifyEvent(mContext);
-//            ntfy.setListener(new NotifyEventListener() {
-//                @Override
-//                public void positiveResponse(Context context, Object[] objects) {
-//                    mUtil.flushLog();
-//                    mGp.settingExitClean=true;
-//                    finish();
-//                }
-//                @Override
-//                public void negativeResponse(Context context, Object[] objects) {}
-//            });
-//            mUtil.showCommonDialog(false, "W",
-//                    mContext.getString(R.string.msgs_smbsync_ui_settings_language_changed_restart), "", ntfy);
-//        }
         return changed;
     }
 
