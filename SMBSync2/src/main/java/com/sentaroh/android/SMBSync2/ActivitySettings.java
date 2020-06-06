@@ -225,10 +225,11 @@ public class ActivitySettings extends PreferenceActivity {
     }
 
     public static class SettingsSync extends PreferenceFragment {
+        private Activity mActivity=null;
         private SharedPreferences.OnSharedPreferenceChangeListener listenerAfterHc =
                 new SharedPreferences.OnSharedPreferenceChangeListener() {
                     public void onSharedPreferenceChanged(SharedPreferences shared_pref, String key_string) {
-                        checkSettingValue(mUtil, shared_pref, key_string, getContext());
+                        checkSettingValue(mUtil, shared_pref, key_string, mActivity);
                     }
                 };
         private CommonUtilities mUtil = null;
@@ -239,6 +240,7 @@ public class ActivitySettings extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             mUtil = new CommonUtilities(getActivity(), "SettingsSync", mGp, null);
             mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
+            mActivity=getActivity();
 
             addPreferencesFromResource(R.xml.settings_frag_sync);
 
@@ -275,6 +277,9 @@ public class ActivitySettings extends PreferenceActivity {
                     shared_pref.edit().putString(key_string, GlobalParameters.DEFAULT_NOCOMPRESS_FILE_TYPE).commit();
                 }
                 pref_key.setSummary(shared_pref.getString(key_string, GlobalParameters.DEFAULT_NOCOMPRESS_FILE_TYPE));
+            } else if (key_string.equals(c.getString(R.string.settings_mgt_dir))) {
+                isChecked = true;
+                pref_key.setSummary(shared_pref.getString(key_string, mGp.getManagementDirectory()));
             }
             return isChecked;
         }
@@ -301,10 +306,11 @@ public class ActivitySettings extends PreferenceActivity {
     }
 
     public static class SettingsLog extends PreferenceFragment {
+        private Activity mActivity=null;
         private SharedPreferences.OnSharedPreferenceChangeListener listenerAfterHc =
                 new SharedPreferences.OnSharedPreferenceChangeListener() {
                     public void onSharedPreferenceChanged(SharedPreferences shared_pref, String key_string) {
-                        checkSettingValue(mUtil, shared_pref, key_string, getActivity());
+                        checkSettingValue(mUtil, shared_pref, key_string, mActivity);
                     }
                 };
         private CommonUtilities mUtil = null;
@@ -315,6 +321,7 @@ public class ActivitySettings extends PreferenceActivity {
             mUtil = new CommonUtilities(getActivity(), "SettingsLog", mGp, null);
             if (mGp.settingDebugLevel > 0)
                 mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
+            mActivity=getActivity();
 
             addPreferencesFromResource(R.xml.settings_frag_log);
 
@@ -367,10 +374,11 @@ public class ActivitySettings extends PreferenceActivity {
     }
 
     public static class SettingsMisc extends PreferenceFragment {
+        private Activity mActivity=null;
         private SharedPreferences.OnSharedPreferenceChangeListener listenerAfterHc =
                 new SharedPreferences.OnSharedPreferenceChangeListener() {
                     public void onSharedPreferenceChanged(SharedPreferences shared_pref, String key_string) {
-                        checkSettingValue(mUtil, shared_pref, key_string, getActivity());
+                        checkSettingValue(mUtil, shared_pref, key_string, mActivity);
                     }
                 };
         private CommonUtilities mUtil = null;
@@ -381,7 +389,7 @@ public class ActivitySettings extends PreferenceActivity {
             mUtil = new CommonUtilities(getActivity(), "SettingsMisc", mGp, null);
             if (mGp.settingDebugLevel > 0)
                 mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
-
+            mActivity=getActivity();
             addPreferencesFromResource(R.xml.settings_frag_misc);
 
             SharedPreferences shared_pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -424,10 +432,11 @@ public class ActivitySettings extends PreferenceActivity {
     }
 
     public static class SettingsSmb extends PreferenceFragment {
+        private Activity mActivity=null;
         private SharedPreferences.OnSharedPreferenceChangeListener listenerAfterHc =
                 new SharedPreferences.OnSharedPreferenceChangeListener() {
                     public void onSharedPreferenceChanged(SharedPreferences shared_pref, String key_string) {
-                        checkSettingValue(mUtil, shared_pref, key_string, getActivity());
+                        checkSettingValue(mUtil, shared_pref, key_string, mActivity);
                     }
                 };
         private CommonUtilities mUtil = null;
@@ -438,7 +447,7 @@ public class ActivitySettings extends PreferenceActivity {
             mUtil = new CommonUtilities(getActivity(), "SettingsSmb", mGp, null);
             if (mGp.settingDebugLevel > 0)
                 mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
-
+            mActivity=getActivity();
             addPreferencesFromResource(R.xml.settings_frag_smb);
 
 
@@ -510,10 +519,11 @@ public class ActivitySettings extends PreferenceActivity {
     private static int mInitVolume = 100;
 
     public static class SettingsUi extends PreferenceFragment {
+        private Activity mActivity=null;
         private SharedPreferences.OnSharedPreferenceChangeListener listenerAfterHc =
                 new SharedPreferences.OnSharedPreferenceChangeListener() {
                     public void onSharedPreferenceChanged(SharedPreferences shared_pref, String key_string) {
-                        checkSettingValue(mUtil, shared_pref, key_string, getActivity());
+                        checkSettingValue(mUtil, shared_pref, key_string, mActivity);
                     }
                 };
         private CommonUtilities mUtil = null;
@@ -524,7 +534,7 @@ public class ActivitySettings extends PreferenceActivity {
             mUtil = new CommonUtilities(getActivity(), "SettingsUi", mGp, null);
             if (mGp.settingDebugLevel > 0)
                 mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
-
+            mActivity=getActivity();
             addPreferencesFromResource(R.xml.settings_frag_ui);
 
             SharedPreferences shared_pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -663,10 +673,11 @@ public class ActivitySettings extends PreferenceActivity {
     }
 
     public static class SettingsSecurity extends PreferenceFragment {
+        private Activity mActivity=null;
         private SharedPreferences.OnSharedPreferenceChangeListener listenerAfterHc =
                 new SharedPreferences.OnSharedPreferenceChangeListener() {
                     public void onSharedPreferenceChanged(SharedPreferences shared_pref, String key_string) {
-                        checkSettingValue(mUtil, shared_pref, key_string, getActivity());
+                        checkSettingValue(mUtil, shared_pref, key_string, mActivity);
                     }
                 };
         private CommonUtilities mUtil = null;
@@ -687,7 +698,7 @@ public class ActivitySettings extends PreferenceActivity {
             mUtil = new CommonUtilities(getActivity(), "SettingsSecurity", mGp, null);
             if (mGp.settingDebugLevel > 0)
                 mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
-
+            mActivity=getActivity();
             addPreferencesFromResource(R.xml.settings_frag_security);
 
             SharedPreferences shared_pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
