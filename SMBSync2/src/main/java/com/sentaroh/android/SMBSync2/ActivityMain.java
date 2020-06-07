@@ -101,6 +101,7 @@ import com.sentaroh.android.Utilities.Widget.CustomTabContentView;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
 import com.sentaroh.android.Utilities.Widget.CustomViewPager;
 import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
+import com.sentaroh.android.Utilities.Widget.NonWordwrapTextView;
 import com.sentaroh.android.Utilities.ZipUtil;
 
 import java.io.File;
@@ -545,9 +546,9 @@ public class ActivityMain extends AppCompatActivity {
         tv_title.setTextColor(mGp.themeColorList.title_text_color);
         final TextView tv_msg_old=(TextView)dialog.findViewById(R.id.common_dialog_msg);
         tv_msg_old.setVisibility(TextView.GONE);
-        final CustomTextView tv_msg=(CustomTextView)dialog.findViewById(R.id.common_dialog_custom_text_view);
+        final NonWordwrapTextView tv_msg=(NonWordwrapTextView) dialog.findViewById(R.id.common_dialog_nonwordwrap_text_view);
         tv_msg.setVisibility(TextView.VISIBLE);
-        tv_msg.setWordWrapMode(mGp.settingSyncMessageUseStandardTextView);
+        tv_msg.setWordWrapEnabled(mGp.settingSyncMessageUseStandardTextView);
 //        if (Build.VERSION.SDK_INT>=23) tv_msg.setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY);
         final Button btn_copy=(Button)dialog.findViewById(R.id.common_dialog_btn_ok);
         final Button btn_close=(Button)dialog.findViewById(R.id.common_dialog_btn_cancel);
@@ -2040,16 +2041,17 @@ public class ActivityMain extends AppCompatActivity {
                 @Override
                 public void positiveResponse(Context context, Object[] objects) {
                     mUtil.flushLog();
+                    mGp.activityRestartRequired=true;
                     mGp.settingExitClean=false;
                     finish();
-                    mUiHandler.postDelayed(new Runnable(){
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(mContext, ActivityMain.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                        }
-                    }, 500);
+//                    mUiHandler.postDelayed(new Runnable(){
+//                        @Override
+//                        public void run() {
+//                            Intent intent = new Intent(mContext, ActivityMain.class);
+//                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(intent);
+//                        }
+//                    }, 500);
                 }
                 @Override
                 public void negativeResponse(Context context, Object[] objects) {}
