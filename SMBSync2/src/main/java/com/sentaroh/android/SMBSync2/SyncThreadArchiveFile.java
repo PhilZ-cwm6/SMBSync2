@@ -85,7 +85,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     tf.setLastModified(mf.lastModified());
                     mf.delete();
@@ -95,7 +95,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
 
         return sync_result;
@@ -264,7 +265,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     mf.delete();
                     stwa.totalDeleteCount++;
@@ -273,7 +274,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
         return sync_result;
     }
@@ -320,7 +322,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     mf.delete();
                     stwa.totalDeleteCount++;
@@ -329,7 +331,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
         return sync_result;
     }
@@ -684,7 +687,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     try {
                         tf.setLastModified(mf.lastModified());
@@ -697,7 +700,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
         return sync_result;
     }
@@ -729,7 +733,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     m_df.delete();
                     stwa.totalDeleteCount++;
@@ -738,7 +742,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
         return sync_result;
     }
@@ -901,7 +906,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     m_df.delete();
                     stwa.totalDeleteCount++;
@@ -910,7 +915,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
         return sync_result;
     }
@@ -953,7 +959,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     m_df.delete();
                     stwa.totalDeleteCount++;
@@ -962,7 +968,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
         return sync_result;
     }
@@ -1137,7 +1144,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     try {
                         tf.setLastModified(mf.lastModified());
@@ -1152,7 +1159,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
 
         return sync_result;
@@ -1354,7 +1362,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     try {
                         tf.setLastModified(mf.getLastModified());
@@ -1367,7 +1375,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
 
         return sync_result;
@@ -1575,7 +1584,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     try {
                         tf.setLastModified(mf.getLastModified());
@@ -1588,7 +1597,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
 
         return sync_result;
@@ -1643,7 +1653,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     try {
                         tf.setLastModified(mf.getLastModified());
@@ -1656,7 +1666,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
 
         return sync_result;
@@ -1851,7 +1862,7 @@ public class SyncThreadArchiveFile {
             if (sync_result==SyncTaskItem.SYNC_STATUS_SUCCESS) {
                 stwa.totalCopyCount++;
                 SyncThread.showArchiveMsg(stwa, false, sti.getSyncTaskName()+":", "I", from_path, to_path, mf.getName(), tf.getName(),
-                        stwa.msgs_mirror_task_file_archived);
+                        "", stwa.msgs_mirror_task_file_archived);
                 if (!sti.isSyncTestMode()) {
                     try {
                         tf.setLastModified(mf.getLastModified());
@@ -1863,7 +1874,8 @@ public class SyncThreadArchiveFile {
                 }
             }
         } else {
-            stwa.util.addLogMsg("W", to_path, " ", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+            SyncThread.showMsg(stwa, true, sti.getSyncTaskName()+":", "I", to_path, mf.getName(),
+                    "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
         }
 
         return sync_result;

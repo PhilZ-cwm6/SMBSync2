@@ -2039,7 +2039,6 @@ public class SyncThread extends Thread {
                 });
             }
         }
-
         //write to Messages tab: [cat + [space] + full_path + "space" + message] on left column, [type] on right column
         //addLogMsg() displays message on the tabb with fields: cat, type, String... msg: separate different msg fields by " " or a separator for redability
         //argument "type" in addLogMsg() is separate field, displayed in separate column on right of msg, aligned on right border, color themed (file operations...)
@@ -2047,39 +2046,47 @@ public class SyncThread extends Thread {
         //print_msg: remove trailing new line in full_path for readability of the text log file
         //buildPrintMsg(): prints a text file with print_msg, not used for messages display on tab. Text file shown when we click History SyncTask event
         //fields: cat, String... msg: separator " " added between msg fields for redability
-        String lm = "";
-        if (msg.equals("")) lm = full_path;//no message (we should have a type at least), currently full_path is never "" with type. Case lm == "" will also work
-        else lm = full_path.equals("") ? msg : full_path.concat(" ").concat(msg);
-        
 
-        if (task_name.equals("")) {//if also lm == "": we didn't provide any of task_name, message and full_path!
-            stwa.util.addLogMsg(false, true, true, false, cat, task_name, type, full_path, msg);//not currently used (type without task_name)
-            if (stwa.gp.settingWriteSyncResultLog && stwa.syncHistoryWriter != null) {
-                String print_msg = "";
-                if (type.equals("")) print_msg = stwa.util.buildPrintMsg(cat, lm);
-                else print_msg = stwa.util.buildPrintMsg(cat, lm, " ", type);
-                stwa.syncHistoryWriter.println(print_msg);
+        //display message in GUI Messages TAB
+        stwa.util.addLogMsg(false, true, true, false, cat, task_name, type, full_path, msg);
+
+        //buildPrintMsg(): print the sync log text file, shown if we click the Sync event in History TAB
+        String lm = "";
+        String[] print_msg_list = {task_name, full_path, msg, type};
+        for (String msg_part : print_msg_list) {
+            if (!msg_part.equals("")) {
+                if (lm.equals("")) lm = msg_part;
+                else lm = lm.concat(" ").concat(msg_part);
             }
-        } else {
-            stwa.util.addLogMsg(false, true, true, true, cat, task_name, type, full_path, msg);
-            if (stwa.gp.settingWriteSyncResultLog && stwa.syncHistoryWriter != null) {
-                String print_msg = "";
-                if (type.equals("")) print_msg = stwa.util.buildPrintMsg(cat, task_name, " ", lm);
-                else print_msg = stwa.util.buildPrintMsg(cat, task_name, " ", lm, " ", type);
-                stwa.syncHistoryWriter.println(print_msg);
-            }
+        }
+
+        if (stwa.gp.settingWriteSyncResultLog && stwa.syncHistoryWriter != null) {
+            String print_msg = stwa.util.buildPrintMsg(cat, lm);
+            stwa.syncHistoryWriter.println(print_msg);
         }
     }
 
     static public void showArchiveMsg(final SyncThreadWorkArea stwa, boolean log_only,
                                       final String task_name, final String cat,
-                                      final String full_path, final String archive_path, final String from_file_name, final String to_file_name, final String msg) {
-        stwa.gp.progressSpinSyncprofText = task_name;
-        stwa.gp.progressSpinMsgText = String.format(msg,from_file_name,to_file_name);
-        if (!log_only) {
-            NotificationUtil.showOngoingMsg(stwa.gp, stwa.util, System.currentTimeMillis(), task_name, from_file_name, msg);
+                                      final String full_path, final String archive_path, final String from_file_name, final String to_file_name,
+                                      final String msg, final String type) {
+        String notif_msg = "";
+        String[] notif_msg_list = {from_file_name, "-->", to_file_name, msg, type};
+        for (String msg_part : notif_msg_list) {
+            if (!msg_part.equals("")) {
+                if (notif_msg.equals("")) notif_msg = msg_part;
+                else notif_msg = notif_msg.concat(" ").concat(msg_part);
+            }
+        }
+
+        //ongoing progress message in top of screen during sync, not saved to Messages tab
+        stwa.gp.progressSpinSyncprofText = task_name;//title of in app progress notification
+        stwa.gp.progressSpinMsgText = notif_msg;//text of in app progress notification
+
+        if (!log_only) {//set onscreen notification progress
+            NotificationUtil.showOngoingMsg(stwa.gp, stwa.util, System.currentTimeMillis(), task_name, from_file_name, msg, type);//system notification if app in background
             if (stwa.gp.dialogWindowShowed && stwa.gp.progressSpinSyncprof != null) {
-                stwa.gp.uiHandler.post(new Runnable() {
+                stwa.gp.uiHandler.post(new Runnable() {//in app progress notification
                     @Override
                     public void run() {
                         if (stwa.gp.progressSpinSyncprof != null && !stwa.gp.activityIsBackground) {
@@ -2090,21 +2097,24 @@ public class SyncThread extends Thread {
                 });
             }
         }
-        String lm = String.format(msg, full_path,archive_path);
-        if (task_name.equals("")) {
-            stwa.util.addLogMsg(cat, lm);
-            if (stwa.gp.settingWriteSyncResultLog && stwa.syncHistoryWriter != null) {
-                String print_msg = "";
-                print_msg = stwa.util.buildPrintMsg(cat, lm);
-                stwa.syncHistoryWriter.println(print_msg);
+
+        //display message in GUI Messages TAB
+        String printed_path = full_path + " --> " + archive_path;
+        stwa.util.addLogMsg(false, true, true, false, cat, task_name, type, printed_path, msg);
+
+        //buildPrintMsg(): print the sync log text file, shown if we click the Sync event in History TAB
+        String lm = "";
+        String[] print_msg_list = {task_name, printed_path, msg, type};
+        for (String msg_part : print_msg_list) {
+            if (!msg_part.equals("")) {
+                if (lm.equals("")) lm = msg_part;
+                else lm = lm.concat(" ").concat(msg_part);
             }
-        } else {
-            stwa.util.addLogMsg(cat, task_name, " ", lm);
-            if (stwa.gp.settingWriteSyncResultLog && stwa.syncHistoryWriter != null) {
-                String print_msg = "";
-                print_msg = stwa.util.buildPrintMsg(cat, task_name, " ", lm);
-                stwa.syncHistoryWriter.println(print_msg);
-            }
+        }
+
+        if (stwa.gp.settingWriteSyncResultLog && stwa.syncHistoryWriter != null) {
+            String print_msg = stwa.util.buildPrintMsg(cat, lm);
+            stwa.syncHistoryWriter.println(print_msg);
         }
     }
 
