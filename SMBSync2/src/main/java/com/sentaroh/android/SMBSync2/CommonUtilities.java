@@ -25,7 +25,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -43,7 +42,6 @@ import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.storage.StorageManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.util.TypedValue;
@@ -92,8 +90,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import it.sephiroth.android.library.easing.Linear;
-
 import static android.content.Context.USAGE_STATS_SERVICE;
 import static com.sentaroh.android.SMBSync2.Constants.APPLICATION_TAG;
 import static com.sentaroh.android.SMBSync2.Constants.DEFAULT_PREFS_FILENAME;
@@ -133,13 +129,13 @@ public final class CommonUtilities {
     }
 
     public void showCommonDialog(final boolean negative, String type, String title, String msgtext, NotifyEvent ntfy) {
-        MessageDialogFragment cdf =MessageDialogFragment.newInstance(negative, type, title, msgtext);
+        MessageDialogFragment cdf = MessageDialogFragment.newInstance(negative, type, title, msgtext);
         cdf.showDialog(mFragMgr,cdf,ntfy);
     };
 
     public void showCommonDialog(final boolean negative, String type, String title, String msgtext,
                                  String button_text_ok, String button_text_cancel, NotifyEvent ntfy) {
-        MessageDialogFragment cdf =MessageDialogFragment.newInstance(negative, type, title, msgtext, button_text_ok, button_text_cancel);
+        MessageDialogFragment cdf = MessageDialogFragment.newInstance(negative, type, title, msgtext, button_text_ok, button_text_cancel);
         cdf.showDialog(mFragMgr,cdf,ntfy);
     };
 
@@ -199,7 +195,7 @@ public final class CommonUtilities {
 
     static public ArrayList<String> listSystemInfo(Context c, GlobalParameters gp) {
 
-        ArrayList<String> out=SystemInfo.listSystemInfo(c, gp.safMgr);
+        ArrayList<String> out= SystemInfo.listSystemInfo(c, gp.safMgr);
 
         if (Build.VERSION.SDK_INT>=27) {
             out.add("setSettingGrantCoarseLocationRequired="+gp.settingGrantCoarseLocationRequired);
@@ -379,14 +375,14 @@ public final class CommonUtilities {
                 String line=null;
                 while((line=bis.readLine())!=null) {
                     String[] msg_array=line.split("\u0000");
-                    if (msg_array.length >= 4) {//require at least a title
+                    if (msg_array.length>=7) {
                         SyncMessageItem smi=new SyncMessageItem(msg_array[0].replace("\u0001",""), //msgCat
                                 msg_array[1].replace("\u0001",""), //msgDate
                                 msg_array[2].replace("\u0001",""), //msgTime
                                 msg_array[3].replace("\u0001",""), //msgTitle
-                                msg_array.length > 4 ? msg_array[4].replace("\u0001","") : "", //msgBody
-                                msg_array.length > 5 ? msg_array[5].replace("\u0001","") : "", //msgPath
-                                msg_array.length > 6 ? msg_array[6].replace("\u0001","") : ""); //msgType
+                                msg_array[4].replace("\u0001",""), //msgBody
+                                msg_array[5].replace("\u0001",""), //msgPath
+                                msg_array[6].replace("\u0001","")); //msgType
                         result.add(smi);
                     }
                 }

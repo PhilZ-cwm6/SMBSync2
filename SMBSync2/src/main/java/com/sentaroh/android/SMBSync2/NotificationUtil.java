@@ -274,7 +274,7 @@ public class NotificationUtil {
             if (!LogUtil.getLogFilePath(gwa).equals("") && gwa.settingLogOption) {
                 File lf = new File(LogUtil.getLogFilePath(gwa));
                 if (lf.exists()) {
-                    Intent br_log_intent = new Intent(android.content.Intent.ACTION_VIEW);
+                    Intent br_log_intent = new Intent(Intent.ACTION_VIEW);
                     br_log_intent.setDataAndType(Uri.parse("file://" + LogUtil.getLogFilePath(gwa)), "text/plain");
                     PendingIntent br_log_pi = PendingIntent.getActivity(c, 0, br_log_intent,
                             PendingIntent.FLAG_UPDATE_CURRENT);
@@ -321,7 +321,7 @@ public class NotificationUtil {
             if (!LogUtil.getLogFilePath(gwa).equals("") && gwa.settingLogOption) {
                 File lf = new File(LogUtil.getLogFilePath(gwa));
                 if (lf.exists()) {
-                    Intent br_log_intent = new Intent(android.content.Intent.ACTION_VIEW);
+                    Intent br_log_intent = new Intent(Intent.ACTION_VIEW);
                     br_log_intent.setDataAndType(Uri.parse("file://" + LogUtil.getLogFilePath(gwa)), "text/plain");
                     PendingIntent br_log_pi = PendingIntent.getActivity(c, 0, br_log_intent,
                             PendingIntent.FLAG_UPDATE_CURRENT);

@@ -846,8 +846,8 @@ public class SyncThread extends Thread {
     // Default uncaught exception handler variable
     private UncaughtExceptionHandler defaultUEH;
 
-    private Thread.UncaughtExceptionHandler unCaughtExceptionHandler =
-            new Thread.UncaughtExceptionHandler() {
+    private UncaughtExceptionHandler unCaughtExceptionHandler =
+            new UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread thread, Throwable ex) {
                     Thread.currentThread().setUncaughtExceptionHandler(defaultUEH);
@@ -1601,7 +1601,7 @@ public class SyncThread extends Thread {
         }
     }
 
-    static public void deleteSmbFile(SyncThreadWorkArea stwa, SyncTaskItem sti, String fp, JcifsFile hf) throws  JcifsException {
+    static public void deleteSmbFile(SyncThreadWorkArea stwa, SyncTaskItem sti, String fp, JcifsFile hf) throws JcifsException {
         if (stwa.gp.settingDebugLevel >= 2)
             stwa.util.addDebugMsg(2, "I", "deleteSmbFile entered, del=" + fp);
 //		JcifsFile hf=new JcifsFile(fp, stwa.ntlmPasswordAuth);
@@ -2822,7 +2822,7 @@ public class SyncThread extends Thread {
                 include = true;
             } else {
                 for (int i = 0; i < stwa.matchFromBeginDirIncludeFilterList.size(); i++) {
-                    Pattern pattern=Pattern.compile("^"+MiscUtil.convertRegExp(stwa.matchFromBeginDirIncludeFilterList.get(i).getFilter()+"/"));
+                    Pattern pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(stwa.matchFromBeginDirIncludeFilterList.get(i).getFilter()+"/"));
                     mt = pattern.matcher(n_dir+"/");
                     if (mt.find()) {
                         include = true;
@@ -2840,7 +2840,7 @@ public class SyncThread extends Thread {
                         if (exc_filter_array.length<=filter_dir_array.length) {
                             boolean matched=true;
                             for(int i=0;i<exc_filter_array.length;i++) {
-                                Pattern exc_pattern=Pattern.compile("^"+MiscUtil.convertRegExp(exc_filter_array[i])+"$");
+                                Pattern exc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(exc_filter_array[i])+"$");
                                 Matcher exc_mt=exc_pattern.matcher(filter_dir_array[i]);
                                 if (!exc_mt.find()) {
                                     matched=false;
@@ -2865,7 +2865,7 @@ public class SyncThread extends Thread {
                                 exc_key+=exc_filter_array[i]+"/";
                                 dir_key+=dir_array[i]+"/";
                             }
-                            Pattern pattern=Pattern.compile("^"+MiscUtil.convertRegExp(exc_key)+"$");
+                            Pattern pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(exc_key)+"$");
                             mt=pattern.matcher(dir_key);
                             boolean excluded=false;
                             if (mt.find()) {
@@ -3015,7 +3015,7 @@ public class SyncThread extends Thread {
                             inc_filter+=inc_filter_array[i]+"/";
                             inc_dir+=filter_dir_array[i]+"/";
                         }
-                        Pattern pattern=Pattern.compile("^"+MiscUtil.convertRegExp(inc_filter)+"$");
+                        Pattern pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(inc_filter)+"$");
                         Matcher mt=pattern.matcher(inc_dir);
                         if (mt.find()) {
                             inc=true;
@@ -3036,7 +3036,7 @@ public class SyncThread extends Thread {
                         if (exc_filter_array.length<=filter_dir_array.length) {
                             boolean matched=true;
                             for(int i=0;i<exc_filter_array.length;i++) {
-                                Pattern exc_pattern=Pattern.compile("^"+MiscUtil.convertRegExp(exc_filter_array[i])+"$");
+                                Pattern exc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(exc_filter_array[i])+"$");
                                 Matcher exc_mt=exc_pattern.matcher(filter_dir_array[i]);
                                 if (!exc_mt.find()) {
                                     matched=false;
@@ -3049,7 +3049,7 @@ public class SyncThread extends Thread {
                                     for(AdapterFilterList.FilterListItem inc_filter:stwa.matchFromBeginDirIncludeFilterList) {
                                         String[] inc_filter_array=inc_filter.getFilter().split("/");
                                         for(int i=0;i<Math.min(filter_dir_array.length, exc_filter_array.length);i++) {
-                                            Pattern inc_pattern=Pattern.compile("^"+MiscUtil.convertRegExp(inc_filter_array[i])+"$");
+                                            Pattern inc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(inc_filter_array[i])+"$");
                                             Matcher inc_mt=inc_pattern.matcher(filter_dir_array[i]);
                                             if (inc_mt.find()) {
                                                 if (exc_filter_array.length<inc_filter_array.length) {
@@ -3082,7 +3082,7 @@ public class SyncThread extends Thread {
                         String[] exc_filter_array=fli.getFilter().split("/");
                         for(String exc_dir:filter_dir_array) {
                             for(String exc_filter:exc_filter_array) {
-                                Pattern exc_pattern=Pattern.compile("^"+MiscUtil.convertRegExp(exc_filter)+"$");
+                                Pattern exc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(exc_filter)+"$");
                                 Matcher exc_mt=exc_pattern.matcher(exc_dir);
                                 if (exc_mt.find()) {
                                     found=true;
@@ -3091,7 +3091,7 @@ public class SyncThread extends Thread {
                                         for(AdapterFilterList.FilterListItem inc_filter:stwa.matchFromBeginDirIncludeFilterList) {
                                             String[] inc_filter_array=inc_filter.getFilter().split("/");
                                             for(int i=0;i<Math.min(filter_dir_array.length, exc_filter_array.length);i++) {
-                                                Pattern inc_pattern=Pattern.compile("^"+MiscUtil.convertRegExp(inc_filter_array[i])+"$");
+                                                Pattern inc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(inc_filter_array[i])+"$");
                                                 Matcher inc_mt=inc_pattern.matcher(filter_dir_array[i]);
                                                 if (inc_mt.find()) {
                                                     if (exc_filter_array.length<inc_filter_array.length) {

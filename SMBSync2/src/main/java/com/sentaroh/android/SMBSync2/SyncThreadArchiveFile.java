@@ -1113,7 +1113,7 @@ public class SyncThreadArchiveFile {
     }
 
     static private int moveFileExternalToSmb(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_path,
-                                                  File mf, JcifsFile tf, String to_path, String file_name) throws IOException, JcifsException {
+                                             File mf, JcifsFile tf, String to_path, String file_name) throws IOException, JcifsException {
         int sync_result=0;
 
         if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_MOVE, from_path)) {
@@ -1548,7 +1548,7 @@ public class SyncThreadArchiveFile {
     }
 
     static private int moveFileSmbToExternal(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_path,
-                                                  JcifsFile mf, File tf, String to_path, String file_name) throws IOException, JcifsException {
+                                             JcifsFile mf, File tf, String to_path, String file_name) throws IOException, JcifsException {
         int result=0;
         if (Build.VERSION.SDK_INT>=24) result= moveFileSmbToExternalSetLastMod(stwa, sti, from_path, mf, tf, to_path, file_name);
         else result= moveFileSmbToExternalUnsetLastMod(stwa, sti, from_path, mf, tf, to_path, file_name);
@@ -1837,7 +1837,7 @@ public class SyncThreadArchiveFile {
     }
 
     static private int moveFileSmbToSmb(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_path,
-                                             JcifsFile mf, JcifsFile tf, String to_path, String file_name) throws IOException, JcifsException {
+                                        JcifsFile mf, JcifsFile tf, String to_path, String file_name) throws IOException, JcifsException {
         int sync_result=0;
 
         if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_MOVE, from_path)) {
@@ -2112,7 +2112,7 @@ public class SyncThreadArchiveFile {
                 afli.file_name=element.getName();
                 afli.full_path=element.getPath();
                 if (date_time==null || date_time[0]==null) {
-                    String[] dt=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.lastModified()).split(" ");
+                    String[] dt= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.lastModified()).split(" ");
                     afli.shoot_date=dt[0].replace("/","-");
                     afli.shoot_time=dt[1].replace(":","-");
                     afli.date_from_exif=false;
@@ -2144,7 +2144,7 @@ public class SyncThreadArchiveFile {
                 afli.file_name=element.getName();
                 afli.full_path=element.getPath();
                 if (date_time==null || date_time[0]==null) {
-                    String[] dt=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.lastModified()).split(" ");
+                    String[] dt= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.lastModified()).split(" ");
                     afli.shoot_date=dt[0].replace("/","-");
                     afli.shoot_time=dt[1].replace(":","-");
                     afli.date_from_exif=false;
@@ -2185,7 +2185,7 @@ public class SyncThreadArchiveFile {
                 afli.file_name=element.getName();
                 afli.full_path=element.getPath();
                 if (date_time==null || date_time[0]==null) {
-                    String[] dt=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.getLastModified()).split(" ");
+                    String[] dt= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.getLastModified()).split(" ");
                     afli.shoot_date=dt[0].replace("/","-");
                     afli.shoot_time=dt[1].replace(":","-");
                     afli.date_from_exif=false;
@@ -2211,7 +2211,7 @@ public class SyncThreadArchiveFile {
         String[] tm=afli.shoot_time.split("-");
         cal.set(Integer.parseInt(dt[0]),Integer.parseInt(dt[1])-1,Integer.parseInt(dt[2]),
                 Integer.parseInt(tm[0]),Integer.parseInt(tm[1]),Integer.parseInt(tm[2]));
-        String c_ft=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(cal.getTimeInMillis());
+        String c_ft= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(cal.getTimeInMillis());
         long exp_time=0, day_mili=1000L*60L*60L*24L;
         if (sti.getArchiveRetentionPeriod()==SyncTaskItem.PICTURE_ARCHIVE_RETAIN_FOR_A_7_DAYS) exp_time=day_mili*7L;
         else if (sti.getArchiveRetentionPeriod()==SyncTaskItem.PICTURE_ARCHIVE_RETAIN_FOR_A_30_DAYS) exp_time=day_mili*30L;
@@ -2225,7 +2225,7 @@ public class SyncThreadArchiveFile {
             n_cal.add(Calendar.YEAR, 1);
             exp_time=n_cal.getTimeInMillis()-cal.getTimeInMillis();
         }
-        String n_exp=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(cal.getTimeInMillis()+exp_time);
+        String n_exp= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(cal.getTimeInMillis()+exp_time);
 //        boolean result=(System.currentTimeMillis()>cal.getTimeInMillis());
         boolean result=(System.currentTimeMillis()>(cal.getTimeInMillis()+exp_time));
         stwa.util.addDebugMsg(1,"I","isFileArchiveRequired path=",afli.full_path,", shoot date=",afli.shoot_date,
@@ -2440,7 +2440,7 @@ public class SyncThreadArchiveFile {
             tz.setID(dt[3]);
             cal.setTimeZone(tz);
             cal.set(year, month, day, hours, minutes, seconds);
-            result=StringUtil.convDateTimeTo_YearMonthDayHourMinSec(cal.getTimeInMillis()).split(" ");
+            result= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(cal.getTimeInMillis()).split(" ");
         }
         return result;
     }

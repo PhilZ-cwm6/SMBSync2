@@ -733,7 +733,7 @@ public class SyncThreadSyncZip {
     }
 
     static private int copyFileInternalToInternalZip(SyncThreadWorkArea stwa,
-                       SyncTaskItem sti, String from_dir, File mf, String to_dirx, String dest_path, ZipFile zf, ZipParameters zp) throws IOException {
+                                                     SyncTaskItem sti, String from_dir, File mf, String to_dirx, String dest_path, ZipFile zf, ZipParameters zp) throws IOException {
         int sync_result=0;
         String to_dir = from_dir.replace(stwa.gp.internalRootDirectory + "/", "");
 //		Log.v("","copy from="+from_dir+", to="+to_dir);
