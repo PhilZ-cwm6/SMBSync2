@@ -375,14 +375,14 @@ public final class CommonUtilities {
                 String line=null;
                 while((line=bis.readLine())!=null) {
                     String[] msg_array=line.split("\u0000");
-                    if (msg_array.length>=7) {
+                    if (msg_array.length >= 4) {//require at least a title
                         SyncMessageItem smi=new SyncMessageItem(msg_array[0].replace("\u0001",""), //msgCat
                                 msg_array[1].replace("\u0001",""), //msgDate
                                 msg_array[2].replace("\u0001",""), //msgTime
                                 msg_array[3].replace("\u0001",""), //msgTitle
-                                msg_array[4].replace("\u0001",""), //msgBody
-                                msg_array[5].replace("\u0001",""), //msgPath
-                                msg_array[6].replace("\u0001","")); //msgType
+                                msg_array.length > 4 ? msg_array[4].replace("\u0001","") : "", //msgBody
+                                msg_array.length > 5 ? msg_array[5].replace("\u0001","") : "", //msgPath
+                                msg_array.length > 6 ? msg_array[6].replace("\u0001","") : ""); //msgType
                         result.add(smi);
                     }
                 }
@@ -410,13 +410,14 @@ public final class CommonUtilities {
     }
 
     final public void addLogMsg(boolean ui_thread, boolean has_type, boolean has_path, boolean has_title, String cat, String title, String type, String path, String... msg) {
-        mLog.addLogMsg(cat, msg);
 //		final SyncMessageItem mli=new SyncMessageItem(cat, "","", title, mLog.buildLogCatMsg("", cat, msg), path, type);
         String finalMsg = "";
         StringBuilder log_msg = new StringBuilder(512);
         for (int i = 0; i < msg.length; i++) log_msg.append(msg[i]);
         if (!log_msg.toString().equals("")) finalMsg = log_msg.toString();
-        
+        if (!title.equals("")) mLog.addLogMsg(cat, title.concat(": ").concat(finalMsg).concat(" ").concat(path).concat(type));
+        else mLog.addLogMsg(cat, finalMsg.concat(" ").concat(path).concat(type));
+
         String[] dt = StringUtil.convDateTimeTo_YearMonthDayHourMinSecMili(System.currentTimeMillis()).split(" ");
 
         //addDebugMsg(2, "I", "cat=" + cat," dt[0]=" + dt[0] + " dt[1]=" + dt[1] + " title=" + title + " finalMsg=" + finalMsg + " path=" + path + " type=" + type);
