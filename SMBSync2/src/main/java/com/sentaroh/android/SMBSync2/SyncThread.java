@@ -2943,7 +2943,19 @@ public class SyncThread extends Thread {
             } else {
                 if (stwa.dirExcludeFilterPatternList.size()!=0) {
                     for (int i = 0; i < stwa.dirExcludeFilterPatternList.size(); i++) {
-                        mt = stwa.dirExcludeFilterPatternList.get(i).matcher(n_dir);
+                        Pattern filter_pattern = stwa.dirExcludeFilterPatternList.get(i);
+                        String new_filter_dir = n_dir;
+                        if (filter_pattern.toString().startsWith("(^/") || filter_pattern.toString().startsWith("(.*/")) {  // filter==*/cache/* -> excludes master_dir/cache and master_dir/subdir/cache
+                            if (!n_dir.startsWith("/")) new_filter_dir = "/" + n_dir;                             // filter==/cache or filter==cache, only excludes master_dir/cache while master_dir/subdir/cache is included
+                        }
+                        if (!filter_pattern.toString().endsWith("/)") && !filter_pattern.toString().endsWith(".*)")) {// fix above case: filter==/cache -> exclude master/cache/*
+                            String new_pattern_str = filter_pattern.toString();
+                            new_pattern_str = new_pattern_str.substring(0, new_pattern_str.length() - 1) + "/)";
+                            filter_pattern = Pattern.compile(new_pattern_str, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+                        }
+                        if (stwa.gp.settingDebugLevel >= 2)
+                            stwa.util.addDebugMsg(2, "I", "exclude dir by name filter_pattern=" + filter_pattern + " new_filter_dir=" + new_filter_dir);
+                        mt = filter_pattern.matcher(new_filter_dir);
                         if (mt.find()) {
                             if (stwa.currentSTI.isSyncOptionUseExtendedDirectoryFilter1()) {
                                 Pattern[] exc = new Pattern[0];
@@ -3080,43 +3092,75 @@ public class SyncThread extends Thread {
                     boolean found=false;
                     for(AdapterFilterList.FilterListItem fli:stwa.matchAnyDirExcludeFilterList) {
                         String[] exc_filter_array=fli.getFilter().split("/");
-                        for(String exc_dir:filter_dir_array) {
-                            for(String exc_filter:exc_filter_array) {
-                                Pattern exc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(exc_filter)+"$");
-                                Matcher exc_mt=exc_pattern.matcher(exc_dir);
-                                if (exc_mt.find()) {
-                                    found=true;
-                                    if (stwa.matchFromBeginDirIncludeFilterList.size()>0) {
-                                        boolean found_inc=false;
-                                        for(AdapterFilterList.FilterListItem inc_filter:stwa.matchFromBeginDirIncludeFilterList) {
-                                            String[] inc_filter_array=inc_filter.getFilter().split("/");
-                                            for(int i=0;i<Math.min(filter_dir_array.length, exc_filter_array.length);i++) {
-                                                Pattern inc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(inc_filter_array[i])+"$");
-                                                Matcher inc_mt=inc_pattern.matcher(filter_dir_array[i]);
-                                                if (inc_mt.find()) {
-                                                    if (exc_filter_array.length<inc_filter_array.length) {
-                                                        found_inc=true;
-                                                        break;
-                                                    }
-                                                }
+                        Pattern exc_pattern=Pattern.compile("/"+MiscUtil.convertRegExp(fli.getFilter())+"/");
+                        Matcher exc_mt=exc_pattern.matcher("/"+filter_dir+"/");
+                        if (exc_mt.find()) {
+                            found=true;
+                            if (stwa.matchFromBeginDirIncludeFilterList.size()>0) {
+                                boolean found_inc=false;
+                                for(AdapterFilterList.FilterListItem inc_filter:stwa.matchFromBeginDirIncludeFilterList) {
+                                    String[] inc_filter_array=inc_filter.getFilter().split("/");
+                                    for(int i=0;i<Math.min(filter_dir_array.length, exc_filter_array.length);i++) {
+                                        Pattern inc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(inc_filter_array[i])+"$");
+                                        Matcher inc_mt=inc_pattern.matcher(filter_dir_array[i]);
+                                        if (inc_mt.find()) {
+                                            if (exc_filter_array.length<inc_filter_array.length) {
+                                                found_inc=true;
+                                                break;
                                             }
                                         }
-                                        if (found_inc) {
-                                            exc=false;
-                                            break;
-                                        } else {
-                                            exc=true;
-                                            break;
-                                        }
-                                    } else {
-                                        exc=true;
-                                        break;
                                     }
                                 }
+                                if (found_inc) {
+                                    exc=false;
+                                    break;
+                                } else {
+                                    exc=true;
+                                    break;
+                                }
+                            } else {
+                                exc=true;
+                                break;
                             }
-                            if (found) break;
                         }
-                        if (found) break;
+//                        String[] exc_filter_array=fli.getFilter().split("/");
+//                        for(String exc_dir:filter_dir_array) {
+//                            for(String exc_filter:exc_filter_array) {
+//                                Pattern exc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(exc_filter)+"$");
+//                                Matcher exc_mt=exc_pattern.matcher(exc_dir);
+//                                if (exc_mt.find()) {
+//                                    found=true;
+//                                    if (stwa.matchFromBeginDirIncludeFilterList.size()>0) {
+//                                        boolean found_inc=false;
+//                                        for(AdapterFilterList.FilterListItem inc_filter:stwa.matchFromBeginDirIncludeFilterList) {
+//                                            String[] inc_filter_array=inc_filter.getFilter().split("/");
+//                                            for(int i=0;i<Math.min(filter_dir_array.length, exc_filter_array.length);i++) {
+//                                                Pattern inc_pattern=Pattern.compile("^"+ MiscUtil.convertRegExp(inc_filter_array[i])+"$");
+//                                                Matcher inc_mt=inc_pattern.matcher(filter_dir_array[i]);
+//                                                if (inc_mt.find()) {
+//                                                    if (exc_filter_array.length<inc_filter_array.length) {
+//                                                        found_inc=true;
+//                                                        break;
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                        if (found_inc) {
+//                                            exc=false;
+//                                            break;
+//                                        } else {
+//                                            exc=true;
+//                                            break;
+//                                        }
+//                                    } else {
+//                                        exc=true;
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                            if (found) break;
+//                        }
+//                        if (found) break;
                     }
                 }
             }
@@ -3191,7 +3235,19 @@ public class SyncThread extends Thread {
                 if (stwa.dirExcludeFilterPatternList.size()!=0) {
                     for (int i = 0; i < stwa.dirExcludeFilterPatternList.size(); i++) {
                         Pattern filter_pattern = stwa.dirExcludeFilterPatternList.get(i);
-                        Matcher mt = filter_pattern.matcher(filter_dir);
+                        String new_filter_dir = filter_dir;
+                        if (filter_pattern.toString().startsWith("(^/") || filter_pattern.toString().startsWith("(.*/")) {  // filter==*/cache/* -> excludes master_dir/cache/ and master_dir/subdir/cache/
+                            if (!filter_dir.startsWith("/")) new_filter_dir = "/" + filter_dir;                             // filter==/cache/ or filter==cache/, only excludes master_dir/cache/ while master_dir/subdir/cache/
+                        }                                                                                                   // filter==/cache equals /cache* !! and will match /cahemir for example
+                        if (!filter_pattern.toString().endsWith("/)") && !filter_pattern.toString().endsWith(".*)")) {     // fix above case: now filter==/cache -> exclude master/cache/*
+                            String new_pattern_str = filter_pattern.toString();
+                            stwa.util.addDebugMsg(2, "I", "old pattern= " + new_pattern_str);
+                            new_pattern_str = new_pattern_str.substring(0, new_pattern_str.length() - 1) + "/)";
+                            filter_pattern = Pattern.compile(new_pattern_str, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+                        }
+                        if (stwa.gp.settingDebugLevel >= 2)
+                            stwa.util.addDebugMsg(2, "I", "exclude dir filter_pattern=" + filter_pattern + " filter_dir=" + filter_dir + " new_filter_dir=" + new_filter_dir);
+                        Matcher mt = filter_pattern.matcher(new_filter_dir);
                         if (mt.find()) {
                             if (stwa.currentSTI.isSyncOptionUseExtendedDirectoryFilter1()) {
                                 if (matched_inc_array != null) {
