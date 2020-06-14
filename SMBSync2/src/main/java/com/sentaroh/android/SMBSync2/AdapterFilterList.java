@@ -104,8 +104,8 @@ public class AdapterFilterList extends ArrayAdapter<AdapterFilterList.FilterList
     public void sort() {
         this.sort(new Comparator<FilterListItem>() {
             @Override
-            public int compare(AdapterFilterList.FilterListItem lhs,
-                               AdapterFilterList.FilterListItem rhs) {
+            public int compare(FilterListItem lhs,
+                               FilterListItem rhs) {
                 return lhs.getFilter().compareToIgnoreCase(rhs.getFilter());
             }
         });

@@ -567,7 +567,7 @@ public class SyncTaskUtil {
 
         //OK button
         final Handler hndl=new Handler();
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String passwd = et_password.getText().toString();
                 BufferedReader br;
@@ -616,7 +616,7 @@ public class SyncTaskUtil {
             }
         });
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ntfy_pswd.notifyToListener(false, null);
@@ -707,7 +707,7 @@ public class SyncTaskUtil {
         });
 
         //OK button
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String passwd = et_password.getText().toString();
                 if ((ctv_protect.isChecked() && !mGp.settingExportedProfileEncryptRequired) ||
@@ -733,7 +733,7 @@ public class SyncTaskUtil {
         });
 
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ntfy_pswd.notifyToListener(false, null);
@@ -1461,14 +1461,14 @@ public class SyncTaskUtil {
         CommonDialog.setDlgBoxSizeLimit(dialog, true);
 
         // OKボタンの指定
-        btnOk.setOnClickListener(new View.OnClickListener() {
+        btnOk.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ntfy.notifyToListener(true, null);
             }
         });
         // Cancelボタンの指定
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+        btnCancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ntfy.notifyToListener(false, null);
@@ -1519,14 +1519,14 @@ public class SyncTaskUtil {
         CommonDialog.setDlgBoxSizeLimit(dialog, true);
 
         // OKボタンの指定
-        btnOk.setOnClickListener(new View.OnClickListener() {
+        btnOk.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ntfy.notifyToListener(true, null);
             }
         });
         // Cancelボタンの指定
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+        btnCancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ntfy.notifyToListener(false, null);
@@ -1652,7 +1652,7 @@ public class SyncTaskUtil {
 
     private void testSmbAuth(final String host, String port, String share, RemoteAuthInfo ra, final NotifyEvent ntfy) {
         final UncaughtExceptionHandler defaultUEH = Thread.currentThread().getUncaughtExceptionHandler();
-        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
                 Thread.currentThread().setUncaughtExceptionHandler(defaultUEH);
@@ -1780,7 +1780,7 @@ public class SyncTaskUtil {
         });
 
         //OK button
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ArrayList<ScheduleItem>sl=ScheduleUtil.loadScheduleData(mActivity, mGp);
@@ -1803,7 +1803,7 @@ public class SyncTaskUtil {
             }
         });
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
             }
@@ -2236,7 +2236,7 @@ public class SyncTaskUtil {
         //OKボタンの指定
 //        btn_ok.setEnabled(false);
         btn_ok.setVisibility(Button.VISIBLE);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 String sel=tv_home.getText().toString().replace(directory_pre,"");
@@ -2245,7 +2245,7 @@ public class SyncTaskUtil {
             }
         });
         //CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
             }
@@ -2338,7 +2338,7 @@ public class SyncTaskUtil {
         });
 
         //OK button
-        btnOk.setOnClickListener(new View.OnClickListener() {
+        btnOk.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 final String creat_dir=etDir.getText().toString();
                 final String n_path=c_dir+"/"+creat_dir+"/";
@@ -2357,7 +2357,7 @@ public class SyncTaskUtil {
                             return;
                         }
                         NotifyEvent ntfy_confirm=new NotifyEvent(mContext);
-                        ntfy_confirm.setListener(new NotifyEvent.NotifyEventListener(){
+                        ntfy_confirm.setListener(new NotifyEventListener(){
                             @Override
                             public void positiveResponse(Context c, Object[] o) {
                                 NotifyEvent notify_create=new NotifyEvent(mContext);
@@ -2408,7 +2408,7 @@ public class SyncTaskUtil {
             }
         });
         // CANCELボタンの指定
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+        btnCancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 p_ntfy.notifyToListener(false, null);
@@ -2600,7 +2600,7 @@ public class SyncTaskUtil {
 
                 });
                 editFilter(idx, filterAdapter, fli, fli.getFilter(),
-                        mContext.getString(R.string.msgs_profile_sync_task_dlg_wifi_ap_edit_title), ntfy);
+                        mContext.getString(R.string.msgs_profile_sync_task_dlg_wifi_ap_edit_title), ntfy, null);
             }
         });
 
@@ -2635,7 +2635,7 @@ public class SyncTaskUtil {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
-        add_current_ssid.setOnClickListener(new View.OnClickListener() {
+        add_current_ssid.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 WifiManager wm = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -2660,7 +2660,7 @@ public class SyncTaskUtil {
             }
         });
 
-        addBtn.setOnClickListener(new View.OnClickListener() {
+        addBtn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dlg_msg.setText("");
                 String newfilter = et_filter.getText().toString().trim();
@@ -2673,7 +2673,7 @@ public class SyncTaskUtil {
         });
 
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
 //				glblParms.profileListView.setSelectionFromTop(currentViewPosX,currentViewPosY);
@@ -2687,7 +2687,7 @@ public class SyncTaskUtil {
             }
         });
         // OKボタンの指定
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 ap_list.clear();
@@ -2797,7 +2797,7 @@ public class SyncTaskUtil {
 
                 });
                 editFilter(idx, filterAdapter, fli, fli.getFilter(),
-                        mContext.getString(R.string.msgs_profile_sync_task_dlg_wifi_addr_edit_title), ntfy);
+                        mContext.getString(R.string.msgs_profile_sync_task_dlg_wifi_addr_edit_title), ntfy, null);
             }
         });
 
@@ -2832,7 +2832,7 @@ public class SyncTaskUtil {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
-        add_current_addr.setOnClickListener(new View.OnClickListener() {
+        add_current_addr.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 WifiManager wm = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -2857,7 +2857,7 @@ public class SyncTaskUtil {
             }
         });
 
-        addBtn.setOnClickListener(new View.OnClickListener() {
+        addBtn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dlg_msg.setText("");
                 String newfilter = et_filter.getText().toString().trim();
@@ -2870,7 +2870,7 @@ public class SyncTaskUtil {
         });
 
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
 //				glblParms.profileListView.setSelectionFromTop(currentViewPosX,currentViewPosY);
@@ -2884,7 +2884,7 @@ public class SyncTaskUtil {
             }
         });
         // OKボタンの指定
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 addr_list.clear();
@@ -2990,7 +2990,7 @@ public class SyncTaskUtil {
                     public void negativeResponse(Context c, Object[] o) {}
 
                 });
-                editFilter(idx, filterAdapter, fli, fli.getFilter(), "", ntfy);
+                editFilter(idx, filterAdapter, fli, fli.getFilter(), "", ntfy, FILE_FILTER_INVALID_CHARACTER);
             }
         });
 
@@ -3000,6 +3000,14 @@ public class SyncTaskUtil {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() != 0) {
+                    String invalid_char= checkFilterInvalidCharacter(s.toString(), FILE_FILTER_INVALID_CHARACTER);
+                    if (invalid_char!=null) {
+                        String mtxt=mContext.getString(R.string.msgs_profile_sync_task_filter_list_dlg_file_name_contains_invalid_character);
+                        dlg_msg.setText(String.format(mtxt, invalid_char));
+                        CommonDialog.setViewEnabled(mActivity, addBtn, false);
+                        CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                        return;
+                    }
                     if (isFilterExists(s.toString().trim(), filterAdapter)) {
                         String mtxt = mContext.getString(R.string.msgs_filter_list_duplicate_filter_specified);
                         dlg_msg.setText(String.format(mtxt, s.toString().trim()));
@@ -3022,7 +3030,7 @@ public class SyncTaskUtil {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
-        addBtn.setOnClickListener(new View.OnClickListener() {
+        addBtn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dlg_msg.setText("");
                 String newfilter = et_filter.getText().toString().trim();
@@ -3035,7 +3043,7 @@ public class SyncTaskUtil {
         });
 
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
             }
@@ -3048,7 +3056,7 @@ public class SyncTaskUtil {
             }
         });
         // OKボタンの指定
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 file_filter.clear();
@@ -3064,6 +3072,16 @@ public class SyncTaskUtil {
             }
         });
         dialog.show();
+    }
+
+    final private static String[] FILE_FILTER_INVALID_CHARACTER=new String[]{"/"};
+    final private static String[] DIRECTORY_FILTER_INVALID_CHARACTER=new String[]{"\"", ":", "\\", "*", ">", "<", "|"};
+    private String checkFilterInvalidCharacter(String in, String[] invalid_char) {
+        if (in==null || invalid_char==null) return null;
+        for(String item:invalid_char) {
+            if (in.contains(item)) return item;
+        }
+        return null;
     }
 
     public void editDirFilterDlg(final SyncTaskItem sti, final NotifyEvent p_ntfy, boolean use_dir_filter_v2) {
@@ -3160,7 +3178,7 @@ public class SyncTaskUtil {
                     public void negativeResponse(Context c, Object[] o) {
                     }
                 });
-                editFilter(idx, filterAdapter, fli, fli.getFilter(), "", ntfy);
+                editFilter(idx, filterAdapter, fli, fli.getFilter(), "", ntfy, DIRECTORY_FILTER_INVALID_CHARACTER);
             }
         });
 
@@ -3203,7 +3221,7 @@ public class SyncTaskUtil {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
         });
         CommonDialog.setViewEnabled(mActivity, addbtn, false);
-        addbtn.setOnClickListener(new View.OnClickListener() {
+        addbtn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dlg_msg.setText("");
                 String newfilter = et_filter.getText().toString();
@@ -3243,7 +3261,7 @@ public class SyncTaskUtil {
         });
 
         // Directoryボタンの指定
-        dirbtn.setOnClickListener(new View.OnClickListener() {
+        dirbtn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 NotifyEvent ntfy = new NotifyEvent(mContext);
                 ntfy.setListener(new NotifyEventListener() {
@@ -3267,7 +3285,7 @@ public class SyncTaskUtil {
         });
 
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 p_ntfy.notifyToListener(false, null);
@@ -3283,7 +3301,7 @@ public class SyncTaskUtil {
         });
 
         // OKボタンの指定
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 sti.getDirFilter().clear();
@@ -3341,7 +3359,8 @@ public class SyncTaskUtil {
     }
 
     private void editFilter(final int edit_idx, final AdapterFilterList fa,
-                            final AdapterFilterList.FilterListItem fli, final String filter, String title_text, final NotifyEvent p_ntfy) {
+                            final AdapterFilterList.FilterListItem fli, final String filter, String title_text, final NotifyEvent p_ntfy,
+                            final String[] invalid_char) {
 
         // カスタムダイアログの生成
         final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
@@ -3385,6 +3404,13 @@ public class SyncTaskUtil {
                     CommonDialog.setViewEnabled(mActivity, btn_ok, false);
                     return;
                 } else {
+                    String invalid_char= checkFilterInvalidCharacter(s.toString(), FILE_FILTER_INVALID_CHARACTER);
+                    if (invalid_char!=null) {
+                        String mtxt=mContext.getString(R.string.msgs_profile_sync_task_filter_list_dlg_file_name_contains_invalid_character);
+                        dlg_msg.setText(String.format(mtxt, invalid_char));
+                        CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                        return;
+                    }
                     String new_filter=mUtil.removeRedundantWildcard(s.toString(), "*");
                     if (s.length()!=new_filter.length()) {
                         dlg_msg.setText(mContext.getString(R.string.msgs_filter_list_invalid_filter_specified_redundant_wildcard));
@@ -3407,7 +3433,7 @@ public class SyncTaskUtil {
         });
 
         // CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
             }
@@ -3420,7 +3446,7 @@ public class SyncTaskUtil {
             }
         });
         // OKボタンの指定
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (mUtil.isPathWildcardOnly(et_filter.getText().toString())) {
                     dlg_msg.setText(mContext.getString(R.string.msgs_filter_list_invalid_filter_specified_wildcard_only_disallowed));
@@ -3616,7 +3642,7 @@ public class SyncTaskUtil {
 
                 btn_ok.setText(mContext.getString(R.string.msgs_filter_list_dlg_add));
                 btn_ok.setVisibility(Button.VISIBLE);
-                btn_ok.setOnClickListener(new View.OnClickListener() {
+                btn_ok.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         if (!addDirFilter(true, tfa, fla, "/" + m_dir + "/", dlg_msg, sti, false)) return;
                         addDirFilter(false, tfa, fla, "/" + m_dir + "/", dlg_msg, sti, false);
@@ -3628,7 +3654,7 @@ public class SyncTaskUtil {
                 //CANCELボタンの指定
                 final Button btn_cancel = (Button) dialog.findViewById(R.id.item_select_list_dlg_cancel_btn);
                 btn_cancel.setText(mContext.getString(R.string.msgs_filter_list_dlg_close));
-                btn_cancel.setOnClickListener(new View.OnClickListener() {
+                btn_cancel.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         dialog.dismiss();
                         p_ntfy.notifyToListener(true, null);
@@ -3806,7 +3832,7 @@ public class SyncTaskUtil {
 
                 btn_ok.setText(mContext.getString(R.string.msgs_filter_list_dlg_add));
                 btn_ok.setVisibility(Button.VISIBLE);
-                btn_ok.setOnClickListener(new View.OnClickListener() {
+                btn_ok.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         if (!addDirFilter(true, tfa, fla, remdir, dlg_msg, sti, true)) return;
                         addDirFilter(false, tfa, fla, remdir, dlg_msg, sti, true);
@@ -3817,7 +3843,7 @@ public class SyncTaskUtil {
                 //CANCELボタンの指定
                 final Button btn_cancel = (Button) dialog.findViewById(R.id.item_select_list_dlg_cancel_btn);
                 btn_cancel.setText(mContext.getString(R.string.msgs_filter_list_dlg_close));
-                btn_cancel.setOnClickListener(new View.OnClickListener() {
+                btn_cancel.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         dialog.dismiss();
                         p_ntfy.notifyToListener(true, null);
@@ -4076,7 +4102,7 @@ public class SyncTaskUtil {
         lv.setScrollbarFadingEnabled(false);
 
         //SCANボタンの指定
-        btn_scan.setOnClickListener(new View.OnClickListener() {
+        btn_scan.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 ipAddressList.clear();
                 NotifyEvent ntfy = new NotifyEvent(mContext);
@@ -4116,7 +4142,7 @@ public class SyncTaskUtil {
         });
 
         //CANCELボタンの指定
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 p_ntfy.notifyToListener(false, null);
@@ -4168,7 +4194,7 @@ public class SyncTaskUtil {
         dialog.setOnKeyListener(new DialogBackKeyListener(mContext));
         dialog.setCancelable(false);
         // CANCELボタンの指定
-        scan_cancel.setOnClickListener(new View.OnClickListener() {
+        scan_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
 //                scan_cancel.setText(mContext.getString(R.string.msgs_progress_dlg_canceling));
                 CommonDialog.setViewEnabled(mActivity, scan_cancel, false);
@@ -4728,7 +4754,7 @@ public class SyncTaskUtil {
                     }
                 });
                 //CANCELボタンの指定
-                btn_cancel.setOnClickListener(new View.OnClickListener() {
+                btn_cancel.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         dialog.dismiss();
                         p_ntfy.notifyToListener(false, null);
@@ -4736,7 +4762,7 @@ public class SyncTaskUtil {
                 });
                 //OKボタンの指定
                 btn_ok.setVisibility(Button.VISIBLE);
-                btn_ok.setOnClickListener(new View.OnClickListener() {
+                btn_ok.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         dialog.dismiss();
                         SparseBooleanArray checked = lv.getCheckedItemPositions();

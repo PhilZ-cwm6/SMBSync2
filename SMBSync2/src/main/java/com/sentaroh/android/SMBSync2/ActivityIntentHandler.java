@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Window;
 
 import com.sentaroh.android.Utilities.Dialog.MessageDialogAppFragment;
+import com.sentaroh.android.Utilities.Dialog.MessageDialogFragment;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
 public class ActivityIntentHandler extends Activity {
@@ -27,10 +28,11 @@ public class ActivityIntentHandler extends Activity {
             Intent in=new Intent(received_intent.getAction());
             in.setClass(ActivityIntentHandler.this, SyncService.class);
             if (received_intent.getExtras() != null) in.putExtras(received_intent.getExtras());
+            final FragmentManager fm=getFragmentManager();
             try {
-                c.startService(in);
+                startService(in);
                 finish();
-            } catch(Exception e) {
+            }catch(Exception e){
                 e.printStackTrace();
                 NotifyEvent ntfy=new NotifyEvent(c);
                 ntfy.setListener(new NotifyEvent.NotifyEventListener() {
@@ -44,9 +46,8 @@ public class ActivityIntentHandler extends Activity {
 
                     }
                 });
-                final FragmentManager fm=getFragmentManager();
                 MessageDialogAppFragment mdf=MessageDialogAppFragment.newInstance(false, "E",
-                        "SMBSync2", "ShortcutAutoSync start service error\n"+e.getMessage());
+                        "SMBSync2", "ActivityIntentHandler start service error\n"+e.getMessage());
                 mdf.showDialog(fm, mdf, ntfy);
             }
 

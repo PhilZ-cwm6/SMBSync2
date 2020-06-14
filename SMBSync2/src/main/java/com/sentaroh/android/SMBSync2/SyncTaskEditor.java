@@ -2042,7 +2042,7 @@ public class SyncTaskEditor extends DialogFragment {
             public void onClick(View v) {
                 if (btn_sync_folder_ok.isEnabled()) {
                     NotifyEvent ntfy = new NotifyEvent(mContext);
-                    ntfy.setListener(new NotifyEvent.NotifyEventListener() {
+                    ntfy.setListener(new NotifyEventListener() {
                         @Override
                         public void positiveResponse(Context context, Object[] objects) {
                             dialog.dismiss();
@@ -2764,7 +2764,7 @@ public class SyncTaskEditor extends DialogFragment {
                 CommonDialog.setDlgBoxSizeCompact(dialog);
                 ctvSuppr.setChecked(false);
                 // Closeボタンの指定
-                btnClose.setOnClickListener(new View.OnClickListener() {
+                btnClose.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         dialog.dismiss();
                         if (ctvSuppr.isChecked()) {
@@ -2840,7 +2840,7 @@ public class SyncTaskEditor extends DialogFragment {
         CommonDialog.setDlgBoxSizeCompact(dialog);
         ctvSuppr.setChecked(false);
         // Closeボタンの指定
-        btnClose.setOnClickListener(new View.OnClickListener() {
+        btnClose.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 dialog.dismiss();
                 if (ctvSuppr.isChecked()) {
@@ -4356,7 +4356,7 @@ public class SyncTaskEditor extends DialogFragment {
             }
         });
         // wifi ap listボタンの指定
-        edit_wifi_ap_list.setOnClickListener(new View.OnClickListener() {
+        edit_wifi_ap_list.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 NotifyEvent ntfy = new NotifyEvent(mContext);
                 //Listen setRemoteShare response
@@ -4378,7 +4378,7 @@ public class SyncTaskEditor extends DialogFragment {
         });
 
         // wifi address listボタンの指定
-        edit_wifi_addr_list.setOnClickListener(new View.OnClickListener() {
+        edit_wifi_addr_list.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 NotifyEvent ntfy = new NotifyEvent(mContext);
                 //Listen setRemoteShare response
@@ -4400,25 +4400,25 @@ public class SyncTaskEditor extends DialogFragment {
         });
 
         // file filterボタンの指定
-        file_filter_btn.setOnClickListener(new View.OnClickListener() {
+        file_filter_btn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 invokeEditFileFilterDlg(mDialog, n_sti, type, dlg_msg, ctUseDirectoryFilterV2.isChecked());
             }
         });
         // directory filterボタンの指定
-        dir_filter_btn.setOnClickListener(new View.OnClickListener() {
+        dir_filter_btn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 invokeEditDirFilterDlg(mDialog, n_sti, type, dlg_msg, ctUseDirectoryFilterV2.isChecked());
             }
         });
 
         final Button btn_cancel = (Button) mDialog.findViewById(R.id.edit_profile_sync_dlg_btn_cancel);
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mGp.syncTaskAdapter.notifyDataSetChanged();
                 if (btn_ok.isEnabled()) {
                     NotifyEvent ntfy = new NotifyEvent(mContext);
-                    ntfy.setListener(new NotifyEvent.NotifyEventListener() {
+                    ntfy.setListener(new NotifyEventListener() {
                         @Override
                         public void positiveResponse(Context context, Object[] objects) {
                             mUtil.addDebugMsg(1,"I","editSyncTask edit cancelled, type="+type+", task="+pfli.getSyncTaskName());
@@ -4461,7 +4461,7 @@ public class SyncTaskEditor extends DialogFragment {
         });
         // OKボタンの指定
         CommonDialog.setViewEnabled(getActivity(), btn_ok, false);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 final SyncTaskItem new_stli = buildSyncTaskListItem(mDialog, n_sti);
                 if (new_stli.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR))

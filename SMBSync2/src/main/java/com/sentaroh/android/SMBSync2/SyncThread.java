@@ -2127,7 +2127,6 @@ public class SyncThread extends Thread {
         }
         stwa.util.addLogMsg(false, false, false, false, "E", stwa.currentSTI.getSyncTaskName(), "", "", ste_msg);
     }
-
     static final public boolean sendConfirmRequest(SyncThreadWorkArea stwa, SyncTaskItem sti, String type, String url) {
         boolean result = true;
         int rc = 0;
