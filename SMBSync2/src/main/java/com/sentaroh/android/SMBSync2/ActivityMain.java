@@ -449,7 +449,7 @@ public class ActivityMain extends AppCompatActivity {
                 ", getChangingConfigurations=" + String.format("0x%08x", getChangingConfigurations()));
         setActivityForeground(false);
         if (!isTaskTermination) saveTaskData();
-        CommonUtilities.saveMsgList(mGp);
+        CommonUtilities.saveMsgList(mGp);//Save last updated message tab list
     }
 
     @Override
