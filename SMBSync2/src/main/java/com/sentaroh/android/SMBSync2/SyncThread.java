@@ -2127,7 +2127,6 @@ public class SyncThread extends Thread {
         }
         stwa.util.addLogMsg(false, false, false, false, "E", stwa.currentSTI.getSyncTaskName(), "", "", ste_msg);
     }
-
     static final public boolean sendConfirmRequest(SyncThreadWorkArea stwa, SyncTaskItem sti, String type, String url) {
         boolean result = true;
         int rc = 0;
@@ -3360,32 +3359,28 @@ public class SyncThread extends Thread {
                 if (prefix.equals("I")) {//include filter
                     String[] rem_filter_array = rem_filter.split(";");
                     for (String filter_item : rem_filter_array) {
-                        String new_filter_item=filter_item;
-                        if (new_filter_item.startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) new_filter_item=new_filter_item.replaceFirst(MiscUtil.convertRegExp(WHOLE_DIRECTORY_FILTER_PREFIX), "*/");
-                        if (!new_filter_item.startsWith("*")) pre_str = "^";//force match from begining
+                        if (!filter_item.startsWith("*")) pre_str = "^";//force match from begining
                         else pre_str = "";
 
-                        if (!new_filter_item.endsWith("/") && !new_filter_item.endsWith("*")) suf_str = "/";//match exact path name: filter==/cache -> master/cache/*
+                        if (!filter_item.endsWith("/") && !filter_item.endsWith("*")) suf_str = "/";//match exact path name: filter==/cache -> master/cache/*
                         else suf_str = "";
 
-                        dfinc = pre_str + MiscUtil.convertRegExp(new_filter_item + suf_str);
+                        dfinc = pre_str + MiscUtil.convertRegExp(filter_item + suf_str);
                         mStwa.dirIncludeFilterPatternList.add(Pattern.compile("(" + dfinc + ")", flags));
                         all_inc += dfinc + ";";
                     }
                 } else {//exclude filter
                     String[] rem_filter_array = rem_filter.split(";");
                     for (String filter_item : rem_filter_array) {
-                        String new_filter_item=filter_item;
-                        if (new_filter_item.startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) new_filter_item=new_filter_item.replaceFirst(MiscUtil.convertRegExp(WHOLE_DIRECTORY_FILTER_PREFIX), "*/");
-                        if (!new_filter_item.startsWith("*")) pre_str = "^";//force match from begining
+                        if (!filter_item.startsWith("*")) pre_str = "^";//force match from begining
                         else pre_str = "";
 
                         //match exact path name: filter==/cache -> master/cache/*
                         //empty folders will be added in target. To not add them when /cache is specified instead of /cache/: add code to recompile pattern in isDirectorytoBeProcessed()
-                        if (!new_filter_item.endsWith("/") && !new_filter_item.endsWith("*")) suf_str = "/";
+                        if (!filter_item.endsWith("/") && !filter_item.endsWith("*")) suf_str = "/";
                         else suf_str = "";
 
-                        dfexc = pre_str + MiscUtil.convertRegExp(new_filter_item + suf_str);
+                        dfexc = pre_str + MiscUtil.convertRegExp(filter_item + suf_str);
                         mStwa.dirExcludeFilterPatternList.add(Pattern.compile("(" + dfexc + ")", flags));
                         all_exc += dfexc + ";";
                     }
@@ -3538,15 +3533,11 @@ public class SyncThread extends Thread {
         if (new_filter.startsWith(";")) new_filter=new_filter.replaceFirst(";","");
 
         String[] filter_items_array = new_filter.split(";");
-        for (String filter_item : filter_items_array) {
+        for (String filter_entry : filter_items_array) {
             String[] filter_array = null;
-            String new_filter_item = filter_item;
 
-            if (new_filter_item.startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) new_filter_item=new_filter_item.replaceFirst(MiscUtil.convertRegExp(WHOLE_DIRECTORY_FILTER_PREFIX), "*/");
-            //mStwa.util.addDebugMsg(2, "I", "new_filter_item=" + new_filter_item);
-
-            if (new_filter_item.startsWith("/")) filter_array = new_filter_item.replaceFirst("/", "").split("/");
-            else filter_array = new_filter_item.split("/");
+            if (filter_entry.startsWith("/")) filter_array = filter_entry.replaceFirst("/", "").split("/");
+            else filter_array = filter_entry.split("/");
 
             Pattern[] pattern_array = new Pattern[filter_array.length];
 

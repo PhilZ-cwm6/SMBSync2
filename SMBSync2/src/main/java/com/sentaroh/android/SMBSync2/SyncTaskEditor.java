@@ -5104,13 +5104,28 @@ public class SyncTaskEditor extends DialogFragment {
                     String filter_inc_exc=item.substring(0,1);
                     String filter_value=item.substring(1);
                     if (filter_inc_exc.equals("I")) {
-                        if (filter_value.startsWith("*/") || filter_value.startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) {
+                        if (filter_value.startsWith("*/")) {
                             error_filter+=filter_value+";";
                             error_detected = true;
                         }
                     }
                 }
                 if (error_detected) result = mContext.getString(R.string.msgs_profile_sync_task_sync_option_use_directory_filter_match_anywhere_in_path_error, error_filter);
+            }
+        }
+
+        if (!error_detected) {
+            if (ctUseDirectoryFilterV2.isChecked() && n_sti.getDirFilter().size() > 0) {
+                String error_filter="";
+                for(String item:n_sti.getDirFilter()) {
+                    String filter_inc_exc=item.substring(0,1);
+                    String filter_value=item.substring(1);
+                    if (filter_value.startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) {
+                        error_filter+=filter_value+";";
+                        error_detected = true;
+                    }
+                }
+                if (error_detected) result = mContext.getString(R.string.msgs_profile_sync_task_sync_option_use_directory_filter_old_whole_dir_prefix_error, error_filter);
             }
         }
 

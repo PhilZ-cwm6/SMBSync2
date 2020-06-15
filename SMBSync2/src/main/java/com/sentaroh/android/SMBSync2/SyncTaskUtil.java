@@ -3130,13 +3130,14 @@ public class SyncTaskUtil {
         lv.setScrollingCacheEnabled(false);
         lv.setScrollbarFadingEnabled(false);
 
-        isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg);//display warning in main filter list view
+        if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg))//display warning in main filter list view
+            isIncludeFilterRelativePath(filterAdapter, btn_ok, dlg_msg);
 
         NotifyEvent ntfy_inc_exc = new NotifyEvent(mContext);
         ntfy_inc_exc.setListener(new NotifyEventListener() {
             @Override
             public void positiveResponse(Context c, Object[] o) {
-                if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg)) {
+                if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg) && isIncludeFilterRelativePath(filterAdapter, btn_ok, dlg_msg)) {
                     CommonDialog.setViewEnabled(mActivity, btn_ok, true);
                     dlg_msg.setText("");
                 }
@@ -3150,7 +3151,7 @@ public class SyncTaskUtil {
         ntfy_delete.setListener(new NotifyEventListener() {
             @Override
             public void positiveResponse(Context c, Object[] o) {
-                if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg)) {
+                if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg) && isIncludeFilterRelativePath(filterAdapter, btn_ok, dlg_msg)) {
                     CommonDialog.setViewEnabled(mActivity, btn_ok, true);
                     dlg_msg.setText("");
                 }
@@ -3168,7 +3169,7 @@ public class SyncTaskUtil {
                 ntfy.setListener(new NotifyEventListener() {
                     @Override
                     public void positiveResponse(Context c, Object[] o) {
-                        if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg)) {
+                        if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg) && isIncludeFilterRelativePath(filterAdapter, btn_ok, dlg_msg)) {
                             CommonDialog.setViewEnabled(mActivity, btn_ok, true);
                             dlg_msg.setText("");
                         }
@@ -3236,9 +3237,16 @@ public class SyncTaskUtil {
                 dlg_msg.setText("");
                 et_filter.setText("");
                 if (use_dir_filter_v2) {
+                    if (newfilter.startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) {
+                        String suggest_filter = newfilter.replace(WHOLE_DIRECTORY_FILTER_PREFIX, "*/")+ (newfilter.endsWith("/*") || newfilter.endsWith("/") ? "":"/*");
+                        String mtxt = mContext.getString(R.string.msgs_profile_sync_task_sync_option_use_directory_filter_old_whole_dir_prefix_edit_dlg_error);
+                        dlg_msg.setText(String.format(mtxt, newfilter, suggest_filter));
+                        return;
+                    }
+
                     AdapterFilterList.FilterListItem fli=new AdapterFilterList.FilterListItem(newfilter, true);
                     fli.setUseFilterV2(true);
-                    if (newfilter.startsWith("*/") || newfilter.startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) fli.setInclude(false);
+                    if (newfilter.startsWith("*/")) fli.setInclude(false);
                     filterAdapter.add(fli);
                 } else {
                     filterAdapter.add(new AdapterFilterList.FilterListItem(newfilter, true));
@@ -3246,7 +3254,7 @@ public class SyncTaskUtil {
                 filterAdapter.setNotifyOnChange(true);
                 filterAdapter.sort();
                 CommonDialog.setViewEnabled(mActivity, dirbtn, true);
-                if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg)) {
+                if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg) && isIncludeFilterRelativePath(filterAdapter, btn_ok, dlg_msg)) {
                     CommonDialog.setViewEnabled(mActivity, btn_ok, true);
                 }
             }
@@ -3259,7 +3267,7 @@ public class SyncTaskUtil {
                 ntfy.setListener(new NotifyEventListener() {
                     @Override
                     public void positiveResponse(Context arg0, Object[] arg1) {
-                        if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg)) {
+                        if (isValidWholeDirectoryFilter(filterAdapter, btn_ok, dlg_msg) && isIncludeFilterRelativePath(filterAdapter, btn_ok, dlg_msg)) {
                             CommonDialog.setViewEnabled(mActivity, btn_ok, true);
                             dlg_msg.setText("");
                         }
@@ -3316,8 +3324,27 @@ public class SyncTaskUtil {
         String error_filters="";
         for(int i=0;i<filter_adapter.getCount();i++) {
             AdapterFilterList.FilterListItem fli=filter_adapter.getItem(i);
-            if (!fli.isDeleted() && fli.isInclude()) {
-                if (fli.getFilter().startsWith(WHOLE_DIRECTORY_FILTER_PREFIX) || fli.getFilter().startsWith("*/")) {
+            if (!fli.isDeleted() && fli.isUseFilterV2() && fli.getFilter().startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) {
+                error_filters=fli.getFilter();
+                break;
+            }
+        }
+        if (!error_filters.equals("")) {
+            String suggest_filter = error_filters.replace(WHOLE_DIRECTORY_FILTER_PREFIX, "*/")+ (error_filters.endsWith("/*") || error_filters.endsWith("/") ? "":"/*");
+            dlg_msg.setText(mContext.getString(R.string.msgs_profile_sync_task_sync_option_use_directory_filter_old_whole_dir_prefix_edit_dlg_error, error_filters, suggest_filter));
+            CommonDialog.setViewEnabled(mActivity, ok_btn, false);
+            result=false;
+        }
+        return result;
+    }
+
+    private boolean isIncludeFilterRelativePath(AdapterFilterList filter_adapter, Button ok_btn, TextView dlg_msg) {
+        boolean result=true;
+        String error_filters="";
+        for(int i=0;i<filter_adapter.getCount();i++) {
+            AdapterFilterList.FilterListItem fli=filter_adapter.getItem(i);
+            if (!fli.isDeleted() && fli.isUseFilterV2() && fli.isInclude()) {
+                if (fli.getFilter().startsWith("*/")) {
                     error_filters=fli.getFilter();
                     break;
                 }
