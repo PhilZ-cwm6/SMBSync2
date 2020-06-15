@@ -338,7 +338,7 @@ public final class CommonUtilities {
             if (!mfd.exists()) mfd.mkdirs();
             File mf = new File(dir + "/.messages");
             fos=new FileOutputStream(mf);
-            PrintWriter bos=new PrintWriter(new BufferedOutputStream(fos,1024*1024*4));
+            PrintWriter bos=new PrintWriter(new BufferedOutputStream(fos,1024*1024));
             StringBuffer sb=new StringBuffer(1024);
             synchronized (gp.msgList) {
                 for (SyncMessageItem smi:gp.msgList) {
@@ -371,10 +371,10 @@ public final class CommonUtilities {
 //            File mf=new File(c.getFilesDir().getPath()+"/"+"message_list.txt");
             if (mf.exists()) {
                 FileReader fr=new FileReader(mf);
-                BufferedReader bis=new BufferedReader(fr, 1024*1024*2);
-                String line= null;
-                while((line= bis.readLine()) != null) {
-                    String[] msg_array= line.split("\u0000");
+                BufferedReader bis=new BufferedReader(fr, 1024*1024);
+                String line=null;
+                while((line=bis.readLine())!=null) {
+                    String[] msg_array=line.split("\u0000");
                     if (msg_array.length>=7) {
                         SyncMessageItem smi=new SyncMessageItem(msg_array[0].replace("\u0001",""), //msgCat
                                 msg_array[1].replace("\u0001",""), //msgDate
