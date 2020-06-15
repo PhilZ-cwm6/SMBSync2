@@ -159,10 +159,7 @@ public class AdapterFilterList extends ArrayAdapter<AdapterFilterList.FilterList
                 holder.tv_row_filter.setEnabled(true);
                 holder.btn_row_delbtn.setEnabled(true);
                 if (o.isUseFilterV2()) {
-                    if (o.getFilter().startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) {
-                        holder.rb_inc.setEnabled(false);
-                        holder.rb_exc.setEnabled(false);
-                    } else if (o.getFilter().startsWith("*/")) {
+                    if (o.getFilter().startsWith("*/") || o.getFilter().startsWith(WHOLE_DIRECTORY_FILTER_PREFIX)) {
                         holder.rb_inc.setEnabled(false);
                         holder.rb_exc.setEnabled(true);
                     } else {
