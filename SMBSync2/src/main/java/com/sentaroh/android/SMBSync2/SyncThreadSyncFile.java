@@ -116,7 +116,6 @@ public class SyncThreadSyncFile {
                         if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_DIR, target_dir)) {
                             SyncThread.deleteExternalStorageItem(stwa, true, sti, target_dir);
                         } else {
-                            stwa.totalIgnoreCount++;
                             SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                         }
@@ -135,7 +134,6 @@ public class SyncThreadSyncFile {
                                 if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_FILE, target_dir)) {
                                     SyncThread.deleteExternalStorageItem(stwa, true, sti, target_dir);
                                 } else {
-                                    stwa.totalIgnoreCount++;
                                     SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                             "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                                 }
@@ -221,7 +219,6 @@ public class SyncThreadSyncFile {
                         if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_DIR, target_dir)) {
                             SyncThread.deleteInternalStorageItem(stwa, true, sti, target_dir);
                         } else {
-                            stwa.totalIgnoreCount++;
                             SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                         }
@@ -240,7 +237,6 @@ public class SyncThreadSyncFile {
                                 if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_FILE, target_dir)) {
                                     SyncThread.deleteInternalStorageItem(stwa, true, sti, target_dir);
                                 } else {
-                                    stwa.totalIgnoreCount++;
                                     SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                             "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                                 }
@@ -316,7 +312,6 @@ public class SyncThreadSyncFile {
                     if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_DIR, target_dir)) {
                         SyncThread.deleteInternalStorageItem(stwa, true, sti, target_dir);
                     } else {
-                        stwa.totalIgnoreCount++;
                         SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                 "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                     }
@@ -337,7 +332,6 @@ public class SyncThreadSyncFile {
                             if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_FILE, target_dir)) {
                                 SyncThread.deleteInternalStorageItem(stwa, true, sti, target_dir);
                             } else {
-                                stwa.totalIgnoreCount++;
                                 SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                        "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                             }
@@ -420,7 +414,6 @@ public class SyncThreadSyncFile {
                         if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_DIR, target_dir)) {
                             SyncThread.deleteSmbItem(stwa, true, sti, to_base, target_dir + "/", stwa.targetAuth);
                         } else {
-                            stwa.totalIgnoreCount++;
                             SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                         }
@@ -441,7 +434,6 @@ public class SyncThreadSyncFile {
                                 if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_FILE, target_dir)) {
                                     SyncThread.deleteSmbItem(stwa, true, sti, to_base, target_dir, stwa.targetAuth);
                                 } else {
-                                    stwa.totalIgnoreCount++;
                                     SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                             "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                                 }
@@ -507,7 +499,6 @@ public class SyncThreadSyncFile {
                 if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_DIR, target_dir)) {
                     SyncThread.deleteExternalStorageItem(stwa, true, sti, target_dir);
                 } else {
-                    stwa.totalIgnoreCount++;
                     SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                             "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                 }
@@ -521,7 +512,6 @@ public class SyncThreadSyncFile {
                             if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_FILE, target_dir)) {
                                 SyncThread.deleteExternalStorageItem(stwa, true, sti, target_dir);
                             } else {
-                                stwa.totalIgnoreCount++;
                                 SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                         "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                             }
@@ -697,7 +687,6 @@ public class SyncThreadSyncFile {
                                                         "", stwa.msgs_mirror_task_file_moved);
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                         }
@@ -721,7 +710,6 @@ public class SyncThreadSyncFile {
                                                     stwa.totalCopyCount++;
                                                 }
                                             } else {
-                                                stwa.totalIgnoreCount++;
                                                 SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                         "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                             }
@@ -982,7 +970,6 @@ public class SyncThreadSyncFile {
                                                     "", stwa.msgs_mirror_task_file_moved);
                                         }
                                     } else {
-                                        stwa.totalIgnoreCount++;
                                         SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                 "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                     }
@@ -1012,7 +999,6 @@ public class SyncThreadSyncFile {
                                                 stwa.totalCopyCount++;
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                         }
@@ -1229,7 +1215,6 @@ public class SyncThreadSyncFile {
                                                     "", stwa.msgs_mirror_task_file_moved);
                                         }
                                     } else {
-                                        stwa.totalIgnoreCount++;
                                         SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                 "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                     }
@@ -1260,7 +1245,6 @@ public class SyncThreadSyncFile {
                                                 stwa.totalCopyCount++;
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                         }
@@ -1448,7 +1432,6 @@ public class SyncThreadSyncFile {
                                                     "", stwa.msgs_mirror_task_file_moved);
                                         }
                                     } else {
-                                        stwa.totalIgnoreCount++;
                                         SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                 "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                     }
@@ -1472,7 +1455,6 @@ public class SyncThreadSyncFile {
                                                 stwa.totalCopyCount++;
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                         }
@@ -1688,7 +1670,6 @@ public class SyncThreadSyncFile {
                                                         "", stwa.msgs_mirror_task_file_moved);
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                         }
@@ -1717,7 +1698,6 @@ public class SyncThreadSyncFile {
                                                     stwa.totalCopyCount++;
                                                 }
                                             } else {
-                                                stwa.totalIgnoreCount++;
                                                 SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                         "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                             }
@@ -1937,7 +1917,6 @@ public class SyncThreadSyncFile {
                                                     "", stwa.msgs_mirror_task_file_moved);
                                         }
                                     } else {
-                                        stwa.totalIgnoreCount++;
                                         SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                 "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                     }
@@ -1968,7 +1947,6 @@ public class SyncThreadSyncFile {
                                                 stwa.totalCopyCount++;
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                         }
@@ -2230,7 +2208,6 @@ public class SyncThreadSyncFile {
                                                     "", stwa.msgs_mirror_task_file_moved);
                                         }
                                     } else {
-                                        stwa.totalIgnoreCount++;
                                         SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                 "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                     }
@@ -2265,7 +2242,6 @@ public class SyncThreadSyncFile {
                                                 stwa.totalCopyCount++;
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                         }
@@ -2574,7 +2550,6 @@ public class SyncThreadSyncFile {
                                                     "", stwa.msgs_mirror_task_file_moved);
                                         }
                                     } else {
-                                        stwa.totalIgnoreCount++;
                                         SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                 "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                     }
@@ -2616,7 +2591,6 @@ public class SyncThreadSyncFile {
                                                 stwa.totalCopyCount++;
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                         }
@@ -2881,7 +2855,6 @@ public class SyncThreadSyncFile {
                                                         "", stwa.msgs_mirror_task_file_moved);
                                             }
                                         } else {
-                                            stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
                                         }
@@ -2909,7 +2882,6 @@ public class SyncThreadSyncFile {
                                                     stwa.totalCopyCount++;
                                                 }
                                             } else {
-                                                stwa.totalIgnoreCount++;
                                                 SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                         "", stwa.context.getString(R.string.msgs_mirror_confirm_copy_cancel));
                                             }
@@ -2998,7 +2970,6 @@ public class SyncThreadSyncFile {
                         if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_DIR, target_dir)) {
                             SyncThread.deleteSmbItem(stwa, true, sti, to_base, target_dir, stwa.targetAuth);
                         } else {
-                            stwa.totalIgnoreCount++;
                             SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                         }
@@ -3017,7 +2988,6 @@ public class SyncThreadSyncFile {
                                 if (SyncThread.sendConfirmRequest(stwa, sti, SMBSYNC2_CONFIRM_REQUEST_DELETE_FILE, target_dir)) {
                                     SyncThread.deleteSmbItem(stwa, true, sti, to_base, target_dir, stwa.targetAuth);
                                 } else {
-                                    stwa.totalIgnoreCount++;
                                     SyncThread.showMsg(stwa, false, sti.getSyncTaskName(), "I", target_dir, tf.getName(),
                                             "", stwa.context.getString(R.string.msgs_mirror_confirm_delete_cancel));
                                 }
