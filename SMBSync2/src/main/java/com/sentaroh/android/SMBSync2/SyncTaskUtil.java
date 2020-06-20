@@ -103,8 +103,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.sentaroh.android.SMBSync2.AdapterNetworkScanResult.NetworkScanListItem.SMB_STATUS_ACCESS_DENIED;
 import static com.sentaroh.android.SMBSync2.AdapterNetworkScanResult.NetworkScanListItem.SMB_STATUS_INVALID_LOGON_TYPE;
@@ -128,9 +126,9 @@ import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_DEC;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_ENC;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_FILTER_DIR;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_FILTER_DIR_INVALID_CHARS;
+import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_FILTER_EXCLUDE;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_FILTER_FILE;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_FILTER_FILE_INVALID_CHARS;
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_FILTER_EXCLUDE;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_FILTER_INCLUDE;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_TYPE_SETTINGS;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_PROF_TYPE_SYNC;
@@ -1775,7 +1773,7 @@ public class SyncTaskUtil {
         etInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable arg0) {
-                if (!arg0.toString().equalsIgnoreCase(pli.getSyncTaskName()))CommonDialog.setViewEnabled(mActivity, btn_ok, true);
+                if (!arg0.toString().equalsIgnoreCase(pli.getSyncTaskName())) CommonDialog.setViewEnabled(mActivity, btn_ok, true);
                 else CommonDialog.setViewEnabled(mActivity, btn_ok, false);
             }
 
@@ -2457,7 +2455,7 @@ public class SyncTaskUtil {
                   } else {
                       un=ra.smb_user_name;
                   }
-                  String[] e_msg=JcifsUtil.analyzeNtStatusCode(e, new_dir, un);
+                  String[] e_msg= JcifsUtil.analyzeNtStatusCode(e, new_dir, un);
                   if (e.getCause()!=null) {
                       String tc=e.getCause().toString();
                       cause=tc.substring(tc.indexOf(":")+1);
@@ -4052,7 +4050,7 @@ public class SyncTaskUtil {
                             }
                         } catch(Exception e) {
                             mUtil.showCommonDialog(false,"E","Error","sel="+sel+", remdir="+remdir+"\n"+
-                                    e.getMessage()+"\n"+MiscUtil.getStackTraceString(e),null);
+                                    e.getMessage()+"\n"+ MiscUtil.getStackTraceString(e),null);
                         }
                     }
 
@@ -4628,7 +4626,7 @@ public class SyncTaskUtil {
     final private SmbServerStatusResult createSmbServerVersionList(int smb_level, String domain, String user, String pass, String address,
                                                                    String min_ver, String max_ver) {
         JcifsAuth auth=null;
-        if (smb_level==JcifsAuth.JCIFS_FILE_SMB1) auth=new JcifsAuth(JcifsAuth.JCIFS_FILE_SMB1, domain, user, pass);
+        if (smb_level== JcifsAuth.JCIFS_FILE_SMB1) auth=new JcifsAuth(JcifsAuth.JCIFS_FILE_SMB1, domain, user, pass);
         else auth=new JcifsAuth(smb_level, domain, user, pass, true, min_ver, max_ver);
         String[] share_list=null;
         String server_status="";
@@ -5118,7 +5116,7 @@ public class SyncTaskUtil {
                         util.addDebugMsg(1,"W","createSyncTaskListFromFile decrypt password obtain error="+e.getMessage()+"\n"+stm);
                         e.printStackTrace();
                     }
-                    if (priv_key!=null) cp_autosave=EncryptUtil.initDecryptEnv(priv_key);
+                    if (priv_key!=null) cp_autosave= EncryptUtil.initDecryptEnv(priv_key);
                 }
                 try {
                     BufferedReader br = new BufferedReader(new FileReader(fp), 8192);
@@ -5194,7 +5192,7 @@ public class SyncTaskUtil {
                     } else {
                         priv_key=KeyStoreUtil.getGeneratedPasswordNewVersion(context, SMBSYNC2_KEY_STORE_ALIAS);
                     }
-                    cp_int=EncryptUtil.initDecryptEnv(priv_key);
+                    cp_int= EncryptUtil.initDecryptEnv(priv_key);
                     br = new BufferedReader(new FileReader(gp.applicationRootDirectory + "/" + pf), 8192);
                     util.addDebugMsg(1,"I","createSyncTaskListFromFile profile="+lf.getPath());
                     String pl;
@@ -7042,7 +7040,7 @@ public class SyncTaskUtil {
     private static String encryptByInternalPassword(GlobalParameters mGp, CommonUtilities util, CipherParms cp_int, String from_str) {
         String result="";
         try {
-            result=Base64Compat.encodeToString(EncryptUtil.encrypt(from_str, cp_int), Base64Compat.NO_WRAP);
+            result= Base64Compat.encodeToString(EncryptUtil.encrypt(from_str, cp_int), Base64Compat.NO_WRAP);
         } catch(Exception e) {
             result=null;
             e.printStackTrace();
@@ -7404,7 +7402,7 @@ public class SyncTaskUtil {
                             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + pl);
                         }
                     } else {
-                        String enc =Base64Compat.encodeToString(EncryptUtil.encrypt(pl, cp_int), Base64Compat.NO_WRAP);
+                        String enc = Base64Compat.encodeToString(EncryptUtil.encrypt(pl, cp_int), Base64Compat.NO_WRAP);
                         pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + enc);
                     }
 
