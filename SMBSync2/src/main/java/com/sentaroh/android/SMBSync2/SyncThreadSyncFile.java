@@ -701,6 +701,7 @@ public class SyncThreadSyncFile {
                                             stwa.totalIgnoreCount++;
                                             SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "I", parsed_to_path, mf.getName(),
                                                     "", stwa.context.getString(R.string.msgs_mirror_confirm_move_cancel));
+
                                         }
                                     } else {
                                         if (SyncThread.isFileChanged(stwa, sti, parsed_to_path, tf, mf, stwa.ALL_COPY) &&

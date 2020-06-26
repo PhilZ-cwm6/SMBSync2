@@ -265,6 +265,7 @@ public class ActivityMain extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered, " + "resartStatus=" + restartType);
+
         if (restartType == RESTART_WITH_OUT_INITIALYZE) {
             mGp.safMgr.loadSafFile();
             setActivityForeground(true);
