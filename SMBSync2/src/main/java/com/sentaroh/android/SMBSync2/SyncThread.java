@@ -120,7 +120,7 @@ public class SyncThread extends Thread {
         public Pattern fileFilterInclude, fileFilterExclude;
         //		public Pattern dirFilterInclude,dirFilterExclude;
         public ArrayList<Pattern> dirIncludeFilterPatternList = new ArrayList<Pattern>();//no more used by directory filters v2
-		public ArrayList<Pattern> dirExcludeFilterPatternList = new ArrayList<Pattern>();//no more used by directory filters v2
+        public ArrayList<Pattern> dirExcludeFilterPatternList = new ArrayList<Pattern>();//no more used by directory filters v2
 
         public ArrayList<Pattern> wholeDirIncludeFilterPatternList = new ArrayList<Pattern>();//no more used by directory filters v2
         public ArrayList<Pattern> wholeDirExcludeFilterPatternList = new ArrayList<Pattern>();//no more used by directory filters v2
@@ -2887,7 +2887,7 @@ public class SyncThread extends Thread {
         if (!t_dir.endsWith("/")) filtered_dir = t_dir + "/";
         else filtered_dir = t_dir;
 
-		//if (stwa.gp.settingDebugLevel >= 2) stwa.util.addDebugMsg(2, "I", "isDirectorySelectedByDirectoryNameVer2 filtered_dir=" + filtered_dir);
+        //if (stwa.gp.settingDebugLevel >= 2) stwa.util.addDebugMsg(2, "I", "isDirectorySelectedByDirectoryNameVer2 filtered_dir=" + filtered_dir);
 
         if (filtered_dir.equals("/")) {
             //not filtered
@@ -3453,7 +3453,7 @@ public class SyncThread extends Thread {
 
     //file and folder filter can be names/paths separated by ; in a same line
     //add fileFilterInclude and fileFilterExclude for files
-	//call createDirFilterArrayList() for dir filters
+    //call createDirFilterArrayList() for dir filters
     final private int compileFilterVer2(SyncTaskItem sti, ArrayList<String> s_ff, ArrayList<String> s_df) {
         ArrayList<String> ff = new ArrayList<String>();
         ff.addAll(s_ff);
@@ -3533,27 +3533,27 @@ public class SyncThread extends Thread {
                 filter = discreet_df.get(j).substring(1, discreet_df.get(j).length());
                 createDirFilterArrayList(sti, prefix, filter);//create inc + exc Filter Array lists
 
-				if (mStwa.gp.settingDebugLevel >= 1) {//print user filters sorted by include/exclude
-					//get all ";" separated filter items from each filter entry
-					String rem_filter=filter;
-					while(rem_filter.indexOf(";;")>=0) rem_filter=rem_filter.replaceAll(";;",";");
-					if (rem_filter.endsWith(";")) rem_filter=rem_filter.substring(0,rem_filter.length()-1);
-					if (rem_filter.startsWith(";")) rem_filter=rem_filter.replaceFirst(";","");
+                if (mStwa.gp.settingDebugLevel >= 1) {//print user filters sorted by include/exclude
+                    //get all ";" separated filter items from each filter entry
+                    String rem_filter=filter;
+                    while(rem_filter.indexOf(";;")>=0) rem_filter=rem_filter.replaceAll(";;",";");
+                    if (rem_filter.endsWith(";")) rem_filter=rem_filter.substring(0,rem_filter.length()-1);
+                    if (rem_filter.startsWith(";")) rem_filter=rem_filter.replaceFirst(";","");
 
-					//create inc + exc filter list
-					String pre_str = "", suf_str = "";
-					if (prefix.equals("I")) {//include filter
-						String[] rem_filter_array = rem_filter.split(";");
-						for (String filter_item : rem_filter_array) {
-							all_inc += filter_item + ";";
-						}
-					} else {//exclude filter
-						String[] rem_filter_array = rem_filter.split(";");
-						for (String filter_item : rem_filter_array) {
-							all_exc += filter_item + ";";
-						}
-					}
-				}
+                    //create inc + exc filter list
+                    String pre_str = "", suf_str = "";
+                    if (prefix.equals("I")) {//include filter
+                        String[] rem_filter_array = rem_filter.split(";");
+                        for (String filter_item : rem_filter_array) {
+                            all_inc += filter_item + ";";
+                        }
+                    } else {//exclude filter
+                        String[] rem_filter_array = rem_filter.split(";");
+                        for (String filter_item : rem_filter_array) {
+                            all_exc += filter_item + ";";
+                        }
+                    }
+                }
             }
 
             if (mStwa.gp.settingDebugLevel >= 1) {
@@ -3717,9 +3717,9 @@ public class SyncThread extends Thread {
             String new_filter_item = filter_item;
             
             //if exclude filter, check if it is traverse or not (decide to create or not the excluded dir folders):
-			// - excl filter==dir -> do not traverse dir/, so doesn't create empty "dir" folders
-			// - excl filter==dir/ -> traverse "dir/", so it creates excluded "dir" paths but not the children "dir/dir2"
-			//   + we add "<" suffix so that isDirectoryToBeProcessed() knows that the user filter ended with "/"
+            // - excl filter==dir -> do not traverse dir/, so doesn't create empty "dir" folders
+            // - excl filter==dir/ -> traverse "dir/", so it creates excluded "dir" paths but not the children "dir/dir2"
+            //   + we add "<" suffix so that isDirectoryToBeProcessed() knows that the user filter ended with "/"
             if (!prefix.equals("I")) {//exclude filter
                 if (new_filter_item.endsWith("/")) new_filter_item = new_filter_item.substring(0, new_filter_item.length() - 1) + "<";
             }
