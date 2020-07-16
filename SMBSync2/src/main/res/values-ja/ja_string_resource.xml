@@ -1028,4 +1028,6 @@
         <string name="settings_wifi_lock">settings_wifi_lock</string>
         <string name="settings_wifi_lock_summary_ena">同期中はWi-Fiをスリープさせない</string>
         <string name="settings_wifi_lock_title">Wi-Fiロック</string>
+        <string name="msgs_main_sync_list_array_mtype_mirr_img">IMAGE</string>
+        <string name="msgs_main_sync_profile_dlg_mirror_image">Mirror (Exact Image)</string>
 </resources>
