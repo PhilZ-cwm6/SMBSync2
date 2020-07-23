@@ -330,7 +330,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 holder.iv_row_image_master.setImageResource(R.drawable.ic_32_server);
             }
             holder.tv_row_master.setTextColor(mTextColor);
-            holder.tv_row_master.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+            holder.tv_row_master.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);// disable highlight language errors
 
             String target_dir = o.getTargetDirectoryName().startsWith("/")?o.getTargetDirectoryName().substring(1):o.getTargetDirectoryName();
             if (o.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_INTERNAL)) {
@@ -379,7 +379,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 holder.iv_row_image_target.setImageResource(R.drawable.ic_32_server);
             }
             holder.tv_row_target.setTextColor(mTextColor);
-            holder.tv_row_target.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+            holder.tv_row_target.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);// disable highlight language errors
 
             if (isShowCheckBox) {
                 holder.cbv_row_cb1.setVisibility(CheckBox.VISIBLE);
@@ -393,6 +393,20 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 }
             }
             final int p = position;
+
+            holder.tv_row_master.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ActivityMain) mContext).dispatchSyncTaskListItemClick(o, position);
+                }
+            });
+
+            holder.tv_row_target.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ActivityMain) mContext).dispatchSyncTaskListItemClick(o, position);
+                }
+            });
 
             holder.ib_row_sync.setOnClickListener(new View.OnClickListener() {
                 @Override
