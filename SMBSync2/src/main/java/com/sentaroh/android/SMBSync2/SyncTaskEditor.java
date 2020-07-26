@@ -3514,6 +3514,10 @@ public class SyncTaskEditor extends DialogFragment {
         spinnerSyncType.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
+                if (ctvEnsureTargetExactMirror.isChecked() && spinnerSyncType.getSelectedItem().toString().equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror)))
+                    ((TextView) parent.getChildAt(position)).setTextColor(mGp.themeColorList.text_color_warning);
+                else ((TextView) parent.getChildAt(position)).setTextColor(mGp.themeColorList.title_text_color);
                 setSyncTaskTypeFromSpinnere(spinnerSyncType, n_sti);
                 if (spinnerSyncType.getSelectedItem().toString().equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_archive))) {
                     if (n_sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_ZIP)) {
@@ -3831,7 +3835,7 @@ public class SyncTaskEditor extends DialogFragment {
         final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
         CommonUtilities.setCheckedTextView(ctvEnsureTargetExactMirror);
         ctvEnsureTargetExactMirror.setChecked(n_sti.isSyncOptionEnsureTargetIsExactMirror());
-//        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
+        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
         ctvEnsureTargetExactMirror.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -3846,7 +3850,7 @@ public class SyncTaskEditor extends DialogFragment {
                             ntfy);
                 } else {//if unchecked, no unexpected deletes will ever be done on the target (delete only files/dir included by filters AND removed from master), do not display warning
                     ctvEnsureTargetExactMirror.setChecked(isChecked);
-//                    setSpinnerSyncTaskType(spinnerSyncType, n_sti);
+                    setSpinnerSyncTaskType(spinnerSyncType, n_sti);
                     checkSyncTaskOkButtonEnabled(mDialog, type, n_sti, dlg_msg);
                 }
 
@@ -3854,7 +3858,7 @@ public class SyncTaskEditor extends DialogFragment {
                     @Override
                     public void positiveResponse(Context context, Object[] objects) {
                         ctvEnsureTargetExactMirror.setChecked(isChecked);//true
-//                        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
+                        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
                         checkSyncTaskOkButtonEnabled(mDialog, type, n_sti, dlg_msg);
                     }
                     @Override

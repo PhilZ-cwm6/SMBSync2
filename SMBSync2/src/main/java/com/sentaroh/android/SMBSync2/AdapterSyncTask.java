@@ -256,9 +256,9 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 synctp = holder.tv_mtype_archive;
             else synctp = "ERR";
 
-//            if (o.isSyncOptionEnsureTargetIsExactMirror()) holder.tv_row_synctype.setTextColor(mThemeColorList.text_color_warning);
-//            else holder.tv_row_synctype.setTextColor(mTextColor);
-            holder.tv_row_synctype.setTextColor(mTextColor);
+            if (o.isSyncOptionEnsureTargetIsExactMirror() && o.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) holder.tv_row_synctype.setTextColor(mThemeColorList.text_color_warning);
+            else holder.tv_row_synctype.setTextColor(mTextColor);
+//            holder.tv_row_synctype.setTextColor(mTextColor);
             holder.tv_row_synctype.setText(synctp);
 
             String result = "";
