@@ -410,8 +410,6 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     o.setChecked(isChecked);
-                    holder.tv_row_master.setSingleLine(!isChecked);
-                    holder.tv_row_target.setSingleLine(!isChecked);
                     items.set(p, o);
                     if (mNotifyCheckBoxEvent != null && isShowCheckBox)
                         mNotifyCheckBoxEvent.notifyToListener(true, null);
