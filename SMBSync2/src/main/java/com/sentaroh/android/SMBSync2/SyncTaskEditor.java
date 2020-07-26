@@ -3291,9 +3291,9 @@ public class SyncTaskEditor extends DialogFragment {
         spinnerSyncOption.setAdapter(adapterSyncOption);
 
         final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
-        if (ctvEnsureTargetExactMirror.isChecked()) adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror_image));
-        else adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror));
-//        adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror));
+//        if (ctvEnsureTargetExactMirror.isChecked()) adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror_image));
+//        else adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror));
+        adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror));
 
         adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_copy));
         adapterSyncOption.add(mContext.getString(R.string.msgs_main_sync_profile_dlg_move));
@@ -3831,7 +3831,7 @@ public class SyncTaskEditor extends DialogFragment {
         final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
         CommonUtilities.setCheckedTextView(ctvEnsureTargetExactMirror);
         ctvEnsureTargetExactMirror.setChecked(n_sti.isSyncOptionEnsureTargetIsExactMirror());
-        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
+//        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
         ctvEnsureTargetExactMirror.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -3846,7 +3846,7 @@ public class SyncTaskEditor extends DialogFragment {
                             ntfy);
                 } else {//if unchecked, no unexpected deletes will ever be done on the target (delete only files/dir included by filters AND removed from master), do not display warning
                     ctvEnsureTargetExactMirror.setChecked(isChecked);
-                    setSpinnerSyncTaskType(spinnerSyncType, n_sti);
+//                    setSpinnerSyncTaskType(spinnerSyncType, n_sti);
                     checkSyncTaskOkButtonEnabled(mDialog, type, n_sti, dlg_msg);
                 }
 
@@ -3854,7 +3854,7 @@ public class SyncTaskEditor extends DialogFragment {
                     @Override
                     public void positiveResponse(Context context, Object[] objects) {
                         ctvEnsureTargetExactMirror.setChecked(isChecked);//true
-                        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
+//                        setSpinnerSyncTaskType(spinnerSyncType, n_sti);
                         checkSyncTaskOkButtonEnabled(mDialog, type, n_sti, dlg_msg);
                     }
                     @Override
@@ -4921,12 +4921,12 @@ public class SyncTaskEditor extends DialogFragment {
         String so = null;
 
         final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
-        if (ctvEnsureTargetExactMirror.isChecked()) so = mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror_image);
-        else so = mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror);
-//        so = mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror);
+//        if (ctvEnsureTargetExactMirror.isChecked()) so = mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror_image);
+//        else so = mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror);
+        so = mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror);
 
         if (spinner.getSelectedItemPosition()<spinner.getAdapter().getCount()) so=spinner.getSelectedItem().toString();//Mirror adapter.getCount() = 0 (Spinner position 0)
-        if (so.equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror)) || so.equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror_image)))
+        if (so.equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror)))// || so.equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror_image)))
             n_stli.setSyncTaskType(SyncTaskItem.SYNC_TASK_TYPE_MIRROR);
         else if (so.equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_copy)))
             n_stli.setSyncTaskType(SyncTaskItem.SYNC_TASK_TYPE_COPY);

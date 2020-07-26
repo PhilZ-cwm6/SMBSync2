@@ -1029,6 +1029,4 @@
         <string name="settings_wifi_lock">settings_wifi_lock</string>
         <string name="settings_wifi_lock_summary_ena">Keep the Wi-Fi radio awake until sync is completed</string>
         <string name="settings_wifi_lock_title">Wi-Fi Locking</string>
-        <string name="msgs_main_sync_list_array_mtype_mirr_img">IMAGE</string>
-        <string name="msgs_main_sync_profile_dlg_mirror_image">Mirror (Exact Image)</string>
 </resources>

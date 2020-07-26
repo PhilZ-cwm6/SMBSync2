@@ -1030,6 +1030,4 @@
         <string name="settings_wifi_lock">settings_wifi_lock</string>
         <string name="settings_wifi_lock_summary_ena">Не давать уходить в сон Wi-Fi до завершенной синхронизации</string>
         <string name="settings_wifi_lock_title">Блокировка Wi-Fi</string>
-        <string name="msgs_main_sync_list_array_mtype_mirr_img">ИЗОБРАЖЕНИЕ</string>
-        <string name="msgs_main_sync_profile_dlg_mirror_image">Зеркало (Точное изображение)</string>
 </resources>

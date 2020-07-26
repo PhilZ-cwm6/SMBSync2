@@ -1029,6 +1029,4 @@
         <string name="settings_wifi_lock">settings_wifi_lock</string>
         <string name="settings_wifi_lock_summary_ena">Maintenir le Wi-Fi activé jusqu\'à la fin de la synchronisation</string>
         <string name="settings_wifi_lock_title">Verrouillage du Wi-Fi</string>
-        <string name="msgs_main_sync_list_array_mtype_mirr_img">IMAGE</string>
-        <string name="msgs_main_sync_profile_dlg_mirror_image">Miroir (Image Exacte)</string>
 </resources>
