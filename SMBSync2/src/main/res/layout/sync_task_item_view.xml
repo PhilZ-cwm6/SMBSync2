@@ -65,7 +65,7 @@
                             android:layout_gravity="center_vertical|top"
                             android:src="@drawable/ic_16_server" />
 
-                        <com.sentaroh.android.Utilities.Widget.NonWordwrapTextView
+                        <TextView
                             android:id="@+id/sync_task_master_info"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
                             android:layout_gravity="top"
                             android:src="@drawable/ic_16_server" />
 
-                        <com.sentaroh.android.Utilities.Widget.NonWordwrapTextView
+                        <TextView
                             android:id="@+id/sync_task_target_info"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
