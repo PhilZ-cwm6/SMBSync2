@@ -410,6 +410,12 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     o.setChecked(isChecked);
+                    holder.tv_row_master.setSingleLine(!isChecked);
+                    holder.tv_row_target.setSingleLine(!isChecked);
+                    holder.tv_row_master.invalidate();//needed for an immediate apply (even if not guarantied, else old NonWrap view applies instead of the ellipsized)
+                    holder.tv_row_master.requestLayout();
+                    holder.tv_row_target.invalidate();
+                    holder.tv_row_target.requestLayout();
                     items.set(p, o);
                     if (mNotifyCheckBoxEvent != null && isShowCheckBox)
                         mNotifyCheckBoxEvent.notifyToListener(true, null);
