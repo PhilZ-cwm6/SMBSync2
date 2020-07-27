@@ -71,7 +71,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:ellipsize="middle"
-                            android:singleLine="true"
+                            android:lines="1"
                             android:text="Master"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
                     </LinearLayout>
@@ -102,7 +102,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:ellipsize="middle"
-                            android:singleLine="true"
+                            android:lines="1"
                             android:text="Target"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
                     </LinearLayout>
