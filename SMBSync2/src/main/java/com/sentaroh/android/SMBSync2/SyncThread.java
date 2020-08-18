@@ -662,72 +662,101 @@ public class SyncThread extends Thread {
 
     private int checkStorageAccess(SyncTaskItem sti) {
         int sync_result = 0;
-        if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD) ||
-                sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD)) {
-            if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) {
-                sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
-                String e_msg = "";
-                if (mGp.safMgr.hasExternalSdcardPath()) {
-                    e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required);
-                } else {
-                    e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_not_mounted);
+        if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD) || sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD)) {
+            if (Build.VERSION.SDK_INT<=29) {
+                if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    String e_msg = "";
+                    if (mGp.safMgr.hasExternalSdcardPath()) {
+                        e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required);
+                    } else {
+                        e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_not_mounted);
+                    }
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "", e_msg);
+                    mGp.syncThreadCtrl.setThreadMessage(e_msg);
+                    return sync_result;
+                } else if (mGp.safMgr.getSdcardRootSafFile() == null) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
+                            mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
+                    mGp.syncThreadCtrl.setThreadMessage(
+                            mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
+                    return sync_result;
                 }
-                showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "", e_msg);
-                mGp.syncThreadCtrl.setThreadMessage(e_msg);
-                return sync_result;
-            } else if (mGp.safMgr.getSdcardRootSafFile() == null) {
-                sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
-                showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
-                        mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
-                mGp.syncThreadCtrl.setThreadMessage(
-                        mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
-                return sync_result;
+            } else {
+                if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
+                            mStwa.context.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_sdcard_not_mounted));
+                    mGp.syncThreadCtrl.setThreadMessage(
+                            mStwa.context.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_sdcard_not_mounted));
+                    return sync_result;
+                }
             }
         }
-        if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB) ||
-                sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB)) {
-            if (mGp.safMgr.getUsbRootPath().equals(SafManager.UNKNOWN_USB_DIRECTORY)) {
-                sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
-                String e_msg = "";
-                e_msg = mStwa.context.getString(R.string.msgs_mirror_usb_storage_not_mounted);
-                showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "", e_msg);
-                mGp.syncThreadCtrl.setThreadMessage(e_msg);
-                return sync_result;
-            } else if (mGp.safMgr.getUsbRootSafFile() == null) {
-                sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
-                showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
-                        mStwa.context.getString(R.string.msgs_mirror_usb_storage_not_mounted));
-                mGp.syncThreadCtrl.setThreadMessage(
-                        mStwa.context.getString(R.string.msgs_mirror_usb_storage_not_mounted));
-                return sync_result;
+        if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB) || sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB)) {
+            if (Build.VERSION.SDK_INT<=29) {
+                if (mGp.safMgr.getUsbRootPath().equals(SafManager.UNKNOWN_USB_DIRECTORY)) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    String e_msg = "";
+                    e_msg = mStwa.context.getString(R.string.msgs_mirror_usb_storage_not_mounted);
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "", e_msg);
+                    mGp.syncThreadCtrl.setThreadMessage(e_msg);
+                    return sync_result;
+                } else if (mGp.safMgr.getUsbRootSafFile() == null) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
+                            mStwa.context.getString(R.string.msgs_mirror_usb_storage_not_mounted));
+                    mGp.syncThreadCtrl.setThreadMessage(
+                            mStwa.context.getString(R.string.msgs_mirror_usb_storage_not_mounted));
+                    return sync_result;
+                }
+            } else {
+                if (mGp.safMgr.getUsbRootPath().equals(SafManager.UNKNOWN_USB_DIRECTORY)) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
+                            mStwa.context.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_usb_not_mounted));
+                    mGp.syncThreadCtrl.setThreadMessage(
+                            mStwa.context.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_usb_not_mounted));
+                    return sync_result;
+                }
             }
         }
-        if (sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_ZIP) &&
-                sti.isTargetZipUseExternalSdcard()) {
-            if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) {
-                sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
-                String e_msg = "";
-                if (mGp.safMgr.hasExternalSdcardPath()) {
-                    e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required);
-                } else {
-                    e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_not_mounted);
+        if (sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_ZIP) && sti.isTargetZipUseExternalSdcard()) {
+            if (Build.VERSION.SDK_INT<=29) {
+                if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    String e_msg = "";
+                    if (mGp.safMgr.hasExternalSdcardPath()) {
+                        e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required);
+                    } else {
+                        e_msg = mStwa.context.getString(R.string.msgs_mirror_external_sdcard_not_mounted);
+                    }
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "", e_msg);
+                    mGp.syncThreadCtrl.setThreadMessage(e_msg);
+                    return sync_result;
+                } else if (mGp.safMgr.getSdcardRootSafFile() == null) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
+                            mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
+                    mGp.syncThreadCtrl.setThreadMessage(
+                            mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
+                    return sync_result;
                 }
-                showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "", e_msg);
-                mGp.syncThreadCtrl.setThreadMessage(e_msg);
-                return sync_result;
-            } else if (mGp.safMgr.getSdcardRootSafFile() == null) {
-                sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
-                showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
-                        mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
-                mGp.syncThreadCtrl.setThreadMessage(
-                        mStwa.context.getString(R.string.msgs_mirror_external_sdcard_select_required));
-                return sync_result;
+            } else {
+                if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_USB_DIRECTORY)) {
+                    sync_result = SyncTaskItem.SYNC_STATUS_ERROR;
+                    showMsg(mStwa, true, sti.getSyncTaskName(), "E", "", "",
+                            mStwa.context.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_sdcard_not_mounted));
+                    mGp.syncThreadCtrl.setThreadMessage(
+                            mStwa.context.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_sdcard_not_mounted));
+                    return sync_result;
+                }
             }
         }
 
         if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
             String addr=null;
-//            if (sti.getMasterSmbHostName().equals("") && !sti.getMasterSmbHostName().equals("")) {
             if (!sti.getMasterSmbHostName().equals("")) {
                 addr = CommonUtilities.resolveHostName(mGp, mStwa.util, mStwa.masterAuth.getSmbLevel(), sti.getMasterSmbHostName());
                 if (addr == null) {
@@ -1005,14 +1034,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync Internal-To-SDCARD From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyInternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveInternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorInternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveInternalToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_INTERNAL) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB)) {
@@ -1025,14 +1066,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync Internal-To-USB From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyInternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveInternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorInternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveInternalToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_INTERNAL) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
@@ -1068,14 +1121,26 @@ public class SyncThread extends Thread {
             mStwa.util.addDebugMsg(1, "I", "Sync SDCARD-To-Internal From=" + from + ", To=" + to);
             mStwa.replaceKeywordRequiredAtWhileSync= isReplaceKeywordRequiredAtWhileSync(to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToInternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToInternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToInternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToInternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToInternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_INTERNAL)) {
@@ -1089,14 +1154,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync USB-To-Internal From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToInternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToInternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToInternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToInternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToInternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD)) {
@@ -1110,14 +1187,26 @@ public class SyncThread extends Thread {
             mStwa.util.addDebugMsg(1, "I", "Sync SDCARD-To-SDCARD From=" + from + ", To=" + to);
             mStwa.replaceKeywordRequiredAtWhileSync= isReplaceKeywordRequiredAtWhileSync(to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB)) {
@@ -1131,14 +1220,26 @@ public class SyncThread extends Thread {
             mStwa.util.addDebugMsg(1, "I", "Sync SDCARD-To-USB From=" + from + ", To=" + to);
             mStwa.replaceKeywordRequiredAtWhileSync= isReplaceKeywordRequiredAtWhileSync(to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB)) {
@@ -1152,14 +1253,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync USB-To-USB From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD)) {
@@ -1173,14 +1286,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync USB-To-SDCARD From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SDCARD) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
@@ -1196,14 +1321,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync SDCARD-To-SMB From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToSmb(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToSmb(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToSmb(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToSmb(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToSmb(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToSmb(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
@@ -1219,14 +1356,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync USB-To-SMB From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopyExternalToSmb(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveExternalToSmb(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorExternalToSmb(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveExternalToSmb(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyInternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveInternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorInternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveInternalToSmb(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopyExternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveExternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorExternalToSmb(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveExternalToSmb(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_INTERNAL)) {
@@ -1265,14 +1414,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync SMB-To-SDCARD From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopySmbToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveSmbToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorSmbToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveSmbToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopySmbToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveSmbToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorSmbToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveSmbToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopySmbToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveSmbToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorSmbToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveSmbToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_USB)) {
@@ -1288,14 +1449,26 @@ public class SyncThread extends Thread {
 
             mStwa.util.addDebugMsg(1, "I", "Sync SMB-To-USB From=" + from + ", To=" + to);
 
-            if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
-                sync_result = SyncThreadSyncFile.syncCopySmbToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
-                sync_result = SyncThreadSyncFile.syncMoveSmbToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
-                sync_result = SyncThreadSyncFile.syncMirrorSmbToExternal(mStwa, sti, from, to);
-            } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
-                sync_result = SyncThreadArchiveFile.syncArchiveSmbToExternal(mStwa, sti, from, to);
+            if (Build.VERSION.SDK_INT>=30) {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopySmbToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveSmbToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorSmbToInternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveSmbToInternal(mStwa, sti, from, to);
+                }
+            } else {
+                if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_COPY)) {
+                    sync_result = SyncThreadSyncFile.syncCopySmbToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MOVE)) {
+                    sync_result = SyncThreadSyncFile.syncMoveSmbToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+                    sync_result = SyncThreadSyncFile.syncMirrorSmbToExternal(mStwa, sti, from, to);
+                } else if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_ARCHIVE)) {
+                    sync_result = SyncThreadArchiveFile.syncArchiveSmbToExternal(mStwa, sti, from, to);
+                }
             }
         } else if (sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB) &&
                 sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {

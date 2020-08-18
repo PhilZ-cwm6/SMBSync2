@@ -31,6 +31,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
@@ -42,6 +44,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -75,6 +78,7 @@ import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.SafFile;
 import com.sentaroh.android.Utilities.StringUtil;
+import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.TreeFilelist.TreeFilelistAdapter;
 import com.sentaroh.android.Utilities.TreeFilelist.TreeFilelistItem;
@@ -216,7 +220,8 @@ public class SyncTaskUtil {
         Collections.sort(auto_saved_file_list, new Comparator<File>() {
             @Override
             public int compare(File o1, File o2) {
-                return (int)(o2.lastModified()-o1.lastModified());
+//                return (int)(o2.lastModified()-o1.lastModified());
+                return o2.getName().compareToIgnoreCase(o1.getName());
             }
         });
         SimpleDateFormat sdf =new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -1053,7 +1058,7 @@ public class SyncTaskUtil {
                                     mUtil.showCommonDialog(false, "I",mContext.getString(R.string.msgs_import_autosave_dlg_title),
                                             mContext.getString(R.string.msgs_export_import_profile_import_success)+"\n\n"+imp_list, ntfy_success);
                                     mUtil.addLogMsg("I", mContext.getString(R.string.msgs_export_import_profile_import_success)+"\n"+imp_list);
-                                    SyncTaskUtil.autosaveSyncTaskList(mGp, mContext, mUtil, mCommonDlg, mGp.syncTaskList);
+                                    SyncTaskUtil.autosaveSyncTaskList(mGp, mActivity, mUtil, mCommonDlg, mGp.syncTaskList);
                                 } else {
                                     mUtil.showCommonDialog(false, "E",mContext.getString(R.string.msgs_import_autosave_dlg_title),
                                             mContext.getString(R.string.msgs_export_import_profile_import_failed), null);
@@ -4374,7 +4379,7 @@ public class SyncTaskUtil {
                                 tfa.notifyDataSetChanged();
                                 String mtxt = mContext.getString(R.string.msgs_filter_list_duplicate_filter_specified);
                                 String dup_msg=String.format(mtxt, sel);
-                                Toast.makeText(mContext, dup_msg, Toast.LENGTH_LONG).show();
+                                CommonUtilities.showToastMessageShort(mActivity, dup_msg);
                             } else {
                                 CommonDialog.setViewEnabled(mActivity, btn_ok, true);
                             }
@@ -7336,7 +7341,7 @@ public class SyncTaskUtil {
         }
         return as_fl;
     }
-    public static boolean autosaveSyncTaskList(GlobalParameters mGp, Context c, CommonUtilities util, CommonDialog cd,
+    public static boolean autosaveSyncTaskList(GlobalParameters mGp, Activity c, CommonUtilities util, CommonDialog cd,
                                                ArrayList<SyncTaskItem> pfl) {
         boolean result=false;
         if (pfl.size()==0) {
@@ -7389,7 +7394,7 @@ public class SyncTaskUtil {
                 String path_str=c.getString(R.string.msgs_import_autosave_dlg_autosave_completed_path);
                 util.addLogMsg("I",msg+". "+path_str+"="+fd+"/"+fp);
                 for(SyncTaskItem sti:pfl) util.addDebugMsg(1,"I","  Task="+sti.getSyncTaskName());
-                Toast.makeText(c, msg, Toast.LENGTH_LONG).show();
+                CommonUtilities.showToastMessageShort(c, msg);
             } else {
                 File tmp_file=new File(fd+"/autosave_temp");
                 tmp_file.delete();

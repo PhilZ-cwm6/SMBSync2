@@ -50,15 +50,15 @@ import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_CONFIRM_REQUEST_M
 
 public class SyncThreadSyncFile {
 
-//	static final private int syncDeleteSmbToExternal(SyncThreadCommonArea stwa,
-//			SyncTaskItem sti, String master_dir, String target_dir) {
-//		File tf=new File(target_dir);
-//		Collections.sort(stwa.smbFileList);
-//		int sr=syncDeleteSmbToExternal(stwa,
-//				sti, master_dir, master_dir, target_dir, target_dir, tf, stwa.smbFileList);
-//		stwa.smbFileList=new ArrayList<String>();
-//		return sr;
-//	};
+//  static final private int syncDeleteSmbToExternal(SyncThreadCommonArea stwa,
+//          SyncTaskItem sti, String master_dir, String target_dir) {
+//      File tf=new File(target_dir);
+//      Collections.sort(stwa.smbFileList);
+//      int sr=syncDeleteSmbToExternal(stwa,
+//              sti, master_dir, master_dir, target_dir, target_dir, tf, stwa.smbFileList);
+//      stwa.smbFileList=new ArrayList<String>();
+//      return sr;
+//  };
 
     //called by syncMirrorSmbToExternal() before or at end of Mirror operation to delete non matching target files
     static final private int syncDeleteSmbToExternal(SyncThreadWorkArea stwa,
@@ -162,15 +162,15 @@ public class SyncThreadSyncFile {
         return sync_result;
     }
 
-//	static final private int syncDeleteSmbToInternal(SyncThreadCommonArea stwa, SyncTaskItem sti,
-//			String master_dir, String target_dir) {
-//		Collections.sort(stwa.smbFileList);
-//		File tf=new File(target_dir);
-//		int sr=syncDeleteSmbToInternal(stwa, sti, master_dir,
-//				master_dir, target_dir, target_dir, tf, stwa.smbFileList);
-//		stwa.smbFileList=new ArrayList<String>();
-//		return sr;
-//	};
+//  static final private int syncDeleteSmbToInternal(SyncThreadCommonArea stwa, SyncTaskItem sti,
+//          String master_dir, String target_dir) {
+//      Collections.sort(stwa.smbFileList);
+//      File tf=new File(target_dir);
+//      int sr=syncDeleteSmbToInternal(stwa, sti, master_dir,
+//              master_dir, target_dir, target_dir, tf, stwa.smbFileList);
+//      stwa.smbFileList=new ArrayList<String>();
+//      return sr;
+//  };
 
     //called by syncMirrorSmbToInternal() before or at end of Mirror operation to delete non matching target files
     static final private int syncDeleteSmbToInternal(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_base,
@@ -388,12 +388,12 @@ public class SyncThreadSyncFile {
         return mf_exists;
     }
 
-//	static final private int syncDeleteInternalToInternal(SyncThreadCommonArea stwa, SyncTaskItem sti,
-//			String master_dir, String target_dir) {
-//		File tf=new File(target_dir);
-//		return syncDeleteInternalToInternal(stwa, sti, master_dir,
-//				master_dir, target_dir, target_dir, tf);
-//	};
+//  static final private int syncDeleteInternalToInternal(SyncThreadCommonArea stwa, SyncTaskItem sti,
+//          String master_dir, String target_dir) {
+//      File tf=new File(target_dir);
+//      return syncDeleteInternalToInternal(stwa, sti, master_dir,
+//              master_dir, target_dir, target_dir, tf);
+//  };
 
     //called by syncMirrorInternalToInternal() and syncMirrorExternalToInternal() before or at end of Mirror operation to delete non matching target files
     static final private int syncDeleteInternalToInternal(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_base,
@@ -475,21 +475,21 @@ public class SyncThreadSyncFile {
         return sync_result;
     }
 
-//	static final private int syncDeleteInternalToSmb(SyncThreadCommonArea stwa, SyncTaskItem sti,
-//			String master_dir, String target_dir) {
-//		SmbFile tf = null;
-//		try {
-//			tf = new SmbFile(target_dir + "/", stwa.ntlmPasswordAuth);
-//		} catch (MalformedURLException e) {
-//			stwa.util.addLogMsg("E","","syncDeleteInternalToSmb master="+master_dir+", target="+target_dir);
-//			stwa.util.addLogMsg("E","",e.getMessage());//e.toString());
-//			SyncThread.printStackTraceElement(stwa, e.getStackTrace());
-//			stwa.gp.syncThreadCtrl.setThreadMessage(e.getMessage());
-//			return SyncTaskItem.SYNC_STATUS_ERROR;
-//		}
-//		return syncDeleteInternalToSmb(stwa, sti, master_dir,
-//				master_dir, target_dir, target_dir, tf);
-//	};
+//  static final private int syncDeleteInternalToSmb(SyncThreadCommonArea stwa, SyncTaskItem sti,
+//          String master_dir, String target_dir) {
+//      SmbFile tf = null;
+//      try {
+//          tf = new SmbFile(target_dir + "/", stwa.ntlmPasswordAuth);
+//      } catch (MalformedURLException e) {
+//          stwa.util.addLogMsg("E","","syncDeleteInternalToSmb master="+master_dir+", target="+target_dir);
+//          stwa.util.addLogMsg("E","",e.getMessage());//e.toString());
+//          SyncThread.printStackTraceElement(stwa, e.getStackTrace());
+//          stwa.gp.syncThreadCtrl.setThreadMessage(e.getMessage());
+//          return SyncTaskItem.SYNC_STATUS_ERROR;
+//      }
+//      return syncDeleteInternalToSmb(stwa, sti, master_dir,
+//              master_dir, target_dir, target_dir, tf);
+//  };
 
     //called by syncMirrorInternalToSmb() and syncMirrorExternalToSmb() before or at end of Mirror operation to delete non matching target files
     static final private int syncDeleteInternalToSmb(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_base,
@@ -594,12 +594,12 @@ public class SyncThreadSyncFile {
         return sync_result;
     }
 
-//	static final private int syncDeleteInternalToExternal(SyncThreadCommonArea stwa, SyncTaskItem sti,
-//			String master_dir, String target_dir) {
-//		File tf = new File(target_dir);
-//		return syncDeleteInternalToExternal(stwa, sti, master_dir,
-//				master_dir, target_dir, target_dir, tf);
-//	};
+//  static final private int syncDeleteInternalToExternal(SyncThreadCommonArea stwa, SyncTaskItem sti,
+//          String master_dir, String target_dir) {
+//      File tf = new File(target_dir);
+//      return syncDeleteInternalToExternal(stwa, sti, master_dir,
+//              master_dir, target_dir, target_dir, tf);
+//  };
 
     //called by syncMirrorInternalToExternal() and syncMirrorExternalToExternal() before or at end of Mirror operation to delete non matching target files
     static final private int syncDeleteInternalToExternal(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_base,
@@ -789,7 +789,8 @@ public class SyncThreadSyncFile {
                         }
                     } else {
                         if (stwa.gp.settingDebugLevel >= 1 && !mf.canRead())
-                            stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                            SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                    stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                     }
                 } else { // file copy
                     if (SyncThread.isDirectorySelectedByFileName(stwa, t_from_path) &&
@@ -905,7 +906,7 @@ public class SyncThreadSyncFile {
     }
 
     static private String convertToExifDateTime(SyncThreadWorkArea stwa, SyncTaskItem sti, InputStream is,
-                                          long file_last_modified, String from_path, String to_path) {
+                                                long file_last_modified, String from_path, String to_path) {
         String parsed_to_path=to_path;
         if (sti.isTargetUseTakenDateTimeToDirectoryNameKeyword() && stwa.replaceKeywordRequiredAtWhileSync) {
             String[] taken_date=null;
@@ -1071,7 +1072,8 @@ public class SyncThreadSyncFile {
                         }
                     } else {
                         if (stwa.gp.settingDebugLevel >= 1 && !mf.canRead())
-                            stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                            SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                    stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                     }
                 } else { // file copy
                     if (SyncThread.isDirectorySelectedByFileName(stwa, t_from_path) &&
@@ -1324,7 +1326,8 @@ public class SyncThreadSyncFile {
                         }
                     } else {
                         if (stwa.gp.settingDebugLevel >= 1 && !mf.canRead())
-                            stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                            SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                    stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                     }
                 } else { // file copy
                     if (SyncThread.isDirectorySelectedByFileName(stwa, t_from_path) &&
@@ -1543,7 +1546,8 @@ public class SyncThreadSyncFile {
                         }
                     } else {
                         if (stwa.gp.settingDebugLevel >= 1 && !mf.canRead())
-                            stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                            SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                    stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                     }
                 } else { // file copy
                     if (SyncThread.isDirectorySelectedByFileName(stwa, t_from_path) &&
@@ -1773,7 +1777,8 @@ public class SyncThreadSyncFile {
                         }
                     } else {
                         if (stwa.gp.settingDebugLevel >= 1 && !mf.canRead())
-                            stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                            SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                    stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                     }
                 } else { // file copy
                     if (SyncThread.isDirectorySelectedByFileName(stwa, t_from_path) &&
@@ -2025,7 +2030,8 @@ public class SyncThreadSyncFile {
                         }
                     } else {
                         if (stwa.gp.settingDebugLevel >= 1 && !mf.canRead())
-                            stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                            SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                    stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                     }
                 } else { // file copy
                     if (SyncThread.isDirectorySelectedByFileName(stwa, t_from_path) &&
@@ -2314,7 +2320,8 @@ public class SyncThreadSyncFile {
                     } else {
                         if (!mf.canRead()) {
                             if (stwa.gp.settingDebugLevel >= 1)
-                                stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                                SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                        stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                         }
                     }
                 } else { // file copy
@@ -2653,7 +2660,8 @@ public class SyncThreadSyncFile {
                         }
                     } else {
                         if (stwa.gp.settingDebugLevel >= 1 && !mf.canRead())
-                            stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                            SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                    stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                     }
                 } else { // file copy
                     if (SyncThread.isDirectorySelectedByFileName(stwa, t_from_path) &&
@@ -2978,7 +2986,8 @@ public class SyncThreadSyncFile {
                     } else {
                         if (!mf.canRead()) {
                             if (stwa.gp.settingDebugLevel >= 1)
-                                stwa.util.addDebugMsg(1, "I", "Directory ignored because can not read, fp=" + from_path + "/" + mf.getName());
+                                SyncThread.showMsg(stwa, true, sti.getSyncTaskName(), "W", "", "",
+                                        stwa.context.getString(R.string.msgs_mirror_task_directory_ignored_because_can_not_read, from_path + "/" + mf.getName()));
                         }
                     }
                 } else { // file copy

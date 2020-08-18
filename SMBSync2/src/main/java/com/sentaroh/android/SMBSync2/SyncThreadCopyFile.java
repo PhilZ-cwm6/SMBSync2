@@ -24,15 +24,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import android.content.ContentProviderClient;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.os.SystemClock;
 
 import com.sentaroh.android.SMBSync2.SyncThread.SyncThreadWorkArea;
 import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.jcifs.JcifsException;
 import com.sentaroh.jcifs.JcifsFile;
 
@@ -44,6 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import static com.sentaroh.android.SMBSync2.Constants.APP_SPECIFIC_DIRECTORY;
+import static com.sentaroh.android.SMBSync2.Constants.SYNC_IO_AREA_SIZE;
 
 public class SyncThreadCopyFile {
 
@@ -122,8 +119,8 @@ public class SyncThreadCopyFile {
         String to_file_dest = to_dir + "/" + file_name;
         String to_file_temp = null, to_file_dir_tmp="";
 
-        if (to_dir.startsWith(stwa.gp.safMgr.getSdcardRootPath())) to_file_dir_tmp = stwa.gp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/files/";//+file_name;
-        else to_file_dir_tmp = stwa.gp.safMgr.getUsbRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/files/";//+file_name;
+        if (to_dir.startsWith(stwa.gp.safMgr.getSdcardRootPath())) to_file_dir_tmp = stwa.gp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache/";//+file_name;
+        else to_file_dir_tmp = stwa.gp.safMgr.getUsbRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache/";//+file_name;
         to_file_temp=to_file_dir_tmp+System.currentTimeMillis();//file_name;
 
         SyncThread.createDirectoryToExternalStorage(stwa, sti, to_dir);
@@ -190,7 +187,7 @@ public class SyncThreadCopyFile {
         if (sti.isSyncTestMode()) return SyncTaskItem.SYNC_STATUS_SUCCESS;
 
         String to_file_dest = to_dir + "/" + file_name;
-        String to_dir_tmp = stwa.gp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/files";
+        String to_dir_tmp = stwa.gp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/cache";
         File tmp_dir=new File(to_dir_tmp);
         if (!tmp_dir.exists()) tmp_dir.mkdirs();
         String to_file_path = to_dir_tmp+"/"+"temp_file.tmp";
@@ -381,7 +378,14 @@ public class SyncThreadCopyFile {
         if (sti.isSyncTestMode()) return SyncTaskItem.SYNC_STATUS_SUCCESS;
 
         String to_file_dest = to_dir + "/" + file_name;
-        String to_dir_tmp = stwa.gp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/files";
+
+        String to_dir_tmp = "";
+        if (Build.VERSION.SDK_INT>=30) {
+            to_dir_tmp=getTempFileDirectory(to_dir);
+        } else {
+            to_dir_tmp = stwa.gp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/cache";
+        }
+
         File tmp_dir=new File(to_dir_tmp);
         if (!tmp_dir.exists()) tmp_dir.mkdirs();
         String temp_path = to_dir_tmp+"/"+"temp_file.tmp";
@@ -467,6 +471,17 @@ public class SyncThreadCopyFile {
         return SyncTaskItem.SYNC_STATUS_SUCCESS;
     }
 
+    static public String getTempFileDirectory(String to_dir) {
+        String result="";
+        if (to_dir.startsWith("/storage/emulated/0")) {
+            result="/storage/emulated/0/"+APP_SPECIFIC_DIRECTORY+"/cache";
+        } else {
+            String[] dir_parts=to_dir.split("/");
+            result="/"+dir_parts[1]+"/"+dir_parts[2]+"/"+APP_SPECIFIC_DIRECTORY+"/cache";
+        }
+        return result;
+    }
+
     static private int copyFileInternalToExternalSetLastMod(SyncThreadWorkArea stwa,
                                                             SyncTaskItem sti, String from_dir, File mf, String to_dir, String file_name) throws IOException {
         if (stwa.gp.settingDebugLevel >= 1)
@@ -478,8 +493,8 @@ public class SyncThreadCopyFile {
         String to_file_dest = to_dir + "/" + file_name;
         String to_file_temp = null, to_file_dir_tmp="";
 
-        if (to_dir.startsWith(stwa.gp.safMgr.getSdcardRootPath())) to_file_dir_tmp = stwa.gp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/files/";//+file_name;
-        else to_file_dir_tmp = stwa.gp.safMgr.getUsbRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/files/";//+file_name;
+        if (to_dir.startsWith(stwa.gp.safMgr.getSdcardRootPath())) to_file_dir_tmp = stwa.gp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache/";//+file_name;
+        else to_file_dir_tmp = stwa.gp.safMgr.getUsbRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache/";//+file_name;
         to_file_temp=to_file_dir_tmp+System.currentTimeMillis();//file_name;
 
         SyncThread.createDirectoryToExternalStorage(stwa, sti, to_dir);
@@ -715,7 +730,14 @@ public class SyncThreadCopyFile {
         if (sti.isSyncTestMode()) return SyncTaskItem.SYNC_STATUS_SUCCESS;
 
         String to_file_dest = to_dir + "/" + file_name;
-        String to_dir_tmp = stwa.gp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/files";
+
+        String to_dir_tmp = "";
+        if (Build.VERSION.SDK_INT>=30) {
+            to_dir_tmp=getTempFileDirectory(to_dir);
+        } else {
+            to_dir_tmp = stwa.gp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/cache";
+        }
+
         File tmp_dir=new File(to_dir_tmp);
         if (!tmp_dir.exists()) tmp_dir.mkdirs();
         String to_file_temp = to_dir_tmp+"/"+"temp_file.tmp";
@@ -818,8 +840,8 @@ public class SyncThreadCopyFile {
         String to_file_dest = to_dir + "/" + file_name;
         String to_file_temp = null, to_file_dir_tmp="";
 
-        if (to_dir.startsWith(stwa.gp.safMgr.getSdcardRootPath())) to_file_dir_tmp = stwa.gp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/files/";//+file_name;
-        else to_file_dir_tmp = stwa.gp.safMgr.getUsbRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/files/";//+file_name;
+        if (to_dir.startsWith(stwa.gp.safMgr.getSdcardRootPath())) to_file_dir_tmp = stwa.gp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache/";//+file_name;
+        else to_file_dir_tmp = stwa.gp.safMgr.getUsbRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache/";//+file_name;
         to_file_temp=to_file_dir_tmp+System.currentTimeMillis();//file_name;
 
         SyncThread.createDirectoryToExternalStorage(stwa, sti, to_dir);
@@ -878,8 +900,6 @@ public class SyncThreadCopyFile {
     }
 
     private final static int SHOW_PROGRESS_THRESHOLD_VALUE = 1024 * 1024 * 4;
-    private final static int IO_AREA_SIZE = 1024 * 1024;
-    public final static int LARGE_BUFFERED_STREAM_BUFFER_SIZE = 1024 * 1024 * 4;
 
     static public int copyFile(SyncThreadWorkArea stwa, SyncTaskItem sti, String from_dir, String to_dir,
                                 String file_name, long file_size, InputStream ifs, OutputStream ofs) throws IOException {
@@ -888,10 +908,9 @@ public class SyncThreadCopyFile {
 
         long read_begin_time = System.currentTimeMillis();
 
-        int buffer_size=LARGE_BUFFERED_STREAM_BUFFER_SIZE, io_area_size=IO_AREA_SIZE;
+        int io_area_size= SYNC_IO_AREA_SIZE;
         boolean show_prog = (file_size > SHOW_PROGRESS_THRESHOLD_VALUE);
         if (sti.isSyncOptionUseSmallIoBuffer() && sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
-            buffer_size=1024*16-1;
             io_area_size=1024*16-1;
             show_prog=(file_size > 1024*64);
         }
