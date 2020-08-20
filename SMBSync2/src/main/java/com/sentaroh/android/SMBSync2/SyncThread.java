@@ -129,7 +129,7 @@ public class SyncThread extends Thread {
         public ArrayList<Pattern> wholeDirIncludeFilterPatternList = new ArrayList<Pattern>();//no more used by directory filters v2
         public ArrayList<Pattern> wholeDirExcludeFilterPatternList = new ArrayList<Pattern>();//no more used by directory filters v2
 
-        public final boolean ALL_COPY = false;//if true, isFileChangedDetailCompare() will always copy the file whatever the time_diff and size_diff options are selected by user (override debug mode)
+        public final boolean ALL_COPY = false;
 
         public long totalTransferByte = 0, totalTransferTime = 0;
         public int totalCopyCount, totalDeleteCount, totalIgnoreCount = 0, totalRetryCount = 0;

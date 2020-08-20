@@ -3609,10 +3609,12 @@ public class SyncTaskEditor extends DialogFragment {
         spinnerSyncType.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //if exact mirror mode option is enabled, display Mirror entry in Sync Type spinner in yellow color
                 final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
                 if (ctvEnsureTargetExactMirror.isChecked() && spinnerSyncType.getSelectedItem().toString().equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_mirror)))
                     ((TextView) parent.getChildAt(0)).setTextColor(mGp.themeColorList.text_color_warning);//only position 0 is visible, else, use position - first_visible
                 else ((TextView) parent.getChildAt(0)).setTextColor(mGp.themeColorList.title_text_color);
+
                 setSyncTaskTypeFromSpinnere(spinnerSyncType, n_sti);
                 if (spinnerSyncType.getSelectedItem().toString().equals(mContext.getString(R.string.msgs_main_sync_profile_dlg_archive))) {
                     if (n_sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_ZIP)) {
@@ -3927,6 +3929,7 @@ public class SyncTaskEditor extends DialogFragment {
         ctvDeleteFirst.setChecked(n_sti.isSyncOptionDeleteFirstWhenMirror());
         setCtvListenerForEditSyncTask(ctvDeleteFirst, type, n_sti, dlg_msg);
 
+        // calling setSpinnerSyncTaskType(...) is needed to update sync type color when the exact mirror option is changed
         final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
         CommonUtilities.setCheckedTextView(ctvEnsureTargetExactMirror);
         ctvEnsureTargetExactMirror.setChecked(n_sti.isSyncOptionEnsureTargetIsExactMirror());

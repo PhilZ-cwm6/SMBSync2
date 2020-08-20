@@ -258,6 +258,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 synctp = holder.tv_mtype_archive;
             else synctp = "ERR";
 
+            //if exact mirror image option is enabled, set the Sync mode color to yellow in sync tasks list main view
             if (o.isSyncOptionEnsureTargetIsExactMirror() && o.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) holder.tv_row_synctype.setTextColor(mThemeColorList.text_color_warning);
             else holder.tv_row_synctype.setTextColor(mTextColor);
 //            holder.tv_row_synctype.setTextColor(mTextColor);
@@ -419,6 +420,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     o.setChecked(isChecked);
+                    //on sync task item selected, expand the path to full text instead of ellipsize middle
                     holder.tv_row_master.setSingleLine(!isChecked);
                     holder.tv_row_target.setSingleLine(!isChecked);
                     holder.tv_row_master.invalidate();//needed for an immediate apply (even if not guarantied, else old NonWrap view applies instead of the ellipsized)
