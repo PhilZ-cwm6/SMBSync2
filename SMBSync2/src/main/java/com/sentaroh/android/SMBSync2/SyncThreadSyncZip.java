@@ -49,10 +49,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import static com.sentaroh.android.SMBSync2.Constants.APP_SPECIFIC_DIRECTORY;
-import static com.sentaroh.android.SMBSync2.Constants.SYNC_IO_AREA_SIZE;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_CONFIRM_REQUEST_COPY;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_CONFIRM_REQUEST_DELETE_FILE;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_CONFIRM_REQUEST_MOVE;
+import static com.sentaroh.android.SMBSync2.Constants.SYNC_IO_AREA_SIZE;
 
 public class SyncThreadSyncZip {
 
