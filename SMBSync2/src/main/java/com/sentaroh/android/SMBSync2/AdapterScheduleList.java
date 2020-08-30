@@ -16,9 +16,6 @@ import com.sentaroh.android.Utilities.NotifyEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.regex.Pattern;
-
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_LIST_SEPARATOR;
 
 class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
     private int layout_id = 0;
@@ -205,14 +202,14 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
                 if (o.syncTaskList.equals("")) {
                     schedule_error=true;
                 } else {
-                    if (o.syncTaskList.indexOf(SMBSYNC2_LIST_SEPARATOR)>0) {
-                        String[] stl=o.syncTaskList.split(Pattern.quote(SMBSYNC2_LIST_SEPARATOR));
+                    if (o.syncTaskList.indexOf(",")>0) {
+                        String[] stl=o.syncTaskList.split(",");
                         String sep="";
                         for(String stn:stl) {
                             if (ScheduleUtil.getSyncTask(mGp,stn)==null) {
                                 schedule_error=true;
                                 error_item_name=sep+stn;
-                                sep="; ";
+                                sep=",";
                             }
                         }
                     } else {
@@ -233,7 +230,8 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
                 } else {
                     holder.tv_error_info.setVisibility(TextView.GONE);
                 }
-                sync_prof = String.format(mContext.getString(R.string.msgs_scheduler_info_sync_selected_profile), o.syncTaskList.replace(SMBSYNC2_LIST_SEPARATOR, "; "));
+                sync_prof = String.format(mContext.getString(R.string.msgs_scheduler_info_sync_selected_profile),
+                        o.syncTaskList);
             }
             holder.tv_time_info.setText(time_info + " " + sync_prof);
 

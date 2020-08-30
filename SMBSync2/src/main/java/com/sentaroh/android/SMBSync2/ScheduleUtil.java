@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.sentaroh.android.Utilities.StringUtil;
@@ -38,9 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.regex.Pattern;
-
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_LIST_SEPARATOR;
 
 import static com.sentaroh.android.SMBSync2.ScheduleConstants.SCHEDULER_LAST_SCHEDULED_UTC_TIME_KEY;
 import static com.sentaroh.android.SMBSync2.ScheduleConstants.SCHEDULER_SCHEDULE_DAY_OF_THE_WEEK_KEY;
@@ -71,14 +67,9 @@ public class ScheduleUtil {
         String v3_data = prefs.getString(SCHEDULER_SCHEDULE_SAVED_DATA_V3, "-1");
         String v4_data = prefs.getString(SCHEDULER_SCHEDULE_SAVED_DATA_V4, "-1");
         String v5_data = prefs.getString(SCHEDULER_SCHEDULE_SAVED_DATA_V5, "-1");
-        //String v6_data = prefs.getString(SCHEDULER_SCHEDULE_SAVED_DATA_V6, "-1");
 //    	Log.v("","data="+v2_data);
-//        if (!v6_data.equals("-1")) {
-//            sl = buildScheduleListV6(gp, v6_data);
-//        } else
         if (!v5_data.equals("-1")) {
             sl = buildScheduleListV5(gp, v5_data);
-            //saveScheduleData(c, gp, sl);//save to v6
         } else if (!v4_data.equals("-1")) {
             sl = buildScheduleListV4(gp, v4_data);
         } else if (!v3_data.equals("-1")) {
@@ -299,12 +290,6 @@ public class ScheduleUtil {
                 if (sub_array[8].length() > 0)
                     si.scheduleLastExecTime = Long.valueOf(sub_array[8].replace("\u0000", ""));
                 si.syncTaskList = sub_array[9].replace("\u0000", "");
-                Log.v("I","loaded si.syncTaskList="+si.syncTaskList);
-                if (si.syncTaskList.contains(",")) {
-                    //Schedule List v5 doesn't support comma
-                    //si.syncTaskList = si.syncTaskList.replaceAll(",", SMBSYNC2_LIST_SEPARATOR);
-                    //will be saved later when returning from this method
-                }
                 si.syncGroupList = sub_array[10].replace("\u0000", "");
                 si.syncWifiOnBeforeStart = sub_array[11].replace("\u0000", "").equals("1") ? true : false;
                 si.syncWifiOffAfterEnd = sub_array[12].replace("\u0000", "").equals("1") ? true : false;
@@ -358,8 +343,8 @@ public class ScheduleUtil {
     final static public void removeSyncTaskFromSchedule(GlobalParameters gp, CommonUtilities cu, ArrayList<ScheduleItem> sl, String delete_task_name) {
         for (ScheduleItem si : sl) {
             if (!si.syncTaskList.equals("")&& si.syncTaskList.contains(delete_task_name)) {
-                if (si.syncTaskList.indexOf(SMBSYNC2_LIST_SEPARATOR)>0) {//Multiple entry
-                    String[] task_list=si.syncTaskList.split(Pattern.quote(SMBSYNC2_LIST_SEPARATOR));
+                if (si.syncTaskList.indexOf(",")>0) {//Multiple entry
+                    String[] task_list=si.syncTaskList.split(",");
                     ArrayList<String>n_task_list=new ArrayList<String>();
                     if (task_list!=null) {
                         for(String stn:task_list) {
@@ -376,7 +361,7 @@ public class ScheduleUtil {
                             si.syncTaskList="";
                             for(String item:n_task_list) {
                                 si.syncTaskList+=sep+item;
-                                sep=SMBSYNC2_LIST_SEPARATOR;
+                                sep=",";
                             }
                         }
                     } else {
@@ -397,8 +382,8 @@ public class ScheduleUtil {
     final static public void renameSyncTaskFromSchedule(GlobalParameters gp, CommonUtilities cu, ArrayList<ScheduleItem> sl, String rename_task_name, String new_name) {
         for (ScheduleItem si : sl) {
             if (!si.syncTaskList.equals("") && si.syncTaskList.contains(rename_task_name)) {
-                if (si.syncTaskList.indexOf(SMBSYNC2_LIST_SEPARATOR)>0) {//Multiple entry
-                    String[] task_list=si.syncTaskList.split(Pattern.quote(SMBSYNC2_LIST_SEPARATOR));
+                if (si.syncTaskList.indexOf(",")>0) {//Multiple entry
+                    String[] task_list=si.syncTaskList.split(",");
                     ArrayList<String>n_task_list=new ArrayList<String>();
                     if (task_list!=null) {
                         for(String stn:task_list) {
@@ -414,7 +399,7 @@ public class ScheduleUtil {
                     si.syncTaskList="";
                     for(String item:n_task_list) {
                         si.syncTaskList+=sep+item;
-                        sep=SMBSYNC2_LIST_SEPARATOR;
+                        sep=",";
                     }
                 } else {
                     if (si.syncTaskList.equals(rename_task_name)) {
@@ -707,8 +692,8 @@ public class ScheduleUtil {
                         //NOP
                     } else {
                         if (!si.syncTaskList.equals("")) {
-                            if (si.syncTaskList.indexOf(SMBSYNC2_LIST_SEPARATOR)>0) {
-                                String[] stl=si.syncTaskList.split(Pattern.quote(SMBSYNC2_LIST_SEPARATOR));
+                            if (si.syncTaskList.indexOf(",")>0) {
+                                String[] stl=si.syncTaskList.split(",");
                                 for(String stn:stl) {
 //    /*debug*/                   cu.addDebugMsg(1,"I", "setSchedulerInfo findSyncTask1 name="+stn+", result="+getSyncTask(gp,stn));
                                     if (getSyncTask(gp,stn)==null) {
