@@ -2359,11 +2359,11 @@ public class ActivityMain extends AppCompatActivity {
     public void checkBackgroundLocationPermission(final NotifyEvent p_ntfy) {
         mUtil.addDebugMsg(1, "I", "Background location permission=" + checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION));
         NotifyEvent ntfy_bg_location_request = new NotifyEvent(mContext);
-        ntfy_bg_location_request.setListener(new NotifyEvent.NotifyEventListener() {
+        ntfy_bg_location_request.setListener(new NotifyEventListener() {
             @Override
             public void positiveResponse(Context c, Object[] o) {
                 NotifyEvent ntfy_bg_location_response=new NotifyEvent(mContext);
-                ntfy_bg_location_response.setListener(new NotifyEvent.NotifyEventListener() {
+                ntfy_bg_location_response.setListener(new NotifyEventListener() {
                     @Override
                     public void positiveResponse(Context context, Object[] objects) {
                         mGp.setSettingGrantCoarseLocationRequired(mContext, true);

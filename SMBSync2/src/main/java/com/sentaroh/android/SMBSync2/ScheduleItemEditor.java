@@ -627,7 +627,7 @@ public class ScheduleItemEditor {
             public void onClick(View v) {
                 if (isScheduleWasChanged()) {
                     NotifyEvent ntfy = new NotifyEvent(mContext);
-                    ntfy.setListener(new NotifyEvent.NotifyEventListener() {
+                    ntfy.setListener(new NotifyEventListener() {
                         @Override
                         public void positiveResponse(Context context, Object[] objects) {
                             dialog.dismiss();
