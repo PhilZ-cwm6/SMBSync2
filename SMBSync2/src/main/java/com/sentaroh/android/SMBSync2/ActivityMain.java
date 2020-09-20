@@ -2505,7 +2505,7 @@ public class ActivityMain extends AppCompatActivity {
 
 //        dlg_ok.setText(mContext.getString(R.string.msgs_storage_permission_all_file_access_button_text));
 
-        dlg_ok.setOnClickListener(new View.OnClickListener() {
+        dlg_ok.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 p_ntfy.notifyToListener(true, null);
@@ -2513,7 +2513,7 @@ public class ActivityMain extends AppCompatActivity {
             }
         });
 
-        dlg_cancel.setOnClickListener(new View.OnClickListener() {
+        dlg_cancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 p_ntfy.notifyToListener(false, null);
