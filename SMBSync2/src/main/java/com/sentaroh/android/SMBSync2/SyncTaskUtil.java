@@ -4103,7 +4103,7 @@ public class SyncTaskUtil {
     //checkDup==false: check a new sync task name for validity against existing sync tasks (called when rename/create a sync task)
     //checkDup==true: check if task name is already a duplicate in the syncTaskAdapter (could be caused by bug in previous versions or modification to the settings file)
     //                        called when editing sync task and in the Sync Task Adapter
-    //WARNING: when first loading Sync Task settings from file, gp.syncTaskAdapter is not init (ActivityMain and SyncService), so check for duplicates will fail
+    //WARNING: when first loading Sync Task settings from file, gp.syncTaskAdapter and gp.syncTaskList are not init (ActivityMain and SyncService), so check for duplicates will fail if we pass GlobalParameters as arg
     static public String isValidSyncTaskName(Context c, ArrayList<SyncTaskItem> stl, String t_name, boolean checkDup, boolean showAllError) {
         String result = "", invalid_chars_msg="", dup_msg="", sep="";
         if (t_name.length() > 0) {

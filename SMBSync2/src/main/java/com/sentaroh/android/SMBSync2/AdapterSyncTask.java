@@ -184,6 +184,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
             LayoutInflater vi = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(id, null);
             holder = new ViewHolder();
+            holder.tv_seq_num = (TextView) v.findViewById(R.id.sync_task_list_view_seq);
             holder.tv_row_name = (TextView) v.findViewById(R.id.sync_task_name);
             holder.tv_row_active = (TextView) v.findViewById(R.id.sync_task_enabled);
             holder.cbv_row_cb1 = (CheckBox) v.findViewById(R.id.sync_task_selected);
@@ -225,7 +226,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
             boolean sync_btn_disable=false;
 
             holder.ll_view.setBackgroundDrawable(ll_default);
-            //Do not change the background of tasks sync button in main view to make it clear that it is a button.
+            //Do not change the background to make it clear that it is a button.
 //            holder.ib_row_sync.setBackgroundDrawable(ll_default);
 
             String act = "";
@@ -237,6 +238,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 else act = tv_active_test;
             }
             holder.tv_row_active.setText(act);
+            holder.tv_seq_num.setText(String.format("%1$3d)", position + 1));
             holder.tv_row_name.setText(o.getSyncTaskName());
 
             holder.ll_sync.setVisibility(LinearLayout.VISIBLE);
@@ -429,7 +431,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     o.setChecked(isChecked);
-                    //on sync task item selected, expand the path to full text instead of ellipsize middle
+                    //on sync task item selected, expand the tasks paths to full text instead of ellipsize middle
                     holder.tv_row_master.setSingleLine(!isChecked);
                     holder.tv_row_target.setSingleLine(!isChecked);
                     holder.tv_row_master.invalidate();//needed for an immediate apply (even if not guarantied, else old NonWrap view applies instead of the ellipsized)
@@ -453,7 +455,7 @@ public class AdapterSyncTask extends ArrayAdapter<SyncTaskItem> {
         CheckBox cbv_row_cb1;
         ImageButton ib_row_sync;
 
-        TextView tv_row_synctype, tv_row_master, tv_row_target;
+        TextView tv_seq_num, tv_row_synctype, tv_row_master, tv_row_target;
         ImageView iv_row_sync_dir_image;
         ImageView iv_row_image_master, iv_row_image_target;
         String tv_mtype_mirror, tv_mtype_move, tv_mtype_copy, tv_mtype_sync, tv_mtype_archive;
