@@ -39,6 +39,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+//import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -5299,20 +5300,21 @@ public class ActivityMain extends AppCompatActivity {
         private final int mLongPressTimeout;
         private final int mRepeatInterval;
         private final OnClickListener mClickListener;
-        private View touchedView;
+        private View mTouchedView;
+//      private Rect mRect; // Variable to hold the bounds of the view rectangle
 
         private Runnable handlerRunnable = new Runnable() {
             @Override
             public void run() {
-                if(touchedView.isEnabled()) {
+                if(mTouchedView.isEnabled()) {
                     handler.postDelayed(this, mRepeatInterval);
-                    mClickListener.onClick(touchedView);
+                    mClickListener.onClick(mTouchedView);
                 } else {
                     //view was disabled by the clickListener: remove the callback
+                    //mUtil.addDebugMsg(2, "I", "runnable cancelled by View Removed");
                     handler.removeCallbacks(handlerRunnable);
-                    touchedView.setPressed(false);
-                    touchedView = null;
-                    //mUtil.addDebugMsg(2, "I", "runnable cancelled by View removed");
+                    mTouchedView.setPressed(false);
+                    mTouchedView = null;
                 }
                 //mUtil.addDebugMsg(2, "I", "runnable running");
             }
@@ -5325,8 +5327,7 @@ public class ActivityMain extends AppCompatActivity {
          * @param clickListener The OnClickListener, that will be called
          *        periodically
         */
-        public RepeatListener(int initialDelay, int repeatDelay,
-                OnClickListener clickListener) {
+        public RepeatListener(int initialDelay, int repeatDelay, OnClickListener clickListener) {
             if (clickListener == null)
                 throw new IllegalArgumentException("null runnable");
             if (initialDelay < 0 || repeatDelay < 0)
@@ -5342,22 +5343,34 @@ public class ActivityMain extends AppCompatActivity {
                 case MotionEvent.ACTION_DOWN:
                         handler.removeCallbacks(handlerRunnable);
                         handler.postDelayed(handlerRunnable, mLongPressTimeout);
-                        touchedView = view;
-                        touchedView.setPressed(true);
+                        mTouchedView = view;
+                        mTouchedView.setPressed(true);
                         mClickListener.onClick(view);
+//                        mRect = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
                         return true;
                 case MotionEvent.ACTION_MOVE:
                         break;
-                case MotionEvent.ACTION_UP:
+//                      if (!mRect.contains(view.getLeft() + (int) motionEvent.getX(), view.getTop() + (int) motionEvent.getY())) {
+//                          // User moved outside view rectangle bounds
+//                          // this part is not needed with the View.onTouch implementation as it is treated as ACTION_UP and ACTION_CANCEL
+//                          // if implemented, we must check for view == null before mTouchedView.setPressed(false);
+//                          mUtil.addDebugMsg(2, "I", "runnable cancelled by Move Outside View");
+//                          handler.removeCallbacks(handlerRunnable);
+//                          mTouchedView.setPressed(false);
+//                          mTouchedView = null;
+//                          return true;
+//                      }
                 case MotionEvent.ACTION_CANCEL:
+                        //mUtil.addDebugMsg(2, "I", "runnable cancelled by ACTION_CANCEL");
+                case MotionEvent.ACTION_UP:
+                        //mUtil.addDebugMsg(2, "I", "runnable cancelled by Finger UP");
                         handler.removeCallbacks(handlerRunnable);
-                        touchedView.setPressed(false);
-                        touchedView = null;
-                        //mUtil.addDebugMsg(2, "I", "runnable cancelled by finger UP");
+                        mTouchedView.setPressed(false);
+                        mTouchedView = null;
                         return true;
-                }
+            }
 
-                return false;
+            return false;
         }
     }
 }
