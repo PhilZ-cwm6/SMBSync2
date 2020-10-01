@@ -56,6 +56,7 @@ import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -3578,8 +3579,6 @@ public class ActivityMain extends AppCompatActivity {
 
     }
 
-    private boolean isHistoryButtonMoveDownPressed = true;
-    private boolean isAnyHistoryButtonMovePressed = false;
     private void setHistoryContextButtonListener() {
         mContextHistoryButtonSendTo.setOnClickListener(new OnClickListener() {
             @Override
@@ -3598,103 +3597,36 @@ public class ActivityMain extends AppCompatActivity {
         ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonSendTo, mContext.getString(R.string.msgs_hist_cont_label_share));
 
         // UP/DOWN bottom context buttons: single click to page up/down, long click to fast scroll up/down
-        final Handler contextButtonMoveHandler = new Handler(); 
-        Runnable contextButtonMoveLongPressRunnable = new Runnable() { 
-            public void run() {
-                contextButtonMoveHandler.postDelayed(this, 100);
+        mContextHistoryButtonMoveTop.setOnTouchListener(new RepeatListener(500, 100, new OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 int page_items =  mGp.syncHistoryListView.getLastVisiblePosition() - mGp.syncHistoryListView.getFirstVisiblePosition() + 1;
-                int sel = 0;
-                if (isHistoryButtonMoveDownPressed) sel = mGp.syncHistoryListView.getLastVisiblePosition() + 1;
-                else sel = mGp.syncHistoryListView.getFirstVisiblePosition() - page_items + 1;
+                int sel = mGp.syncHistoryListView.getFirstVisiblePosition() - page_items + 1;
 
                 if (sel > mGp.syncHistoryAdapter.getCount() - 1) sel = mGp.syncHistoryAdapter.getCount() - 1;
                 if (sel < 0) sel = 0;
 
+                //mUtil.addDebugMsg(1, "I", "page_items="+page_items + " First="+mGp.syncHistoryListView.getFirstVisiblePosition() + " Last="+mGp.syncHistoryListView.getLastVisiblePosition() + " sel="+sel);
                 mGp.syncHistoryListView.setSelection(sel);
-                //mUtil.addDebugMsg(2, "I", "runnable running");
-                if (!isAnyHistoryButtonMovePressed) {
-                    contextButtonMoveHandler.removeCallbacks(this);
-                    //mUtil.addDebugMsg(2, "I", "runnable cancelled");
-                }
-            }   
-        };
-
-        mContextHistoryButtonMoveTop.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                MotionEvent mCurrentEvent = event;
-                switch(event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                            isHistoryButtonMoveDownPressed = false;
-                            isAnyHistoryButtonMovePressed = true;
-                            contextButtonMoveHandler.postDelayed(contextButtonMoveLongPressRunnable, 500);
-                            break;
-                    case MotionEvent.ACTION_MOVE:
-                            //contextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                            isAnyHistoryButtonMovePressed = false;
-                            contextButtonMoveHandler.post(contextButtonMoveLongPressRunnable);
-                            //contextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                }
-                return false;
             }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveTop, mContext.getString(R.string.msgs_hist_cont_label_move_top));
+        }));
+        //ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveTop, mContext.getString(R.string.msgs_hist_cont_label_move_top));
 
-        mContextHistoryButtonMoveBottom.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                MotionEvent mCurrentEvent = event;
-                switch(event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                            isHistoryButtonMoveDownPressed = true;
-                            isAnyHistoryButtonMovePressed = true;
-                            contextButtonMoveHandler.postDelayed(contextButtonMoveLongPressRunnable, 500);
-                            break;
-                    case MotionEvent.ACTION_MOVE:
-                            //mContextcontextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                            isAnyHistoryButtonMovePressed = false;
-                            contextButtonMoveHandler.post(contextButtonMoveLongPressRunnable);
-                            //contextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                }
-                return false;
-            }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveBottom, mContext.getString(R.string.msgs_hist_cont_label_move_bottom));
-/*
-        mContextHistoryButtonMoveTop.setOnClickListener(new OnClickListener() {
+        mContextHistoryButtonMoveBottom.setOnTouchListener(new RepeatListener(500, 100, new OnClickListener() {
             @Override
             public void onClick(View v) {
                 int page_items =  mGp.syncHistoryListView.getLastVisiblePosition() - mGp.syncHistoryListView.getFirstVisiblePosition() + 1;
-                int up_sel = mGp.syncHistoryListView.getFirstVisiblePosition() - page_items + 1;
-                if (up_sel < 0) up_sel = 0;
+                int sel = mGp.syncHistoryListView.getLastVisiblePosition() + 1;
 
-                mGp.syncHistoryListView.setSelection(up_sel);
+                if (sel > mGp.syncHistoryAdapter.getCount() - 1) sel = mGp.syncHistoryAdapter.getCount() - 1;
+                if (sel < 0) sel = 0;
+
+                //mUtil.addDebugMsg(1, "I", "page_items="+page_items + " First="+mGp.syncHistoryListView.getFirstVisiblePosition() + " Last="+mGp.syncHistoryListView.getLastVisiblePosition() + " sel="+sel);
+                mGp.syncHistoryListView.setSelection(sel);
             }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveTop, mContext.getString(R.string.msgs_hist_cont_label_move_top));
+        }));
+        //ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveBottom, mContext.getString(R.string.msgs_hist_cont_label_move_bottom));
 
-        mContextHistoryButtonMoveBottom.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int page_items =  mGp.syncHistoryListView.getLastVisiblePosition() - mGp.syncHistoryListView.getFirstVisiblePosition() + 1;
-                int down_sel = mGp.syncHistoryListView.getLastVisiblePosition() + 1;
-//               mUtil.addDebugMsg(1, "I", "page_items="+page_items + " getFirstVisiblePosition="+mGp.syncHistoryListView.getFirstVisiblePosition() +
-//                                  " getLastVisiblePosition()="+mGp.syncHistoryListView.getLastVisiblePosition() + " down_sel="+down_sel);
-                if (down_sel > mGp.syncHistoryAdapter.getCount() - 1) down_sel = mGp.syncHistoryAdapter.getCount() - 1;
-
-                mGp.syncHistoryListView.setSelection(down_sel);
-            }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveBottom, mContext.getString(R.string.msgs_hist_cont_label_move_bottom));
-*/
         mContextHistoryButtonDeleteHistory.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -4630,8 +4562,6 @@ public class ActivityMain extends AppCompatActivity {
         refreshOptionMenu();
     }
 
-    private boolean isMessageButtonMoveDownPressed = false;
-    private boolean isAnyMessageButtonMovePressed = false;
     private void setMessageContextButtonListener() {
         mContextMessageButtonPinned.setOnClickListener(new OnClickListener() {
             @Override
@@ -4656,102 +4586,36 @@ public class ActivityMain extends AppCompatActivity {
         ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonPinned, mContext.getString(R.string.msgs_msg_cont_label_pinned_inactive));
 
         // UP/DOWN bottom context buttons: single click to page up/down, long click to fast scroll up/down
-        final Handler contextButtonMoveHandler = new Handler(); 
-        Runnable contextButtonMoveLongPressRunnable = new Runnable() { 
-            public void run() {
-                contextButtonMoveHandler.postDelayed(this, 100);
+        mContextMessageButtonMoveTop.setOnTouchListener(new RepeatListener(500, 100, new OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 int page_items =  mGp.msgListView.getLastVisiblePosition() - mGp.msgListView.getFirstVisiblePosition() + 1;
-                int sel = 0;
-                if (isMessageButtonMoveDownPressed) sel = mGp.msgListView.getLastVisiblePosition() + 1;
-                else sel = mGp.msgListView.getFirstVisiblePosition() - page_items + 1;
-
+                int sel = mGp.msgListView.getFirstVisiblePosition() - page_items + 1;
                 if (sel > mGp.msgListAdapter.getCount() - 1) sel = mGp.msgListAdapter.getCount() - 1;
                 if (sel < 0) sel = 0;
-                //mUtil.addDebugMsg(2, "I", "*******************page_items="+page_items + " first="+mGp.msgListView.getFirstVisiblePosition() + " last="+mGp.msgListView.getLastVisiblePosition() + " sel="+sel);
 
+                //mUtil.addDebugMsg(2, "I", "page_items="+page_items + " first="+mGp.msgListView.getFirstVisiblePosition() + " last="+mGp.msgListView.getLastVisiblePosition() + " sel="+sel);
                 mGp.msgListView.setItemChecked(sel, true);
                 mGp.msgListView.setSelection(sel);
-
-                //mUtil.addDebugMsg(2, "I", "runnable running");
-                if (!isAnyMessageButtonMovePressed) {
-                    contextButtonMoveHandler.removeCallbacks(this);
-                    //mUtil.addDebugMsg(2, "I", "runnable cancelled");
-                }
-            }   
-        };
-
-        mContextMessageButtonMoveTop.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                MotionEvent mCurrentEvent = event;
-                switch(event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                            isMessageButtonMoveDownPressed = false;
-                            isAnyMessageButtonMovePressed = true;
-                            contextButtonMoveHandler.postDelayed(contextButtonMoveLongPressRunnable, 500);
-                            break;
-                    case MotionEvent.ACTION_MOVE:
-                            //contextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                            isAnyMessageButtonMovePressed = false;
-                            contextButtonMoveHandler.post(contextButtonMoveLongPressRunnable);
-                            //contextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                }
-                return false;
             }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveTop, mContext.getString(R.string.msgs_msg_cont_label_move_top));
+        }));
+        //ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveTop, mContext.getString(R.string.msgs_msg_cont_label_move_top));
 
-        mContextMessageButtonMoveBottom.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                MotionEvent mCurrentEvent = event;
-                switch(event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                            isMessageButtonMoveDownPressed = true;
-                            isAnyMessageButtonMovePressed = true;
-                            contextButtonMoveHandler.postDelayed(contextButtonMoveLongPressRunnable, 500);
-                            break;
-                    case MotionEvent.ACTION_MOVE:
-                            //mContextcontextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                            isAnyMessageButtonMovePressed = false;
-                            contextButtonMoveHandler.post(contextButtonMoveLongPressRunnable);
-                            //contextButtonMoveHandler.removeCallbacks(contextButtonMoveLongPressRunnable);
-                            break;
-                }
-                return false;
-            }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveBottom, mContext.getString(R.string.msgs_msg_cont_label_move_bottom));
-/*
-        mContextMessageButtonMoveTop.setOnClickListener(new OnClickListener() {
+        mContextMessageButtonMoveBottom.setOnTouchListener(new RepeatListener(500, 100, new OnClickListener() {
             @Override
             public void onClick(View v) {
-                setContextButtonEnabled(mContextMessageButtonMoveTop, false);
-                mGp.msgListView.setItemChecked(0, true);
-                mGp.msgListView.setSelection(0);
-                setContextButtonEnabled(mContextMessageButtonMoveTop, true);
-            }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveTop, mContext.getString(R.string.msgs_msg_cont_label_move_top));
+                int page_items =  mGp.msgListView.getLastVisiblePosition() - mGp.msgListView.getFirstVisiblePosition() + 1;
+                int sel = mGp.msgListView.getLastVisiblePosition() + 1;
+                if (sel > mGp.msgListAdapter.getCount() - 1) sel = mGp.msgListAdapter.getCount() - 1;
+                if (sel < 0) sel = 0;
 
-        mContextMessageButtonMoveBottom.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setContextButtonEnabled(mContextMessageButtonMoveBottom, false);
-                mGp.msgListView.setItemChecked(mGp.msgListAdapter.getCount() - 1, true);
-                mGp.msgListView.setSelection(mGp.msgListAdapter.getCount() - 1);
-                setContextButtonEnabled(mContextMessageButtonMoveBottom, true);
+                //mUtil.addDebugMsg(2, "I", "page_items="+page_items + " first="+mGp.msgListView.getFirstVisiblePosition() + " last="+mGp.msgListView.getLastVisiblePosition() + " sel="+sel);
+                mGp.msgListView.setItemChecked(sel, true);
+                mGp.msgListView.setSelection(sel);
             }
-        });
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveBottom, mContext.getString(R.string.msgs_msg_cont_label_move_bottom));
-*/
+        }));
+        //ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveBottom, mContext.getString(R.string.msgs_msg_cont_label_move_bottom));
+
         mContextMessageButtonClear.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -5417,6 +5281,85 @@ public class ActivityMain extends AppCompatActivity {
         }
     }
 
+/*
+     * A class, that can be used as a TouchListener on any view (e.g. a Button).
+     * It cyclically runs a clickListener, emulating keyboard-like behaviour. First
+     * click is fired immediately, next one after the initialInterval, and subsequent
+     * ones after the normalInterval.
+     *
+     * Android default onLongClick can be returned by int ViewConfiguration.getLongPressTimeout() : 500 msec default
+     * Interval is scheduled after the onClick completes, so it has to run fast.
+     * If it runs slow, it does not generate skipped onClicks. Can be rewritten to
+     * achieve this.
+*/
+    private class RepeatListener implements View.OnTouchListener {
+
+        private Handler handler = new Handler();
+
+        private int initialInterval;
+        private final int normalInterval;
+        private final OnClickListener clickListener;
+        private View touchedView;
+
+        private Runnable handlerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(touchedView.isEnabled()) {
+                    handler.postDelayed(this, normalInterval);
+                    clickListener.onClick(touchedView);
+                } else {
+                    //view was disabled by the clickListener: remove the callback
+                    handler.removeCallbacks(handlerRunnable);
+                    touchedView.setPressed(false);
+                    touchedView = null;
+                    //mUtil.addDebugMsg(2, "I", "runnable cancelled by View removed");
+                }
+                //mUtil.addDebugMsg(2, "I", "runnable running");
+            }
+        };
+
+        /**
+         * @param initialInterval The interval after first click event (500 msec is the default Android onLongClick delay)
+         * @param normalInterval The interval after second and subsequent click 
+         *        events (100 msec recommended)
+         * @param clickListener The OnClickListener, that will be called
+         *        periodically
+        */
+        public RepeatListener(int initialInterval, int normalInterval, 
+                OnClickListener clickListener) {
+            if (clickListener == null)
+                throw new IllegalArgumentException("null runnable");
+            if (initialInterval < 0 || normalInterval < 0)
+                throw new IllegalArgumentException("negative interval");
+
+            this.initialInterval = initialInterval;
+            this.normalInterval = normalInterval;
+            this.clickListener = clickListener;
+        }
+
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                        handler.removeCallbacks(handlerRunnable);
+                        handler.postDelayed(handlerRunnable, initialInterval);
+                        touchedView = view;
+                        touchedView.setPressed(true);
+                        clickListener.onClick(view);
+                        return true;
+                case MotionEvent.ACTION_MOVE:
+                        break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                        handler.removeCallbacks(handlerRunnable);
+                        touchedView.setPressed(false);
+                        touchedView = null;
+                        //mUtil.addDebugMsg(2, "I", "runnable cancelled by finger UP");
+                        return true;
+                }
+
+                return false;
+        }
+    }
 }
 
 //class ActivityDataHolder implements Serializable {
