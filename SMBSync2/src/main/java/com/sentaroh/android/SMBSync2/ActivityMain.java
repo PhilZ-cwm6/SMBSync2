@@ -5284,8 +5284,8 @@ public class ActivityMain extends AppCompatActivity {
 /*
      * A class, that can be used as a TouchListener on any view (e.g. a Button).
      * It cyclically runs a clickListener, emulating keyboard-like behaviour. First
-     * click is fired immediately, next one after the initialInterval, and subsequent
-     * ones after the normalInterval.
+     * click is fired immediately, next one after the initialDelay, and subsequent
+     * ones after the repeatDelay.
      *
      * Android default onLongClick can be returned by int ViewConfiguration.getLongPressTimeout() : 500 msec default
      * Interval is scheduled after the onClick completes, so it has to run fast.
@@ -5296,17 +5296,17 @@ public class ActivityMain extends AppCompatActivity {
 
         private Handler handler = new Handler();
 
-        private int initialInterval;
-        private final int normalInterval;
-        private final OnClickListener clickListener;
+        private final int mLongPressTimeout;
+        private final int mRepeatInterval;
+        private final OnClickListener mClickListener;
         private View touchedView;
 
         private Runnable handlerRunnable = new Runnable() {
             @Override
             public void run() {
                 if(touchedView.isEnabled()) {
-                    handler.postDelayed(this, normalInterval);
-                    clickListener.onClick(touchedView);
+                    handler.postDelayed(this, mRepeatInterval);
+                    mClickListener.onClick(touchedView);
                 } else {
                     //view was disabled by the clickListener: remove the callback
                     handler.removeCallbacks(handlerRunnable);
@@ -5319,32 +5319,32 @@ public class ActivityMain extends AppCompatActivity {
         };
 
         /**
-         * @param initialInterval The interval after first click event (500 msec is the default Android onLongClick delay)
-         * @param normalInterval The interval after second and subsequent click 
+         * @param initialDelay The interval after first click event (500 msec is the default Android onLongClick delay)
+         * @param repeatDelay The interval after second and subsequent click 
          *        events (100 msec recommended)
          * @param clickListener The OnClickListener, that will be called
          *        periodically
         */
-        public RepeatListener(int initialInterval, int normalInterval, 
+        public RepeatListener(int initialDelay, int repeatDelay,
                 OnClickListener clickListener) {
             if (clickListener == null)
                 throw new IllegalArgumentException("null runnable");
-            if (initialInterval < 0 || normalInterval < 0)
+            if (initialDelay < 0 || repeatDelay < 0)
                 throw new IllegalArgumentException("negative interval");
 
-            this.initialInterval = initialInterval;
-            this.normalInterval = normalInterval;
-            this.clickListener = clickListener;
+            mLongPressTimeout = initialDelay;
+            mRepeatInterval = repeatDelay;
+            mClickListener = clickListener;
         }
 
         public boolean onTouch(View view, MotionEvent motionEvent) {
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                         handler.removeCallbacks(handlerRunnable);
-                        handler.postDelayed(handlerRunnable, initialInterval);
+                        handler.postDelayed(handlerRunnable, mLongPressTimeout);
                         touchedView = view;
                         touchedView.setPressed(true);
-                        clickListener.onClick(view);
+                        mClickListener.onClick(view);
                         return true;
                 case MotionEvent.ACTION_MOVE:
                         break;
