@@ -39,7 +39,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-//import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,7 +56,6 @@ import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -1019,8 +1017,8 @@ public class ActivityMain extends AppCompatActivity {
 
         mGp.syncTabScheduleAdapter = new AdapterScheduleList(mActivity, R.layout.schedule_sync_list_item, mGp.syncTabScheduleList);
         mGp.syncTabScheduleListView.setAdapter(mGp.syncTabScheduleAdapter);
-        mGp.syncTabMessage=(TextView)mScheduleView.findViewById(R.id.main_schedule_list_message);
-        mGp.syncTabMessage.setTextColor(mGp.themeColorList.text_color_warning);
+        mGp.syncTabScheduleMessage=(TextView)mScheduleView.findViewById(R.id.main_schedule_list_message);
+        mGp.syncTabScheduleMessage.setTextColor(mGp.themeColorList.text_color_warning);
         setScheduleTabMessage();
 
         mGp.scheduleInfoView = (TextView) findViewById(R.id.main_schedule_view_info);
@@ -1211,7 +1209,7 @@ public class ActivityMain extends AppCompatActivity {
                     v_top_sync_btn.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            if (v.getId()==R.id.menu_top_sync) {
+                            if (v.getId()== R.id.menu_top_sync) {
                                 if (mGp.syncTaskAdapter.isShowCheckBox())  {
                                     CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_main_sync_selected_profiles_toast), 2);
                                 } else {
@@ -1230,7 +1228,7 @@ public class ActivityMain extends AppCompatActivity {
                     v_top_schedule_btn.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            if (v.getId()==R.id.menu_top_scheduler) {
+                            if (v.getId()== R.id.menu_top_scheduler) {
                                 if (mGp.settingScheduleSyncEnabled)  {
                                     CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_scheduler_service_toggle_disable), 2);
                                 } else {
@@ -3067,16 +3065,16 @@ public class ActivityMain extends AppCompatActivity {
 
     private void setScheduleTabMessage() {
         if (mGp.syncTabScheduleAdapter.getCount() == 0) {
-            mGp.syncTabMessage.setVisibility(TextView.VISIBLE);
-            mGp.syncTabMessage.setText(mContext.getString(R.string.msgs_schedule_list_edit_no_schedule));
+            mGp.syncTabScheduleMessage.setVisibility(TextView.VISIBLE);
+            mGp.syncTabScheduleMessage.setText(mContext.getString(R.string.msgs_schedule_list_edit_no_schedule));
         } else {
             if (mGp.settingScheduleSyncEnabled) {
                 if (mGp.syncTabScheduleAdapter.getCount()!=0) {
-                    mGp.syncTabMessage.setVisibility(TextView.GONE);
+                    mGp.syncTabScheduleMessage.setVisibility(TextView.GONE);
                 }
             } else {
-                mGp.syncTabMessage.setVisibility(TextView.VISIBLE);
-                mGp.syncTabMessage.setText(mContext.getString(R.string.msgs_schedule_list_edit_scheduler_disabled));
+                mGp.syncTabScheduleMessage.setVisibility(TextView.VISIBLE);
+                mGp.syncTabScheduleMessage.setText(mContext.getString(R.string.msgs_schedule_list_edit_scheduler_disabled));
             }
         }
         mGp.syncTabScheduleAdapter.notifyDataSetChanged();
@@ -3153,7 +3151,7 @@ public class ActivityMain extends AppCompatActivity {
                             }
                         }
                         if (mGp.syncTabScheduleAdapter.getCount() == 0) {
-                            mGp.syncTabMessage.setVisibility(TextView.VISIBLE);
+                            mGp.syncTabScheduleMessage.setVisibility(TextView.VISIBLE);
                         }
                         mGp.syncTabScheduleAdapter.setSelectMode(false);
                         mGp.syncTabScheduleAdapter.sort();
@@ -3598,34 +3596,79 @@ public class ActivityMain extends AppCompatActivity {
         ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonSendTo, mContext.getString(R.string.msgs_hist_cont_label_share));
 
         // UP/DOWN bottom context buttons: single click to page up/down, long click to fast scroll up/down
-        mContextHistoryButtonMoveTop.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
+        mContextHistoryButtonScrollUp.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int page_items =  mGp.syncHistoryListView.getLastVisiblePosition() - mGp.syncHistoryListView.getFirstVisiblePosition() + 1;
-                int sel = mGp.syncHistoryListView.getFirstVisiblePosition() - page_items + 1;
+/*
+                Scroll up by whole visible list view height in pixels - y_offset
+                 - if first visible item is partially hidden, ensure it will be completely visible on bottom of the list after scroll up by one page
+                 - exception: if first visible item total height exceeds total visible ListView height, scroll by ListView height minus the already view item bottom part
+                   the code is proof tested again a message entry of +4x device size ( > 4 pages)
+                 - first_item_height: total height in pixels of the first visible ListView item (including any non visible part)
+*/
+                int lv_height = mGp.syncHistoryListView.getHeight();
+                //int lv_y_top = mGp.syncHistoryListView.getTop();
+                //int lv_y_padding_top = mGp.syncHistoryListView.getPaddingTop();
+                //ViewGroup.MarginLayoutParams lpListView = (ViewGroup.MarginLayoutParams) mGp.syncHistoryListView.getLayoutParams();
+                //int lv_top_margin = lpListView.topMargin;
+                //int lv_bottom_margin = lpListView.bottomMargin;
+                int first_item_y_top =  mGp.syncHistoryListView.getChildAt(0).getTop();
+                int first_item_y_bottom =  mGp.syncHistoryListView.getChildAt(0).getBottom();
+                int first_item_height = first_item_y_bottom - first_item_y_top;
+                int y_offset = 0;
+                if (first_item_y_top < 0) {
+                    // part of first item is hidden on top
+                    y_offset = first_item_height;
+                    if (y_offset > lv_height) y_offset = first_item_height - first_item_y_bottom;
+                }
 
-                if (sel > mGp.syncHistoryAdapter.getCount() - 1) sel = mGp.syncHistoryAdapter.getCount() - 1;
-                if (sel < 0) sel = 0;
-
-                //mUtil.addDebugMsg(1, "I", "page_items="+page_items + " First="+mGp.syncHistoryListView.getFirstVisiblePosition() + " Last="+mGp.syncHistoryListView.getLastVisiblePosition() + " sel="+sel);
-                mGp.syncHistoryListView.setSelection(sel);
+                //mUtil.addDebugMsg(2, "I", "lv_height="+lv_height + " first_item_height="+first_item_height + " first_item_y_top="+first_item_y_top + " first_item_y_bottom="+first_item_y_bottom);
+                mGp.syncHistoryListView.setItemChecked(mGp.syncHistoryListView.getFirstVisiblePosition(), true);//needed on app start to set touch focus
+                mGp.syncHistoryListView.setSelectionFromTop(mGp.syncHistoryListView.getFirstVisiblePosition(), lv_height - y_offset);
             }
         }));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonScrollUp, mContext.getString(R.string.msgs_hist_cont_label_scroll_up));
+
+        mContextHistoryButtonScrollDown.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int last_item_pos = mGp.syncHistoryListView.getLastVisiblePosition() - mGp.syncHistoryListView.getFirstVisiblePosition();
+                int lv_height = mGp.syncHistoryListView.getHeight();
+                //int lv_y_bottom = mGp.syncHistoryListView.getBottom();
+                //int first_item_y_top =  mGp.syncHistoryListView.getChildAt(0).getTop();
+                //int first_item_y_bottom =  mGp.syncHistoryListView.getChildAt(0).getBottom();
+                //int first_item_height = first_item_y_bottom - first_item_y_top;
+                int last_item_y_top =  mGp.syncHistoryListView.getChildAt(last_item_pos).getTop();
+                int last_item_y_bottom =  mGp.syncHistoryListView.getChildAt(last_item_pos).getBottom();
+                int last_item_height = last_item_y_bottom - last_item_y_top;
+                int y_offset = 0;
+
+                if (last_item_height > lv_height) {
+                    // multi page entry
+                    y_offset = -(lv_height - last_item_y_top);
+                }
+
+                //mUtil.addDebugMsg(2, "I", "y_offset="+y_offset + " last_item_height="+last_item_height + " last_item_y_top="+last_item_y_top);
+                mGp.syncHistoryListView.setItemChecked(mGp.syncHistoryListView.getLastVisiblePosition(), true);
+                mGp.syncHistoryListView.setSelectionFromTop(mGp.syncHistoryListView.getLastVisiblePosition(), y_offset);
+            }
+        }));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonScrollDown, mContext.getString(R.string.msgs_hist_cont_label_scroll_down));
+
+        mContextHistoryButtonMoveTop.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGp.syncHistoryListView.setSelection(0);
+            }
+        });
         ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveTop, mContext.getString(R.string.msgs_hist_cont_label_move_top));
 
-        mContextHistoryButtonMoveBottom.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
+        mContextHistoryButtonMoveBottom.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int page_items =  mGp.syncHistoryListView.getLastVisiblePosition() - mGp.syncHistoryListView.getFirstVisiblePosition() + 1;
-                int sel = mGp.syncHistoryListView.getLastVisiblePosition() + 1;
-
-                if (sel > mGp.syncHistoryAdapter.getCount() - 1) sel = mGp.syncHistoryAdapter.getCount() - 1;
-                if (sel < 0) sel = 0;
-
-                //mUtil.addDebugMsg(1, "I", "page_items="+page_items + " First="+mGp.syncHistoryListView.getFirstVisiblePosition() + " Last="+mGp.syncHistoryListView.getLastVisiblePosition() + " sel="+sel);
-                mGp.syncHistoryListView.setSelection(sel);
+                mGp.syncHistoryListView.setSelection(mGp.syncHistoryAdapter.getCount() - 1);
             }
-        }));
+        });
         ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonMoveBottom, mContext.getString(R.string.msgs_hist_cont_label_move_bottom));
 
         mContextHistoryButtonDeleteHistory.setOnClickListener(new OnClickListener() {
@@ -3748,6 +3791,8 @@ public class ActivityMain extends AppCompatActivity {
             mContextHistiryViewMoveTop.setVisibility(ImageButton.INVISIBLE);
             mContextHistiryViewMoveTop.setVisibility(ImageButton.VISIBLE);
             mContextHistiryViewMoveBottom.setVisibility(ImageButton.VISIBLE);
+            mContextHistiryViewScrollDown.setVisibility(ImageButton.VISIBLE);
+            mContextHistiryViewScrollUp.setVisibility(ImageButton.VISIBLE);
             mContextHistiryViewDeleteHistory.setVisibility(ImageButton.INVISIBLE);
             mContextHistiryViewHistoryCopyClipboard.setVisibility(ImageButton.INVISIBLE);
             if (isUiEnabled()) mContextHistiryViewSelectAll.setVisibility(ImageButton.VISIBLE);
@@ -3758,6 +3803,8 @@ public class ActivityMain extends AppCompatActivity {
             mContextHistiryViewShare.setVisibility(ImageButton.INVISIBLE);
             mContextHistiryViewMoveTop.setVisibility(ImageButton.INVISIBLE);
             mContextHistiryViewMoveBottom.setVisibility(ImageButton.INVISIBLE);
+            mContextHistiryViewScrollDown.setVisibility(ImageButton.INVISIBLE);
+            mContextHistiryViewScrollUp.setVisibility(ImageButton.INVISIBLE);
             mContextHistiryViewDeleteHistory.setVisibility(ImageButton.INVISIBLE);
             mContextHistiryViewHistoryCopyClipboard.setVisibility(ImageButton.INVISIBLE);
             mContextHistiryViewSelectAll.setVisibility(ImageButton.INVISIBLE);
@@ -3982,8 +4029,10 @@ public class ActivityMain extends AppCompatActivity {
     private LinearLayout mContextSyncTaskViewUnselectAll = null;
 
     private ImageButton mContextHistoryButtonSendTo = null;
-    private ImageButton mContextHistoryButtonMoveTop = null;
     private ImageButton mContextHistoryButtonMoveBottom = null;
+    private ImageButton mContextHistoryButtonMoveTop = null;
+    private ImageButton mContextHistoryButtonScrollDown = null;
+    private ImageButton mContextHistoryButtonScrollUp = null;
     private ImageButton mContextHistoryButtonDeleteHistory = null;
     private ImageButton mContextHistoryButtonHistiryCopyClipboard = null;
     private ImageButton mContextHistiryButtonSelectAll = null;
@@ -3992,6 +4041,8 @@ public class ActivityMain extends AppCompatActivity {
     private LinearLayout mContextHistiryViewShare = null;
     private LinearLayout mContextHistiryViewMoveTop = null;
     private LinearLayout mContextHistiryViewMoveBottom = null;
+    private LinearLayout mContextHistiryViewScrollDown = null;
+    private LinearLayout mContextHistiryViewScrollUp = null;
     private LinearLayout mContextHistiryViewDeleteHistory = null;
     private LinearLayout mContextHistiryViewHistoryCopyClipboard = null;
     private LinearLayout mContextHistiryViewSelectAll = null;
@@ -4113,6 +4164,8 @@ public class ActivityMain extends AppCompatActivity {
         mContextHistoryButtonSendTo = (ImageButton) mHistoryView.findViewById(R.id.context_button_share);
         mContextHistoryButtonMoveTop = (ImageButton) mHistoryView.findViewById(R.id.context_button_move_to_top);
         mContextHistoryButtonMoveBottom = (ImageButton) mHistoryView.findViewById(R.id.context_button_move_to_bottom);
+        mContextHistoryButtonScrollDown = (ImageButton) mHistoryView.findViewById(R.id.context_button_scroll_down);
+        mContextHistoryButtonScrollUp = (ImageButton) mHistoryView.findViewById(R.id.context_button_scroll_up);
         mContextHistoryButtonDeleteHistory = (ImageButton) mHistoryView.findViewById(R.id.context_button_delete);
         mContextHistoryButtonHistiryCopyClipboard = (ImageButton) mHistoryView.findViewById(R.id.context_button_copy_to_clipboard);
         mContextHistiryButtonSelectAll = (ImageButton) mHistoryView.findViewById(R.id.context_button_select_all);
@@ -4121,6 +4174,8 @@ public class ActivityMain extends AppCompatActivity {
         mContextHistiryViewShare = (LinearLayout) mHistoryView.findViewById(R.id.context_button_share_view);
         mContextHistiryViewMoveTop = (LinearLayout) mHistoryView.findViewById(R.id.context_button_move_to_top_view);
         mContextHistiryViewMoveBottom = (LinearLayout) mHistoryView.findViewById(R.id.context_button_move_to_bottom_view);
+        mContextHistiryViewScrollDown = (LinearLayout) mHistoryView.findViewById(R.id.context_button_scroll_down_view);
+        mContextHistiryViewScrollUp = (LinearLayout) mHistoryView.findViewById(R.id.context_button_scroll_up_view);
         mContextHistiryViewDeleteHistory = (LinearLayout) mHistoryView.findViewById(R.id.context_button_delete_view);
         mContextHistiryViewHistoryCopyClipboard = (LinearLayout) mHistoryView.findViewById(R.id.context_button_copy_to_clipboard_view);
         mContextHistiryViewSelectAll = (LinearLayout) mHistoryView.findViewById(R.id.context_button_select_all_view);
@@ -4590,14 +4645,32 @@ public class ActivityMain extends AppCompatActivity {
         mContextMessageButtonMoveTop.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int page_items =  mGp.msgListView.getLastVisiblePosition() - mGp.msgListView.getFirstVisiblePosition() + 1;
-                int sel = mGp.msgListView.getFirstVisiblePosition() - page_items + 1;
-                if (sel > mGp.msgListAdapter.getCount() - 1) sel = mGp.msgListAdapter.getCount() - 1;
-                if (sel < 0) sel = 0;
+/*
+                Scroll up by whole visible list view height in pixels - y_offset
+                 - if first visible item is partially hidden, ensure it will be completely visible on bottom of the list after scroll up by one page
+                 - exception: if first visible item total height exceeds total visible ListView height, scroll by ListView height minus the already view item bottom part
+                   the code is proof tested again a message entry of +4x device size ( > 4 pages)
+                 - first_item_height: total height in pixels of the first visible ListView item (including any non visible part)
+*/
+                int lv_height = mGp.msgListView.getHeight();
+                //int lv_y_top = mGp.msgListView.getTop();
+                //int lv_y_padding_top = mGp.msgListView.getPaddingTop();
+                //ViewGroup.MarginLayoutParams lpListView = (ViewGroup.MarginLayoutParams) mGp.msgListView.getLayoutParams();
+                //int lv_top_margin = lpListView.topMargin;
+                //int lv_bottom_margin = lpListView.bottomMargin;
+                int first_item_y_top =  mGp.msgListView.getChildAt(0).getTop();
+                int first_item_y_bottom =  mGp.msgListView.getChildAt(0).getBottom();
+                int first_item_height = first_item_y_bottom - first_item_y_top;
+                int y_offset = 0;
+                if (first_item_y_top < 0) {
+                    // part of first item is hidden on top
+                    y_offset = first_item_height;
+                    if (y_offset > lv_height) y_offset = first_item_height - first_item_y_bottom;
+                }
 
-                //mUtil.addDebugMsg(2, "I", "page_items="+page_items + " first="+mGp.msgListView.getFirstVisiblePosition() + " last="+mGp.msgListView.getLastVisiblePosition() + " sel="+sel);
-                mGp.msgListView.setItemChecked(sel, true);
-                mGp.msgListView.setSelection(sel);
+                //mUtil.addDebugMsg(2, "I", "lv_height="+lv_height + " first_item_height="+first_item_height + " first_item_y_top="+first_item_y_top + " first_item_y_bottom="+first_item_y_bottom);
+                mGp.msgListView.setItemChecked(mGp.msgListView.getFirstVisiblePosition(), true);//needed on app start to set touch focus
+                mGp.msgListView.setSelectionFromTop(mGp.msgListView.getFirstVisiblePosition(), lv_height - y_offset);
             }
         }));
         ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveTop, mContext.getString(R.string.msgs_move_to_top));
@@ -4605,18 +4678,51 @@ public class ActivityMain extends AppCompatActivity {
         mContextMessageButtonMoveBottom.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int page_items =  mGp.msgListView.getLastVisiblePosition() - mGp.msgListView.getFirstVisiblePosition() + 1;
-                int sel = mGp.msgListView.getLastVisiblePosition() + 1;
-                if (sel > mGp.msgListAdapter.getCount() - 1) sel = mGp.msgListAdapter.getCount() - 1;
-                if (sel < 0) sel = 0;
+                int last_item_pos = mGp.msgListView.getLastVisiblePosition() - mGp.msgListView.getFirstVisiblePosition();
+                int lv_height = mGp.msgListView.getHeight();
+                //int lv_y_bottom = mGp.msgListView.getBottom();
+                //int first_item_y_top =  mGp.msgListView.getChildAt(0).getTop();
+                //int first_item_y_bottom =  mGp.msgListView.getChildAt(0).getBottom();
+                //int first_item_height = first_item_y_bottom - first_item_y_top;
+                int last_item_y_top =  mGp.msgListView.getChildAt(last_item_pos).getTop();
+                int last_item_y_bottom =  mGp.msgListView.getChildAt(last_item_pos).getBottom();
+                int last_item_height = last_item_y_bottom - last_item_y_top;
+                int y_offset = 0;
 
-                //mUtil.addDebugMsg(2, "I", "page_items="+page_items + " first="+mGp.msgListView.getFirstVisiblePosition() + " last="+mGp.msgListView.getLastVisiblePosition() + " sel="+sel);
-                mGp.msgListView.setItemChecked(sel, true);
-                mGp.msgListView.setSelection(sel);
+                if (last_item_height > lv_height) {
+                    // multi page entry
+                    y_offset = -(lv_height - last_item_y_top);
+                }
+
+                //mUtil.addDebugMsg(2, "I", "y_offset="+y_offset + " last_item_height="+last_item_height + " last_item_y_top="+last_item_y_top);
+                mGp.msgListView.setItemChecked(mGp.msgListView.getLastVisiblePosition(), true);
+                mGp.msgListView.setSelectionFromTop(mGp.msgListView.getLastVisiblePosition(), y_offset);
             }
         }));
         ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveBottom, mContext.getString(R.string.msgs_move_to_bottom));
+/*
+        mContextMessageButtonMoveTop.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContextButtonEnabled(mContextMessageButtonMoveTop, false);
+                mGp.msgListView.setItemChecked(0, true);
+                mGp.msgListView.setSelection(0);
+                setContextButtonEnabled(mContextMessageButtonMoveTop, true);
+            }
+        });
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveTop, mContext.getString(R.string.msgs_msg_cont_label_move_top));
 
+        mContextMessageButtonMoveBottom.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContextButtonEnabled(mContextMessageButtonMoveBottom, false);
+                mGp.msgListView.setItemChecked(mGp.msgListAdapter.getCount() - 1, true);
+                mGp.msgListView.setSelection(mGp.msgListAdapter.getCount() - 1);
+                setContextButtonEnabled(mContextMessageButtonMoveBottom, true);
+            }
+        });
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonMoveBottom, mContext.getString(R.string.msgs_msg_cont_label_move_bottom));
+*/
         mContextMessageButtonClear.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

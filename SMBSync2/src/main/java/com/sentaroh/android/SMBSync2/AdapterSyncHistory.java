@@ -39,7 +39,6 @@ import android.widget.TextView;
 
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.ThemeColorList;
-import com.sentaroh.android.Utilities.ThemeUtil;
 
 import java.util.ArrayList;
 

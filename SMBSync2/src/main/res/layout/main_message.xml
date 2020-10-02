@@ -13,8 +13,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:fadeScrollbars="false"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium" >
+        android:fastScrollEnabled="true">
     </ListView>
     
     <include layout="@layout/context_view_message" />
