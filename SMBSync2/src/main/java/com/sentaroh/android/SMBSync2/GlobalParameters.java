@@ -403,10 +403,6 @@ public class GlobalParameters extends CommonGlobalParms {
     }
 
     public void clearParms() {
-//        synchronized (syncMessageList) {
-//            syncMessageList = new ArrayList<SyncMessageItem>();
-//            syncMessageListAdapter = null;
-//        }
     }
 
     @SuppressLint("NewApi")

@@ -3363,7 +3363,6 @@ public class ActivityMain extends AppCompatActivity {
         mContextScheduleButtonUnselectAll.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mGp.syncScheduleAdapter.setSelectMode(false);
                 mGp.syncScheduleAdapter.unselectAll();
                 setScheduleContextButtonMode(mGp.syncScheduleAdapter);
             }
@@ -3613,7 +3612,7 @@ public class ActivityMain extends AppCompatActivity {
         if (lv.getChildAt(lv.getChildCount() - 1) == null) return false;
 
         boolean result=true;
-        if (lv.getLastVisiblePosition() == lv.getAdapter().getCount()-1 && 
+        if (lv.getLastVisiblePosition() == lv.getAdapter().getCount()-1 &&
                 lv.getChildAt(lv.getChildCount() - 1).getBottom() <= lv.getHeight()) {
             result=false;
         }
@@ -3706,7 +3705,6 @@ public class ActivityMain extends AppCompatActivity {
                 setHistoryScrollButtonVisibility();
             }
         }));
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonScrollUp, mContext.getString(R.string.msgs_hist_cont_label_scroll_up));
 
         mContextHistoryButtonScrollDown.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
             @Override
@@ -3732,7 +3730,6 @@ public class ActivityMain extends AppCompatActivity {
                 setHistoryScrollButtonVisibility();
             }
         }));
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextHistoryButtonScrollDown, mContext.getString(R.string.msgs_hist_cont_label_scroll_down));
 
         mContextHistoryButtonMoveTop.setOnClickListener(new OnClickListener() {
             @Override
@@ -4764,7 +4761,6 @@ public class ActivityMain extends AppCompatActivity {
                 setMessageScrollButtonVisibility();
             }
         }));
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonScrollUp, mContext.getString(R.string.msgs_msg_cont_label_scroll_up));
 
         mContextMessageButtonScrollDown.setOnTouchListener(new RepeatListener(ANDROID_LONG_PRESS_TIMEOUT, DEFAULT_LONG_PRESS_REPEAT_INTERVAL, false, new OnClickListener() {
             @Override
@@ -4789,7 +4785,6 @@ public class ActivityMain extends AppCompatActivity {
                 setMessageScrollButtonVisibility();
             }
         }));
-        ContextButtonUtil.setButtonLabelListener(mActivity, mContextMessageButtonScrollDown, mContext.getString(R.string.msgs_msg_cont_label_scroll_down));
 
         mContextMessageButtonPinned.setOnClickListener(new OnClickListener() {
             @Override

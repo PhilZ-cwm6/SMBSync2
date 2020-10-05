@@ -120,8 +120,6 @@
         <string name="msgs_hist_cont_label_delete">Удалить историю</string>
         <string name="msgs_hist_cont_label_move_bottom">Двигаться вниз</string>
         <string name="msgs_hist_cont_label_move_top">Переместить наверх</string>
-        <string name="msgs_hist_cont_label_scroll_down">Прокрутить вниз</string>
-        <string name="msgs_hist_cont_label_scroll_up">Прокрутите вверх</string>
         <string name="msgs_hist_cont_label_select_all">Выбрать все элементы истории</string>
         <string name="msgs_hist_cont_label_share">Общий ресурс</string>
         <string name="msgs_hist_cont_label_unselect_all">Удалить все элементы истории</string>
@@ -271,8 +269,6 @@
         <string name="msgs_msg_cont_label_clear">Очистить сообщения</string>
         <string name="msgs_msg_cont_label_move_bottom">Иди до конца</string>
         <string name="msgs_msg_cont_label_move_top">К началу</string>
-        <string name="msgs_msg_cont_label_scroll_down">Прокрутить вниз</string>
-        <string name="msgs_msg_cont_label_scroll_up">Прокрутите вверх</string>
         <string name="msgs_msg_cont_label_pinned_active">Отключите автопрокрутку</string>
         <string name="msgs_msg_cont_label_pinned_inactive">Включите автопрокрутку</string>
         <string name="msgs_no_profile_entry">Нет заданий</string>
