@@ -1299,13 +1299,8 @@ public class ActivityMain extends AppCompatActivity {
             if (mGp.syncThreadActive) menu.findItem(R.id.menu_top_housekeep).setVisible(false);
             else menu.findItem(R.id.menu_top_housekeep).setVisible(true);
 
-            //mod start schedules 2/6
-            menu.findItem(R.id.menu_top_sync).setVisible(false);
-            if (mCurrentTab.equals(SMBSYNC2_TAB_NAME_SCHEDULE)) {
-                menu.findItem(R.id.menu_top_sync).setIcon(R.drawable.ic_32_start_schedule);
-                menu.findItem(R.id.menu_top_sync).setVisible(true);
-            } else if (mGp.syncTaskList != null && mGp.syncTaskList.size() > 0) {
-                menu.findItem(R.id.menu_top_sync).setIcon(R.drawable.ic_32_sync);
+            if (mGp.syncTaskList!=null && mGp.syncTaskList.size()>0) {
+                menu.findItem(R.id.menu_top_sync).setVisible(false);
                 for(SyncTaskItem sti:mGp.syncTaskList) {
                     if ((sti.isSyncTaskAuto() && !sti.isSyncTestMode()) ||
                             mGp.syncTaskAdapter.isShowCheckBox()) {
@@ -1315,6 +1310,16 @@ public class ActivityMain extends AppCompatActivity {
                         }
                     }
                 }
+            } else {
+                menu.findItem(R.id.menu_top_sync).setVisible(false);
+            }
+
+            //mod start schedules 2/6
+            if (mCurrentTab.equals(SMBSYNC2_TAB_NAME_SCHEDULE)) {
+                menu.findItem(R.id.menu_top_sync).setIcon(R.drawable.ic_32_start_schedule);
+                menu.findItem(R.id.menu_top_sync).setVisible(true);
+            } else {
+                menu.findItem(R.id.menu_top_sync).setIcon(R.drawable.ic_32_sync);
             }
 /*
             //issue: toast message state not updated on start
@@ -1424,10 +1429,10 @@ public class ActivityMain extends AppCompatActivity {
                         //mod start schedules 3/6
                         if (mGp.syncScheduleAdapter.isSelectMode()) {
                             //start selected schedule tasks
-                            syncSelectedScheduleTask();
+                            syncSelectedScheduleTasks();
                         } else {
                             //start all enabled schedule tasks
-                            syncEnabledScheduleTask();
+                            syncEnabledScheduleTasks();
                         }
                         mGp.syncScheduleAdapter.setSelectMode(false);
                         mGp.syncScheduleAdapter.unselectAll();
@@ -3147,7 +3152,7 @@ public class ActivityMain extends AppCompatActivity {
                         saveScheduleList();
                         setScheduleTabMessage();
                         //mod start schedules 4/6
-                        invalidateOptionsMenu();//refresh toast notification message when first schedule is deleted
+                        //invalidateOptionsMenu();//refresh toast notification message when first schedule is deleted
                     }
 
                     @Override
@@ -3184,7 +3189,7 @@ public class ActivityMain extends AppCompatActivity {
                         saveScheduleList();
                         setScheduleTabMessage();
                         //mod start schedules 5/6
-                        invalidateOptionsMenu();//refresh toast notification message when last schedule is deleted
+                        //invalidateOptionsMenu();//refresh toast notification message when last schedule is deleted
                     }
 
                     @Override
@@ -4976,7 +4981,8 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     //mod start schedules 6/6
-    private void syncSelectedScheduleTask() {
+    //Manually start selected schedules
+    private void syncSelectedScheduleTasks() {
         final ArrayList<SyncTaskItem> tasks_list = new ArrayList<SyncTaskItem>();
         final ArrayList<ScheduleItem> schedule_list = new ArrayList<ScheduleItem>();
 
@@ -4988,7 +4994,7 @@ public class ActivityMain extends AppCompatActivity {
         }
 
         String schedule_list_msg = "", sep = "";
-        for (int i = 0; i < mGp.syncScheduleAdapter.getCount(); i++) {
+        for(int i = 0; i < mGp.syncScheduleAdapter.getCount(); i++) {
             ScheduleItem si = mGp.syncScheduleAdapter.getItem(i);
             if (si.isChecked) {
                 schedule_list.add(si);
@@ -4999,59 +5005,25 @@ public class ActivityMain extends AppCompatActivity {
 
         if (schedule_list.isEmpty()) {
             //no schedule plan is selected
-            //mUtil.showCommonDialog(false, "E", mContext.getString(R.string.msgs_main_sync_no_schedule_task_selected), "", null);
+            //mUtil.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_sync_no_schedule_task_selected), "", null);
             mUtil.showCommonDialog(false, "W", "You must select at least one schedule task to run.", "", null);
             return;
         }
 
-        //Starting all selected schedule tasks
-        //mUtil.addLogMsg("I", mContext.getString(R.string.msgs_main_sync_all_selected_schedule) + "\n" + schedule_list_msg);
-        //CommonUtilities.showToastMessageShort(mActivity, mContext.getString(R.string.msgs_main_sync_all_selected_schedule));
         mUtil.addLogMsg("I", "Starting all selected schedule tasks:" + "\n" + schedule_list_msg);
         CommonUtilities.showToastMessageShort(mActivity, "Starting all selected schedule tasks:" + "\n" + schedule_list_msg);
-        for (int i = 0; i < schedule_list.size(); i++) {
-            ScheduleItem si = schedule_list.get(i);
-            //mUtil.addLogMsg("I", mContext.getString(R.string.msgs_main_sync_selected_schedule, si.scheduleName));
-            mUtil.addLogMsg("I", "Running selected schedule:" + " " + si.scheduleName);
-            if (si.syncAutoSyncTask) {
-                //schedule plan syncs all Auto Sync tasks
-                mUtil.addDebugMsg(2, "I", "Schedule task is All Auto tasks");
-                syncAutoSyncTask();
-            } else if (si.syncTaskList != null && si.syncTaskList.length() > 0) {
-                //sync specified schedule plan tasks
-                mUtil.addDebugMsg(2, "I", "Schedule task is sync list");
-                String tasks_list_msg = "", sep_t = "";
-                for (String item:si.syncTaskList.split(SYNC_TASK_LIST_SEPARATOR)) {
-                    if (item == null) continue;
-                    SyncTaskItem sti = SyncTaskUtil.getSyncTaskByName(mGp.syncTaskList, item);
-                    if (sti != null) {
-                        tasks_list_msg += sep_t + item;
-                        sep_t = ", ";
-                        tasks_list.add(sti);
-                    } else {
-                        //invalid task name in the schedule
-                        //mUtil.addLogMsg("W", mContext.getString(R.string.msgs_schedule_info_error, si.scheduleName, item)); //msg = The task specified in the schedule cannot be found.\nSchedule: %s, Task: %s
-                        mUtil.addLogMsg("W", "The task specified in the schedule cannot be found.\nSchedule: " + si.scheduleName + ", Task: " + item);
-                    }
-                }
 
-                if (tasks_list.isEmpty()) {
-                    //all sync tasks specified in the schedule plan are invalid
-                    //mUtil.addLogMsg("E", mContext.getString(R.string.msgs_main_sync_schedule_invalid_all_tasks));
-                    mUtil.addLogMsg("E", "All the sync tasks specified in the schedule were not found.");
-                } else {
-                    //start the sync list of the selected schedule
-                    mUtil.addDebugMsg(2, "I", "Starting schedule sync task list: " + tasks_list_msg);
-                    startSyncTask(tasks_list);
-                }
-            } else {
-                //schedule task has no sync task list entries
-                mUtil.addLogMsg("E", mContext.getString(R.string.msgs_scheduler_info_sync_task_list_was_empty));
-            }
+        String schedule_names="";
+        sep="";
+        for(ScheduleItem si : schedule_list) {
+            schedule_names+= sep + si.scheduleName;
+            sep=",";
         }
+        ScheduleUtil.sendScheduleStartRequestByUser(mContext, schedule_names);
     }
 
-    private void syncEnabledScheduleTask() {
+    //Manually start enabled schedules
+    private void syncEnabledScheduleTasks() {
         final ArrayList<SyncTaskItem> tasks_list = new ArrayList<SyncTaskItem>();
         final ArrayList<ScheduleItem> schedule_list = new ArrayList<ScheduleItem>();
 
@@ -5070,7 +5042,7 @@ public class ActivityMain extends AppCompatActivity {
         }
 
         String schedule_list_msg = "", sep = "";
-        for (int i = 0; i < mGp.syncScheduleAdapter.getCount(); i++) {
+        for(int i = 0; i < mGp.syncScheduleAdapter.getCount(); i++) {
             ScheduleItem si = mGp.syncScheduleAdapter.getItem(i);
             if (si.scheduleEnabled) {
                 schedule_list.add(si);
@@ -5091,46 +5063,14 @@ public class ActivityMain extends AppCompatActivity {
         //CommonUtilities.showToastMessageShort(mActivity, mContext.getString(R.string.msgs_main_sync_all_enabled_schedule));
         mUtil.addLogMsg("I", "Starting all enabled schedule tasks:" + "\n" + schedule_list_msg);
         CommonUtilities.showToastMessageShort(mActivity, "Starting all enabled schedule tasks:" + "\n" + schedule_list_msg);
-        for (int i = 0; i < schedule_list.size(); i++) {
-            ScheduleItem si = schedule_list.get(i);
-            //mUtil.addLogMsg("I", mContext.getString(R.string.msgs_main_sync_enabled_schedule, si.scheduleName));
-            mUtil.addLogMsg("I", "Running enabled schedule:" + " " + si.scheduleName);
-            if (si.syncAutoSyncTask) {
-                //schedule plan syncs all Auto Sync tasks
-                mUtil.addDebugMsg(2, "I", "Schedule task is All Auto tasks");
-                syncAutoSyncTask();
-            } else if (si.syncTaskList != null && si.syncTaskList.length() > 0) {
-                //sync specified schedule plan tasks
-                mUtil.addDebugMsg(2, "I", "Schedule task is sync list");
-                String tasks_list_msg = "", sep_t = "";
-                for (String item:si.syncTaskList.split(SYNC_TASK_LIST_SEPARATOR)) {
-                    if (item == null) continue;
-                    SyncTaskItem sti = SyncTaskUtil.getSyncTaskByName(mGp.syncTaskList, item);
-                    if (sti != null) {
-                        tasks_list_msg += sep_t + item;
-                        sep_t = ", ";
-                        tasks_list.add(sti);
-                    } else {
-                        //invalid task name in the schedule
-                        //mUtil.addLogMsg("W", mContext.getString(R.string.msgs_schedule_info_error, si.scheduleName, item)); //msg = The task specified in the schedule cannot be found.\nSchedule: %s, Task: %s
-                        mUtil.addLogMsg("W", "The task specified in the schedule cannot be found.\nSchedule: " + si.scheduleName + ", Task: " + item);
-                    }
-                }
 
-                if (tasks_list.isEmpty()) {
-                    //all sync tasks specified in the schedule plan are invalid
-                    //mUtil.addLogMsg("E", mContext.getString(R.string.msgs_main_sync_schedule_invalid_all_tasks));
-                    mUtil.addLogMsg("E", "All the sync tasks specified in the schedule were not found.");
-                } else {
-                    //start the sync list of the selected schedule
-                    mUtil.addDebugMsg(2, "I", "Starting schedule sync task list: " + tasks_list_msg);
-                    startSyncTask(tasks_list);
-                }
-            } else {
-                //schedule task has no sync task list entries
-                mUtil.addLogMsg("E", mContext.getString(R.string.msgs_scheduler_info_sync_task_list_was_empty));
-            }
+        String schedule_names="";
+        sep="";
+        for(ScheduleItem si : schedule_list) {
+            schedule_names+= sep + si.scheduleName;
+            sep=",";
         }
+        ScheduleUtil.sendScheduleStartRequestByUser(mContext, schedule_names);
     }
 
     private void setUiEnabled() {
