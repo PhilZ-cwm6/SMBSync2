@@ -268,9 +268,9 @@
         <string name="msgs_main_sync_specified_sync_task_not_scheduled">La tâche sélectionnée ne sera pas exécutée, car elle a été ignorée.</string>
         <string name="msgs_main_sync_test_mode_warnning">La tâche sélectionnée est configurée en mode Test. Aucun fichier ne sera copié ou effacé. Exécuter la tâche ?</string>
         <string name="msgs_main_sync_task_press_add_button_to_create_new_sync_task">Appuyer sur le bouton ajouter pour créer une nouvelle tâche.</string>
-        <string name="msgs_move_to_bottom">Aller à la fin</string>
-        <string name="msgs_move_to_top">Aller au début</string>
         <string name="msgs_msg_cont_label_clear">Effacer le message</string>
+        <string name="msgs_msg_cont_label_move_bottom">Aller à la fin</string>
+        <string name="msgs_msg_cont_label_move_top">Aller au début</string>
         <string name="msgs_msg_cont_label_scroll_down">Défiler en bas</string>
         <string name="msgs_msg_cont_label_scroll_up">Défiler en haut</string>
         <string name="msgs_msg_cont_label_pinned_active">Désactiver l\'autodéfilement</string>
