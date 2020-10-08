@@ -2,16 +2,19 @@ package com.sentaroh.android.SMBSync2;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
     private int text_color = 0;
     private NotifyEvent mCbNotify = null;
     private NotifyEvent mSwNotify = null;
+    private NotifyEvent mSyncButtonNotify = null;
     private ArrayList<ScheduleItem> mScheduleList = null;
     private GlobalParameters mGp=null;
 
@@ -42,6 +46,10 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
 
     public void setSwNotify(NotifyEvent ntfy) {
         mSwNotify = ntfy;
+    }
+
+    public void setSyncButtonNotify(NotifyEvent ntfy) {
+        mSyncButtonNotify = ntfy;
     }
 
     public void sort() {
@@ -77,6 +85,12 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
     public boolean isSelectMode() {
         return mSelectMode;
     }
+
+    public int getSelectedItemCount() {
+        int result=0;
+        for(ScheduleItem si:mScheduleList) if (si.isChecked) result++;
+        return result;
+    }
 //        @Override
 //        public void add(ScheduleItem si) {
 //            mScheduleList.add(si);
@@ -111,6 +125,7 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
             holder.tv_error_info.setTextColor(mGp.themeColorList.text_color_warning);
             holder.swEnabled=(Switch)v.findViewById(R.id.schedule_sync_list_switch);
             holder.cbChecked = (CheckBox) v.findViewById(R.id.schedule_sync_list_checked);
+            holder.ib_sync_button=(ImageButton) v.findViewById(R.id.schedule_sync_list_sync);
             text_color = holder.tv_name.getCurrentTextColor();
             v.setTag(holder);
         } else {
@@ -195,83 +210,21 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
                         mContext.getString(R.string.msgs_scheduler_main_dlg_hdr_minute);
             }
 
-            String sync_prof = "";
-            String error_msg = "";
-            String sep_msg = "";
+            if (isSelectMode()) holder.ib_sync_button.setVisibility(ImageButton.INVISIBLE);
+            else holder.ib_sync_button.setVisibility(ImageButton.VISIBLE);
+
+            String sync_prof = "", error_msg = "";
             holder.tv_error_info.setVisibility(TextView.GONE);
+            error_msg=ScheduleUtil.isValidScheduleItem(mContext, mGp, mScheduleList, o, true, true);
 
-            //check for schedule name errors
-            if (o.scheduleName.equals("")) {
-                error_msg = mContext.getString(R.string.msgs_schedule_list_edit_dlg_error_sync_list_name_does_not_specified);
-                sep_msg = "\n";
-            } else {
-                if (ScheduleUtil.isScheduleDuplicate(mScheduleList, o.scheduleName)) {
-                    error_msg = mContext.getString(R.string.msgs_schedule_confirm_msg_rename_duplicate_name);
-                    sep_msg = "\n";
-                }
-
-                String invalid_chars_msg = ScheduleUtil.hasScheduleNameContainsUnusableCharacter(mContext, o.scheduleName);
-                if (!invalid_chars_msg.equals("")) {
-                    error_msg += sep_msg + invalid_chars_msg;
-                    sep_msg = "\n";
-                }
-            }
-
-            //check for errors in schedule sync task list
             if (o.syncAutoSyncTask) {
                 sync_prof = mContext.getString(R.string.msgs_scheduler_info_sync_all_active_profile);
             } else {
-                boolean schedule_error=false;
-                String error_not_found_item_name="";
-                String error_item_name="";
-                if (o.syncTaskList.equals("")) {
-                    schedule_error=true;
-                } else {
-                    if (o.syncTaskList.indexOf(SYNC_TASK_LIST_SEPARATOR)>0) {
-                        String[] stl=o.syncTaskList.split(SYNC_TASK_LIST_SEPARATOR);
-                        String sep_not_found="", sep_error="";
-                        for(String stn:stl) {
-                            SyncTaskItem sti = ScheduleUtil.getSyncTask(mGp, stn);
-                            if (sti==null) {
-                                schedule_error=true;
-                                error_not_found_item_name+=sep_not_found+stn;//display all not found sync tasks in Schedule Tab entries
-                                sep_not_found=",";
-                            } else if (sti.isSyncTaskError()) {//display sync tasks with errors (invalid name, duplicate, error in master/target folder...)
-                                schedule_error=true;
-                                error_item_name+=sep_error+stn;
-                                sep_error=",";
-                            }
-                        }
-                    } else {
-                        SyncTaskItem sti = ScheduleUtil.getSyncTask(mGp, o.syncTaskList);
-                        if (sti==null) {
-                            schedule_error=true;
-                            error_not_found_item_name=o.syncTaskList;
-                        } else if (sti.isSyncTaskError()) {
-                            schedule_error=true;
-                            error_item_name=o.syncTaskList;
-                        }
-                    }
-                }
-
-                if (schedule_error) {
-                    if (o.syncTaskList.equals("")) {
-                        error_msg+= sep_msg + mContext.getString(R.string.msgs_scheduler_info_sync_task_list_was_empty);
-                    } else {
-                        if (!error_not_found_item_name.equals("")) {
-                            error_msg+= sep_msg + String.format(mContext.getString(R.string.msgs_scheduler_info_sync_task_was_not_found), error_not_found_item_name);
-                            sep_msg = "\n";
-                        }
-                        if (!error_item_name.equals("")) {
-                            error_msg+= sep_msg + String.format(mContext.getString(R.string.msgs_scheduler_info_sync_task_in_error), error_item_name);
-                            sep_msg = "\n";
-                        }
-                    }
-                }
                 sync_prof = String.format(mContext.getString(R.string.msgs_scheduler_info_sync_selected_profile), o.syncTaskList);
             }
 
             if (!error_msg.equals("")) {
+                holder.ib_sync_button.setVisibility(ImageButton.INVISIBLE);
                 holder.tv_error_info.setText(error_msg);
                 holder.tv_error_info.setVisibility(TextView.VISIBLE);
             }
@@ -288,6 +241,15 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
                         mCbNotify.notifyToListener(true, new Object[]{isChecked});
                 }
             });
+
+            holder.cbChecked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                 @Override
+                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                     o.isChecked = isChecked;
+                     if (mCbNotify != null)
+                         mCbNotify.notifyToListener(true, new Object[]{isChecked});
+                 }
+            });
             holder.cbChecked.setChecked(o.isChecked);
 
             holder.swEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -303,6 +265,22 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
             });
             holder.swEnabled.setChecked(o.scheduleEnabled);
 
+            holder.ib_sync_button.setOnClickListener(new View.OnClickListener() {
+                 @Override
+                 public void onClick(View v) {
+                     if (mSyncButtonNotify!=null) mSyncButtonNotify.notifyToListener(true, new Object[]{o});
+                 }
+            });
+
+            holder.ib_sync_button.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    CommonDialog.showPopupMessageAsUpAnchorView((ActivityMain)(parent.getContext()), v,
+                            mContext.getString(R.string.msgs_schedule_list_edit_execute_selected_schedule_with_schedule_name, o.scheduleName), 2);
+                    return true;
+                }
+            });
+
         }
         return v;
 
@@ -313,6 +291,7 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
         LinearLayout ll_view;
         CheckBox cbChecked;
         Switch swEnabled;
+        ImageButton ib_sync_button;
     }
 
 }

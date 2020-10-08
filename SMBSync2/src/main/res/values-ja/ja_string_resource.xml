@@ -98,6 +98,7 @@
         <string name="msgs_task_name_rename_with_schedule_group_task_list">タスク名を変更するとスケジュール内のタスク名も変更されます。</string>
         <string name="msgs_task_name_remove_with_schedule_group_task_list">タスクを削除するとスケジュール内のタスク名も削除されます。</string>
         <string name="msgs_task_name_contains_invalid_character">タスク名に無効な文字が含まれています: \"%s\"</string>
+        <string name="msgs_task_name_too_long">タスク名は%1$s文字以内にしてください。 長さ: %2$s </string>
         <string name="msgs_edit_sync_profile">同期タスクの編集</string>
         <string name="msgs_export_prof_fail">タスクリスト保存が失敗しました。</string>
         <string name="msgs_export_prof_success">タスクリストが保存されました。</string>
@@ -262,6 +263,7 @@
         <string name="msgs_main_sync_selected_profiles_checked_boxes">選択された同期タスクを同期します。</string>
         <string name="msgs_main_sync_selected_profiles_toast">選択された同期タスクを同期します。</string>
         <string name="msgs_main_sync_auto_profiles_toast">自動同期タスクだけを同期する</string>
+        <string name="msgs_main_sync_selected_task_has_error">One of the selected tasks is invalid and cannot be executed. Please uncheck it and try again. Task name=%s</string>
         <string name="msgs_main_sync_selected_task_not_found">選択されたタスクは存在しません。タスク=</string>
         <string name="msgs_main_sync_specified_sync_task_not_scheduled">指定された同期タスクは無視されたため実行されません。</string>
         <string name="msgs_main_sync_test_mode_warnning">選択された同期タスクにテストモードの同期タスクが含まれています。テストモードの同期タスクではファイルのコピーや削除が行われません。同期を開始しますか？</string>
@@ -286,8 +288,9 @@
         <string name="msgs_prof_cont_label_sync">同期を開始する</string>
         <string name="msgs_prof_cont_label_unselect_all">全ての選択を解除する</string>
         <string name="msgs_prof_cont_label_up">上に移動</string>
-        <string name="msgs_prof_cont_to_activate_profile">下記プロフィルを自動にします</string>
-        <string name="msgs_prof_cont_to_inactivate_profile">下記プロフィルを手動にします</string>
+        <string name="msgs_prof_cont_to_activate_profile">下記プロフィルを自動にします ?</string>
+        <string name="msgs_prof_cont_to_inactivate_profile">下記プロフィルを手動にします ?</string>
+        <string name="msgs_prof_cont_to_activate_inactivate_profile_error">One of the selected sync tasks is invalid. You cannot toggle its Auto-Start mode until it is fixed. Task name=%s</string>
         <string name="msgs_profile_edit_sync_folder_dlg_change_wifi_confition_to_any">ターゲットとマスターのいずれかがSMBのため無線LANの条件を「APに接続されている時」に変更しますか？</string>
         <string name="msgs_profile_edit_sync_folder_dlg_change_wifi_confition_has_private">ターゲットとマスターのいずれかがSMBのため無線LANの条件を「プライベートアドレス」に変更しますか？</string>
         <string name="msgs_profile_edit_sync_folder_dlg_change_master_folder_to_internal">対象フォルダがZIPに設定されている場合、マスターフォルダは内部ストレージである必要があります。マスターフォルダを内部ストレージに変更しました。</string>
@@ -527,6 +530,7 @@
         <string name="msgs_maintenance_result_log_list_del_title">履歴に登録されていないディレクトリ/ファイルが見つかりました、削除しますか？</string>
     <!-- Menu -->
         <string name="msgs_menu_sync">同期実行</string>
+        <string name="msgs_menu_exec_schedule">スケジュール実行</string>
         <string name="msgs_menu_browse_logfile">ログ表示</string>
         <string name="msgs_menu_export">タスクリスト保存</string>
         <string name="msgs_menu_import">タスクリスト取込み</string>
@@ -706,6 +710,7 @@
         <string name="msgs_schedule_list_edit_dlg_error_sync_list_name_already_exists">スケジュール名が重複しています。</string>
         <string name="msgs_schedule_list_edit_dlg_error_sync_list_name_does_not_specified">スケジュール名が指定されていません。</string>
         <string name="msgs_schedule_list_edit_dlg_error_schedule_name_contains_unusabel_character">スケジュール名に無効な文字が含まれています: \"%s\"</string>
+        <string name="msgs_schedule_list_edit_dlg_error_schedule_name_too_long">スケジュール名は%1$d以内にしてください。長さ=%2$d</string>
         <string name="msgs_schedule_list_edit_dlg_error_sync_list_sync_task_error">同期タスクに修正が必要なエラーが含まれています。</string>
         <string name="msgs_schedule_cont_label_add">スケジュールの追加</string>
         <string name="msgs_schedule_cont_label_activate">スケジュールの有効化</string>
@@ -725,9 +730,19 @@
         <string name="msgs_schedule_confirm_msg_rename_warning">スケジュール名を変更します。.結果は即座に反映され、取り消しできません。</string>
         <string name="msgs_schedule_confirm_msg_rename_duplicate_name">スケジュール名が重複しています。</string>
         <string name="msgs_schedule_confirm_msg_nosave">スケジュールが変更されています、保存せず終了しますか。</string>
+        <string name="msgs_schedule_sync_task_dialog_title">タスク開始エラー</string>
+        <string name="msgs_schedule_sync_selected_schedule_not_found">You must select at least one valid schedule.</string>
+        <string name="msgs_schedule_sync_selected_schedule_invalid_schedule_error">You cannot execute invalid schedules. Please uncheck the following schedules and try again: %s</string>
+        <string name="msgs_schedule_sync_selected_schedule_invalid_schedule_conditions_error">One of the selected schedules cannot be executed because of its configured settings. Schedule=%1$s, Error=%2$s</string>
+        <string name="msgs_schedule_sync_enabled_schedule_not_found">有効なスケジュールが見つかりません。</string>
+        <string name="msgs_schedule_sync_enabled_schedule_invalid_schedule_error">One of the enabled schedules is invalid and cannot be executed. Please disable it and try again. Schedule=%s</string>
+        <string name="msgs_schedule_sync_enabled_schedule_invalid_schedule_conditions_error">One of the enabled schedules cannot be executed because of its configured settings. Schedule=%1$s, Error=%2$s</string>
         <string name="msgs_schedule_rename_schedule">スケジュールの改名</string>
         <string name="msgs_schedule_list_edit_no_schedule">追加ボタンを押してスケジュールを作成してください。</string>
         <string name="msgs_schedule_list_edit_scheduler_disabled">スケジュールが無効になっているためスケジュール同期は実行されません。スケジュール同期を行うには画面上部のスケジュールアイコンをタップして有効にしてください。</string>
+        <string name="msgs_schedule_list_edit_execute_selected_schedule">選択されたスケジュールを実行する</string>
+        <string name="msgs_schedule_list_edit_execute_all_enabled_schedule">全ての有効なスケジュールを実行する</string>
+        <string name="msgs_schedule_list_edit_execute_selected_schedule_with_schedule_name">スケジュールを実行する(%s)</string>
         <string name="msgs_schedule_list_edit_confirm_scheduler_to_enabled">スケジュールを有効にしますか？</string>
         <string name="msgs_schedule_list_edit_confirm_scheduler_to_disabled">スケジュールを無効にしますか？</string>
         <string name="msgs_schedule_list_edit_scheduler_service_toggle_enable">スケジュールを有効にする</string>
@@ -1010,6 +1025,7 @@
             <item>Français (fr)</item>
             <item>日本語 (ja)</item>
             <item>русский (ru)</item>
+            <item>中文(zh)</item>
         </string-array >
         <string-array name="settings_screen_theme_language_list_values">
             <item>0</item>
@@ -1017,6 +1033,7 @@
             <item>2</item>
             <item>3</item>
             <item>4</item>
+            <item>5</item>
         </string-array >
         <string name="settings_screen_theme">settings_screen_theme</string>
         <string name="settings_screen_theme_title">画面テーマ</string>
