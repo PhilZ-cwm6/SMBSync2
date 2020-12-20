@@ -2,7 +2,7 @@ package com.sentaroh.android.SMBSync2;
 
 /*
 The MIT License (MIT)
-Copyright (c) 2011-2018 Sentaroh
+Copyright (c) 2011 Sentaroh
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal
@@ -2479,6 +2479,7 @@ public class SyncThreadArchiveFile {
 //        if (date_time==null || date_time[0]==null) {
 //            date_time= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(last_mod).split(" ");
 //        }
+        try {fis_retry.close();} catch(Exception e) {};
         return date_time;
     }
 

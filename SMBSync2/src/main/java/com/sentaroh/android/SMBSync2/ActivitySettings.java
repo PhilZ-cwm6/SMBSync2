@@ -2,7 +2,7 @@ package com.sentaroh.android.SMBSync2;
 
 /*
 The MIT License (MIT)
-Copyright (c) 2011-2018 Sentaroh
+Copyright (c) 2011 Sentaroh
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal
@@ -73,6 +73,7 @@ public class ActivitySettings extends PreferenceActivity {
 
     private static String mCurrentScreenTheme=SMBSYNC2_SCREEN_THEME_STANDARD;
     private static String mCurrentThemeLangaue=SMBSYNC2_SCREEN_THEME_LANGUAGE_SYSTEM;
+    private static String mCurrentFontScaleFactor=null;
     private Activity mActivity=null;
 
     private CommonUtilities mUtil = null;
@@ -273,8 +274,6 @@ public class ActivitySettings extends PreferenceActivity {
             } else if (key_string.equals(c.getString(R.string.settings_wifi_lock))) {
                 isChecked = true;
             } else if (key_string.equals(c.getString(R.string.settings_sync_history_log))) {
-                isChecked = true;
-            } else if (key_string.equals(c.getString(R.string.settings_suppress_warning_location_service_disabled))) {
                 isChecked = true;
             } else if (key_string.equals(c.getString(R.string.settings_no_compress_file_type))) {
                 isChecked = true;
@@ -548,6 +547,7 @@ public class ActivitySettings extends PreferenceActivity {
 
             mCurrentScreenTheme=shared_pref.getString(getString(R.string.settings_screen_theme), SMBSYNC2_SCREEN_THEME_STANDARD);
             mCurrentThemeLangaue=shared_pref.getString(getString(R.string.settings_screen_theme_language), SMBSYNC2_SCREEN_THEME_LANGUAGE_SYSTEM);
+            mCurrentFontScaleFactor=shared_pref.getString(getString(R.string.settings_display_font_scale_factor), GlobalParameters.FONT_SCALE_FACTOR_NORMAL);
 
             checkSettingValue(mUtil, shared_pref, getString(R.string.settings_notification_message_when_sync_ended), getActivity());
             checkSettingValue(mUtil, shared_pref, getString(R.string.settings_playback_ringtone_when_sync_ended), getActivity());
@@ -557,6 +557,7 @@ public class ActivitySettings extends PreferenceActivity {
             checkSettingValue(mUtil, shared_pref, getString(R.string.settings_device_orientation_portrait), getActivity());
             checkSettingValue(mUtil, shared_pref, getString(R.string.settings_device_orientation_landscape_tablet), getActivity());
             checkSettingValue(mUtil, shared_pref, getString(R.string.settings_screen_theme_language), getActivity());
+            checkSettingValue(mUtil, shared_pref, getString(R.string.settings_display_font_scale_factor), getActivity());
             checkSettingValue(mUtil, shared_pref, getString(R.string.settings_dim_screen_on_while_sync), getActivity());
 
         }
@@ -636,6 +637,20 @@ public class ActivitySettings extends PreferenceActivity {
                 if (!lang_value.equals(mCurrentThemeLangaue)) {
                     getActivity().finish();//relaunch current preferences activity. Will trigger to prompt for restart app when back to main activity
                     mGp.setNewLocale(getActivity(), true);
+                    Intent intent = new Intent(getActivity(), ActivitySettings.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    getActivity().startActivity(intent);
+                }
+            } else if (key_string.equals(c.getString(R.string.settings_display_font_scale_factor))) {
+                isChecked = true;
+                String font_scale_id=shared_pref.getString(key_string, GlobalParameters.FONT_SCALE_FACTOR_NORMAL);
+                String[] font_scale_label = c.getResources().getStringArray(R.array.settings_display_font_scale_factor_list_entries);
+                String sum_msg = font_scale_label[Integer.parseInt(font_scale_id)];
+                pref_key.setSummary(sum_msg);
+                if (!mCurrentFontScaleFactor.equals(font_scale_id)) {
+                    mCurrentFontScaleFactor=font_scale_id;
+                    GlobalParameters.setDisplayFontScale(c, mCurrentFontScaleFactor);
+                    getActivity().finish();
                     Intent intent = new Intent(getActivity(), ActivitySettings.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     getActivity().startActivity(intent);

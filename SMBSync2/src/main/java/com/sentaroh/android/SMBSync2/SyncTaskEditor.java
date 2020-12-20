@@ -2,7 +2,7 @@ package com.sentaroh.android.SMBSync2;
 
 /*
 The MIT License (MIT)
-Copyright (c) 2011-2018 Sentaroh
+Copyright (c) 2011 Sentaroh
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -601,12 +599,14 @@ public class SyncTaskEditor extends DialogFragment {
                 ct_specific_file_type_audio.setChecked(sv.specific_file_type_audio);
                 ct_specific_file_type_image.setChecked(sv.specific_file_type_image);
                 ct_specific_file_type_video.setChecked(sv.specific_file_type_video);
-                if (sv.specific_file_type || sv.specific_file_type_audio || sv.specific_file_type_image || sv.specific_file_type_video || !sv.sync_file_filter_info.equals("")) {
+                if (sv.specific_file_type || sv.specific_file_type_audio || sv.specific_file_type_image || sv.specific_file_type_video ||
+                        (!sv.sync_file_filter_info.equals("") && !sv.sync_file_filter_info.equals(mContext.getString(R.string.msgs_profile_sync_task_dlg_file_filter_not_specified)))) {
                     performClickNoSound(ct_specific_file_type);
                 }
 
                 ct_specific_directory.setChecked(false);
-                if (sv.specific_diretory || !sv.sync_dir_filter_info.equals("")) {
+                if (sv.specific_diretory ||
+                        (!sv.sync_dir_filter_info.equals("") && !sv.sync_dir_filter_info.equals(mContext.getString(R.string.msgs_profile_sync_task_dlg_dir_filter_not_specified)))) {
                     performClickNoSound(ct_specific_directory);
                 }
 
@@ -650,11 +650,11 @@ public class SyncTaskEditor extends DialogFragment {
             hndl.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    final Button new_btn_sync_folder_ok = (Button) mEditFolderDialog.findViewById(R.id.edit_profile_remote_btn_ok);
-                    final TextView new_dlg_msg = (TextView) mEditFolderDialog.findViewById(R.id.edit_sync_folder_dlg_msg);
-                    setSyncFolderOkButtonEnabled(new_btn_sync_folder_ok, ok_button_enabled);
-//                    new_dlg_msg.setVisibility(msg_visibility);
-//                    new_dlg_msg.setText(msg_text);
+                    if (mEditFolderDialog!=null) {
+                        final Button new_btn_sync_folder_ok = (Button) mEditFolderDialog.findViewById(R.id.edit_profile_remote_btn_ok);
+                        final TextView new_dlg_msg = (TextView) mEditFolderDialog.findViewById(R.id.edit_sync_folder_dlg_msg);
+                        setSyncFolderOkButtonEnabled(new_btn_sync_folder_ok, ok_button_enabled);
+                    }
                 }
             }, 500);
         }
@@ -779,7 +779,7 @@ public class SyncTaskEditor extends DialogFragment {
         final Button btn_dir_view_keyword_insert_week_day_long = (Button) ll_dir_view.findViewById(R.id.edit_sync_folder_keyword_insert_weekday_long);
 
         final CheckedTextView ctv_smb_use_taken_date_time_for_directory_keyword = (CheckedTextView) dialog.findViewById(R.id.edit_sync_folder_dlg_smb_use_taken_date_time_for_directory_keyword);
-        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR) || sfev.folder_master) {
             ctv_smb_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.GONE);
         } else {
             ctv_smb_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.VISIBLE);
@@ -864,8 +864,6 @@ public class SyncTaskEditor extends DialogFragment {
             }
         });
 
-        final Button btn_sync_folder_logon = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_logon_btn);
-//        btn_sync_folder_logon.setVisibility(Button.GONE);
         final Button btn_sync_folder_list_share = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_list_share_btn);
         final EditText et_sync_folder_share_name = (EditText) dialog.findViewById(R.id.edit_sync_folder_dlg_share_name);
         et_sync_folder_share_name.setText(sfev.folder_remote_share);
@@ -936,37 +934,6 @@ public class SyncTaskEditor extends DialogFragment {
             @Override
             public void onClick(View v) {
                 mTaskUtil.invokeScanSmbServerDlg(dialog);
-            }
-        });
-
-        btn_sync_folder_logon.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String user=et_sync_folder_user.getText().toString().trim().length()>0?et_sync_folder_user.getText().toString().trim():null;
-                String pass=et_sync_folder_pswd.getText().toString().length()>0?et_sync_folder_pswd.getText().toString():null;
-                if (!ctv_sync_folder_use_pswd.isChecked()) {
-                    user=pass=null;
-                } else {
-                    if (et_sync_folder_user.getText().length()==0) user=null;
-                    if (et_sync_folder_pswd.getText().length()==0) pass=null;
-                }
-                RemoteAuthInfo ra=new RemoteAuthInfo();
-                ra.smb_domain_name=null;
-                ra.smb_user_name=user;
-                ra.smb_user_password=pass;
-                ra.smb_smb_protocol=getSmbSelectedProtocol(sp_sync_folder_smb_proto);
-                ra.smb_ipc_signing_enforced=ctv_sync_folder_smb_ipc_enforced.isChecked();
-                ra.smb_use_smb2_negotiation=ctv_sync_folder_smb_use_smb2_negotiation.isChecked();
-                String host=et_remote_host.getText().toString().trim();
-                if (CommonUtilities.isIpAddressV6(host) ||CommonUtilities.isIpAddressV4(host)) {
-                    mTaskUtil.testSmbLogonDlg("", host,
-                            et_sync_folder_port.getText().toString().trim(),
-                            et_sync_folder_share_name.getText().toString().trim(), ra, null);
-                } else {
-                    mTaskUtil.testSmbLogonDlg(host, "",
-                            et_sync_folder_port.getText().toString().trim(),
-                            et_sync_folder_share_name.getText().toString().trim(), ra, null);
-                }
             }
         });
 
@@ -1069,7 +1036,7 @@ public class SyncTaskEditor extends DialogFragment {
         final Button btn_dir_view_keyword_insert_week_day_long = (Button) ll_dir_view.findViewById(R.id.edit_sync_folder_keyword_insert_weekday_long);
 
         final CheckedTextView ctv_internal_use_taken_date_time_for_directory_keyword = (CheckedTextView) dialog.findViewById(R.id.edit_sync_folder_dlg_internal_use_taken_date_time_for_directory_keyword);
-        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR) || sfev.folder_master) {
             ctv_internal_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.GONE);
         } else {
             ctv_internal_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.VISIBLE);
@@ -1213,7 +1180,7 @@ public class SyncTaskEditor extends DialogFragment {
         final Button btn_dir_view_keyword_insert_week_day_long = (Button) ll_dir_view.findViewById(R.id.edit_sync_folder_keyword_insert_weekday_long);
 
         final CheckedTextView ctv_sdcard_use_taken_date_time_for_directory_keyword = (CheckedTextView) dialog.findViewById(R.id.edit_sync_folder_dlg_sdcard_use_taken_date_time_for_directory_keyword);
-        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR) || sfev.folder_master) {
             ctv_sdcard_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.GONE);
         } else {
             ctv_sdcard_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.VISIBLE);
@@ -1391,7 +1358,7 @@ public class SyncTaskEditor extends DialogFragment {
                 mContext.getString(R.string.msg_edit_sync_folder_keyword_insert_week_day_long));
 
         final CheckedTextView ctv_usb_use_taken_date_time_for_directory_keyword = (CheckedTextView) dialog.findViewById(R.id.edit_sync_folder_dlg_usb_use_taken_date_time_for_directory_keyword);
-        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR)) {
+        if (sti.getSyncTaskType().equals(SyncTaskItem.SYNC_TASK_TYPE_MIRROR) || sfev.folder_master) {
             ctv_usb_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.GONE);
         } else {
             ctv_usb_use_taken_date_time_for_directory_keyword.setVisibility(CheckedTextView.VISIBLE);
@@ -2203,7 +2170,6 @@ public class SyncTaskEditor extends DialogFragment {
         final EditText et_sync_folder_user = (EditText) dialog.findViewById(R.id.edit_sync_folder_dlg_remote_user);
         final EditText et_sync_folder_pswd = (EditText) dialog.findViewById(R.id.edit_sync_folder_dlg_remote_pass);
 
-        final Button btn_sync_folder_logon = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_logon_btn);
         final Button btn_sync_folder_list_share = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_list_share_btn);
         final EditText et_sync_folder_share_name = (EditText) dialog.findViewById(R.id.edit_sync_folder_dlg_share_name);
 
@@ -2373,10 +2339,10 @@ public class SyncTaskEditor extends DialogFragment {
         btn_sdcard_select_sdcard.setVisibility(Button.GONE);
 
         if (master) {
-            ll_internal_keyword_view.setVisibility(LinearLayout.GONE);
-            ll_sdcard_keyword_view.setVisibility(LinearLayout.GONE);
-            ll_usb_keyword_view.setVisibility(LinearLayout.GONE);
-            ll_smb_keyword_view.setVisibility(LinearLayout.GONE);
+            ll_internal_keyword_view.setVisibility(LinearLayout.VISIBLE);
+            ll_sdcard_keyword_view.setVisibility(LinearLayout.VISIBLE);
+            ll_usb_keyword_view.setVisibility(LinearLayout.VISIBLE);
+            ll_smb_keyword_view.setVisibility(LinearLayout.VISIBLE);
             ll_zip_keyword_view.setVisibility(LinearLayout.GONE);
         } else {
             ll_internal_keyword_view.setVisibility(LinearLayout.VISIBLE);
@@ -2617,12 +2583,50 @@ public class SyncTaskEditor extends DialogFragment {
         List<StorageVolume> vol_list=sm.getStorageVolumes();
         StorageVolume sv=null;
         String uuid="";
-        for(StorageVolume item:vol_list) {
-            cu.addDebugMsg(1,"I","getStorageVolume uuid="+item.getUuid()+", desc="+item.getDescription(c));
-            if (item.getDescription(c).toLowerCase().contains(type.toLowerCase())) {
-                sv=item;
-                uuid=item.getUuid();
-                break;
+        GlobalParameters gp=GlobalWorkArea.getGlobalParameters(c);
+        if (type.toLowerCase().equals("usb")) {
+            for(StorageVolume sv_item:vol_list) {
+                cu.addDebugMsg(1,"I","getStorageVolume uuid="+sv_item.getUuid()+", desc="+sv_item.getDescription(c));
+                if (sv_item.getDescription(c).toLowerCase().contains(type.toLowerCase())) {
+                    sv=sv_item;
+                    uuid=sv_item.getUuid();
+                    break;
+                } else {
+                    if (gp.forceUsbUuidList.size()>0) {
+                        for(String item:gp.forceUsbUuidList) {
+                            if (item.equals(sv_item.getUuid())) {
+                                sv=sv_item;
+                                uuid=item;
+                                break;
+                            }
+                        }
+                        if (sv!=null) break;
+                    }
+                }
+            }
+        } else if (type.toLowerCase().equals("sd")) {
+            for(StorageVolume sv_item:vol_list) {
+                cu.addDebugMsg(1,"I","getStorageVolume uuid="+sv_item.getUuid()+", desc="+sv_item.getDescription(c));
+                if (sv_item.getDescription(c).toLowerCase().contains(type.toLowerCase())) {
+                    if (gp.forceUsbUuidList.size()>0) {
+                        boolean found=false;
+                        for(String usb_item:gp.forceUsbUuidList) {
+                            if (usb_item.equals(sv_item.getUuid())) {
+                                found=true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            sv=sv_item;
+                            uuid=sv_item.getUuid();
+                            break;
+                        }
+                    } else {
+                        sv=sv_item;
+                        uuid=sv_item.getUuid();
+                        break;
+                    }
+                }
             }
         }
         cu.addDebugMsg(1,"I","getStorageVolume exit, uuid="+uuid);
@@ -2678,7 +2682,6 @@ public class SyncTaskEditor extends DialogFragment {
 //		final LinearLayout ll_sync_folder_smb_view = (LinearLayout)dialog.findViewById(R.id.edit_sync_folder_dlg_smb_host_view);
 //		final Button btn_search_host = (Button)dialog.findViewById(R.id.edit_sync_folder_dlg_search_remote_host);
 //		final EditText et_sync_folder_domain = (EditText)dialog.findViewById(R.id.edit_sync_folder_dlg_remote_domain);
-        final Button btn_sync_folder_logon = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_logon_btn);
         final Button btn_sync_folder_smb_list_share = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_list_share_btn);
         final Button btn_sync_folder_local_list_dir = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_list_internal_directory_btn);
         final Button btn_sync_folder_smb_list_dir = (Button) dialog.findViewById(R.id.edit_sync_folder_dlg_list_smb_directory_btn);
@@ -2716,12 +2719,10 @@ public class SyncTaskEditor extends DialogFragment {
                 setDialogMsg(dlg_msg, mContext.getString(R.string.msgs_main_sync_profile_dlg_specify_host_address_or_name));
                 CommonDialog.setViewEnabled(getActivity(), btn_sync_folder_smb_list_share, false);
             } else {
-                CommonDialog.setViewEnabled(getActivity(), btn_sync_folder_logon, true);
                 if (ctv_sync_folder_use_port.isChecked() && sync_folder_port.equals("")) {
                     result = false;
                     CommonDialog.setViewEnabled(getActivity(), btn_sync_folder_smb_list_share, false);
                     setSyncFolderSmbListDirectoryButtonEnabled(dialog, false);
-                    CommonDialog.setViewEnabled(getActivity(), btn_sync_folder_logon, false);
                     setDialogMsg(dlg_msg, mContext.getString(R.string.msgs_main_sync_profile_dlg_specify_host_port_number));
                 } else {
                     if (ctv_sync_folder_use_pswd.isChecked()) {
@@ -2729,7 +2730,6 @@ public class SyncTaskEditor extends DialogFragment {
                             result = false;
                             CommonDialog.setViewEnabled(getActivity(), btn_sync_folder_smb_list_share, false);
                             setSyncFolderSmbListDirectoryButtonEnabled(dialog, false);
-                            CommonDialog.setViewEnabled(getActivity(), btn_sync_folder_logon, false);
                             setDialogMsg(dlg_msg, mContext.getString(R.string.msgs_main_sync_profile_dlg_specify_host_userid_pswd));
                         } else {
                             if (sync_folder_user.equals(SMBSYNC2_PROF_DECRYPT_FAILED) || sync_folder_user.equals(SMBSYNC2_PROF_ENCRYPT_FAILED)) {
@@ -2746,7 +2746,6 @@ public class SyncTaskEditor extends DialogFragment {
                                         setDialogMsg(dlg_msg, mContext.getString(R.string.msgs_main_sync_profile_dlg_specify_host_pswd));
                                         btn_sync_folder_smb_list_share.setEnabled(false);
                                         setSyncFolderSmbListDirectoryButtonEnabled(dialog, false);
-                                        btn_sync_folder_logon.setEnabled(false);
                                     }
                                 }
                             }
@@ -2883,112 +2882,112 @@ public class SyncTaskEditor extends DialogFragment {
         }
     }
 
-    static public void checkLocationServiceWarning(Activity activity, GlobalParameters gp, CommonUtilities cu) {
-        if (Build.VERSION.SDK_INT<=26) return;
-        if (Build.VERSION.SDK_INT>=29) {
-            boolean coarse_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED);
-            boolean background_granted=background_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PackageManager.PERMISSION_GRANTED);
-            if (gp.settingSupressLocationServiceWarning ||
-                    (CommonUtilities.isLocationServiceEnabled(activity, gp) && coarse_granted && background_granted)) return;
-            boolean waring_required=false;
-            String used_st="", sep="-";
-            for(SyncTaskItem st_item:gp.syncTaskList) {
-                if (st_item.getSyncOptionWifiStatusOption().equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) {
-                    waring_required=true;
-                    used_st+=sep+st_item.getSyncTaskName();
-                    sep="\n-";
-                }
-            }
+//    static public void checkLocationServiceWarning(Activity activity, GlobalParameters gp, CommonUtilities cu) {
+//        if (Build.VERSION.SDK_INT<=26) return;
+//        if (Build.VERSION.SDK_INT>=29) {
+//            boolean coarse_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED);
+//            boolean background_granted=background_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PackageManager.PERMISSION_GRANTED);
+//            if (gp.settingSupressLocationServiceWarning ||
+//                    (CommonUtilities.isLocationServiceEnabled(activity, gp) && coarse_granted && background_granted)) return;
+//            boolean waring_required=false;
+//            String used_st="", sep="-";
+//            for(SyncTaskItem st_item:gp.syncTaskList) {
+//                if (st_item.getSyncOptionWifiStatusOption().equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) {
+//                    waring_required=true;
+//                    used_st+=sep+st_item.getSyncTaskName();
+//                    sep="\n-";
+//                }
+//            }
+//
+//            if (!waring_required) return;
+//
+//            showLocationServiceWarning(activity, gp, cu, used_st);
+//        } else {
+//            boolean coarse_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED);
+//            if (gp.settingSupressLocationServiceWarning ||
+//                    (CommonUtilities.isLocationServiceEnabled(activity, gp) && coarse_granted)) return;
+//            boolean waring_required=false;
+//            String used_st="", sep="-";
+//            for(SyncTaskItem st_item:gp.syncTaskList) {
+//                if (st_item.getSyncOptionWifiStatusOption().equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) {
+//                    waring_required=true;
+//                    used_st+=sep+st_item.getSyncTaskName();
+//                    sep="\n-";
+//                }
+//            }
+//
+//            if (!waring_required) return;
+//
+//            showLocationServiceWarning(activity, gp, cu, used_st);
+//        }
+//    }
 
-            if (!waring_required) return;
-
-            showLocationServiceWarning(activity, gp, cu, used_st);
-        } else {
-            boolean coarse_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED);
-            if (gp.settingSupressLocationServiceWarning ||
-                    (CommonUtilities.isLocationServiceEnabled(activity, gp) && coarse_granted)) return;
-            boolean waring_required=false;
-            String used_st="", sep="-";
-            for(SyncTaskItem st_item:gp.syncTaskList) {
-                if (st_item.getSyncOptionWifiStatusOption().equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) {
-                    waring_required=true;
-                    used_st+=sep+st_item.getSyncTaskName();
-                    sep="\n-";
-                }
-            }
-
-            if (!waring_required) return;
-
-            showLocationServiceWarning(activity, gp, cu, used_st);
-        }
-    }
-
-    static public void showLocationServiceWarning(final Activity activity, final GlobalParameters gp, final CommonUtilities cu, final String used_st) {
-
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-
-        final Dialog dialog = new Dialog(activity, gp.applicationTheme);//, android.R.style.Theme_Black);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.show_warning_message_dlg);
-
-        final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.show_warning_message_dlg_title_view);
-        final TextView title = (TextView) dialog.findViewById(R.id.show_warning_message_dlg_title);
-        title_view.setBackgroundColor(gp.themeColorList.title_background_color);
-        title.setText(activity.getString(R.string.msgs_main_app_specific_dir_used_title));
-        title.setTextColor(gp.themeColorList.title_text_color);
-        title.setText(activity.getString(R.string.msgs_main_location_service_warning_title));
-
-        String msg_text="";
-        boolean coarse_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED);
-        if (Build.VERSION.SDK_INT>=29) {
-            boolean background_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PackageManager.PERMISSION_GRANTED);
-            boolean loc=CommonUtilities.isLocationServiceEnabled(activity, gp);
-            if (!CommonUtilities.isLocationServiceEnabled(activity, gp) && (!coarse_granted||!background_granted)) {
-                msg_text = activity.getString(R.string.msgs_main_location_service_warning_msg_both);
-            } else if (!CommonUtilities.isLocationServiceEnabled(activity, gp)) {
-                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_location);
-            } else if (!coarse_granted || !background_granted) {
-                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_coarse);
-            }
-        } else {
-            if (!CommonUtilities.isLocationServiceEnabled(activity, gp) && !coarse_granted) {
-                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_both);
-            } else if (!CommonUtilities.isLocationServiceEnabled(activity, gp)) {
-                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_location);
-            } else if (!coarse_granted) {
-                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_coarse);
-            }
-        }
-
-        if (!used_st.equals("")) msg_text+="\n\n"+used_st;
-        ((TextView) dialog.findViewById(R.id.show_warning_message_dlg_msg)).setText(msg_text);
-
-        final Button btnClose = (Button) dialog.findViewById(R.id.show_warning_message_dlg_close);
-        final CheckedTextView ctvSuppr = (CheckedTextView) dialog.findViewById(R.id.show_warning_message_dlg_ctv_suppress);
-        CommonUtilities.setCheckedTextView(ctvSuppr);
-        ctvSuppr.setText(R.string.msgs_main_location_service_warning_suppress);
-
-        CommonDialog.setDlgBoxSizeCompact(dialog);
-        ctvSuppr.setChecked(false);
-        // Closeボタンの指定
-        btnClose.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                dialog.dismiss();
-                if (ctvSuppr.isChecked()) {
-                    prefs.edit().putBoolean(activity.getString(R.string.settings_suppress_warning_location_service_disabled), true).commit();
-                    gp.settingSupressLocationServiceWarning =true;
-                }
-            }
-        });
-        // Cancelリスナーの指定
-        dialog.setOnCancelListener(new Dialog.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface arg0) {
-                btnClose.performClick();
-            }
-        });
-        dialog.show();
-    }
+//    static public void showLocationServiceWarning(final Activity activity, final GlobalParameters gp, final CommonUtilities cu, final String used_st) {
+//
+//        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+//
+//        final Dialog dialog = new Dialog(activity, gp.applicationTheme);//, android.R.style.Theme_Black);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.show_warning_message_dlg);
+//
+//        final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.show_warning_message_dlg_title_view);
+//        final TextView title = (TextView) dialog.findViewById(R.id.show_warning_message_dlg_title);
+//        title_view.setBackgroundColor(gp.themeColorList.title_background_color);
+//        title.setText(activity.getString(R.string.msgs_main_app_specific_dir_used_title));
+//        title.setTextColor(gp.themeColorList.title_text_color);
+//        title.setText(activity.getString(R.string.msgs_main_location_service_warning_title));
+//
+//        String msg_text="";
+//        boolean coarse_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED);
+//        if (Build.VERSION.SDK_INT>=29) {
+//            boolean background_granted=(activity.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PackageManager.PERMISSION_GRANTED);
+//            boolean loc=CommonUtilities.isLocationServiceEnabled(activity, gp);
+//            if (!CommonUtilities.isLocationServiceEnabled(activity, gp) && (!coarse_granted||!background_granted)) {
+//                msg_text = activity.getString(R.string.msgs_main_location_service_warning_msg_both);
+//            } else if (!CommonUtilities.isLocationServiceEnabled(activity, gp)) {
+//                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_location);
+//            } else if (!coarse_granted || !background_granted) {
+//                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_coarse);
+//            }
+//        } else {
+//            if (!CommonUtilities.isLocationServiceEnabled(activity, gp) && !coarse_granted) {
+//                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_both);
+//            } else if (!CommonUtilities.isLocationServiceEnabled(activity, gp)) {
+//                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_location);
+//            } else if (!coarse_granted) {
+//                msg_text=activity.getString(R.string.msgs_main_location_service_warning_msg_coarse);
+//            }
+//        }
+//
+//        if (!used_st.equals("")) msg_text+="\n\n"+used_st;
+//        ((TextView) dialog.findViewById(R.id.show_warning_message_dlg_msg)).setText(msg_text);
+//
+//        final Button btnClose = (Button) dialog.findViewById(R.id.show_warning_message_dlg_close);
+//        final CheckedTextView ctvSuppr = (CheckedTextView) dialog.findViewById(R.id.show_warning_message_dlg_ctv_suppress);
+//        CommonUtilities.setCheckedTextView(ctvSuppr);
+//        ctvSuppr.setText(R.string.msgs_main_location_service_warning_suppress);
+//
+//        CommonDialog.setDlgBoxSizeCompact(dialog);
+//        ctvSuppr.setChecked(false);
+//        // Closeボタンの指定
+//        btnClose.setOnClickListener(new OnClickListener() {
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//                if (ctvSuppr.isChecked()) {
+//                    prefs.edit().putBoolean(activity.getString(R.string.settings_suppress_warning_location_service_disabled), true).commit();
+//                    gp.settingSupressLocationServiceWarning =true;
+//                }
+//            }
+//        });
+//        // Cancelリスナーの指定
+//        dialog.setOnCancelListener(new Dialog.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface arg0) {
+//                btnClose.performClick();
+//            }
+//        });
+//        dialog.show();
+//    }
 
     private void invokeEditDirFilterDlg(final Dialog dialog, final SyncTaskItem n_sti, final String type, final TextView dlg_msg) {
         final CheckedTextView ctvEnsureTargetExactMirror = (CheckedTextView) mDialog.findViewById(R.id.edit_sync_task_option_ctv_sync_ensure_target_is_exact_mirror);
@@ -3204,6 +3203,27 @@ public class SyncTaskEditor extends DialogFragment {
         int sel_no = 0;
 //        ArrayList<String>mpl=LocalMountPoint.getLocalMountpointList2(mContext);
         ArrayList<String> mpl = LocalMountPoint.getLocalMountpointList2(mContext);
+
+        if (Build.VERSION.SDK_INT>=26) {
+            File[] fl=mContext.getExternalFilesDirs(null);
+            if (fl!=null && fl.length>1) {
+                for(File fi:fl) {
+                    if (fi!=null && fi.getPath()!=null) {
+                        String mp_name=fi.getPath().substring(0, fi.getPath().indexOf("/Android/data"));
+                        boolean found=false;
+                        for(String mi:mpl) {
+                            if (mi.equals(mp_name)) {
+                                found=true;
+                                break;
+                            }
+                        }
+                        if (!found) mpl.add(mp_name);
+                    }
+                }
+                for(String mi:mpl) mUtil.addDebugMsg(1,"I","setSpinnerSyncFolderMountPoint MP entry="+mi);
+            }
+        }
+
         if (mpl == null || mpl.size() == 0) {
             adapter.add(mGp.internalRootDirectory);
             mUtil.addDebugMsg(1,"I","setSpinnerSyncFolderMountPoint add MP by InternalStorage only.");
@@ -3249,7 +3269,7 @@ public class SyncTaskEditor extends DialogFragment {
                 new CustomSpinnerAdapter(mContext, android.R.layout.simple_spinner_item);
         mGp.safMgr.loadSafFile();
         adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
-        spinner.setPrompt(mContext.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_type_prompt));
+        spinner.setPrompt(mContext.getString(R.string.msgs_profile_edit_sync_folder_dlg_smb_protocol_prompt_title));
         spinner.setAdapter(adapter);
 
 //        adapter.add(mContext.getString(R.string.msgs_profile_edit_sync_folder_dlg_smb_protocol_system));
@@ -3468,7 +3488,7 @@ public class SyncTaskEditor extends DialogFragment {
     private void setSpinnerSyncTaskWifiOption(Spinner spinner, String cv) {
         CommonUtilities.setSpinnerBackground(mContext, spinner, mGp.isScreenThemeIsLight());
         final CustomSpinnerAdapter adapter =
-                new CustomSpinnerAdapter(mContext, android.R.layout.simple_spinner_item);
+                new AdapterWifiOption(getActivity(), android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
         spinner.setPrompt(mContext.getString(R.string.msgs_main_sync_profile_dlg_wifi_option_prompt));
         spinner.setAdapter(adapter);
@@ -3481,7 +3501,7 @@ public class SyncTaskEditor extends DialogFragment {
         int sel = 0;
         if (cv.equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_OFF)) sel = 0;
         else if (cv.equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_ANY_AP)) sel = 1;
-        else if (cv.equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) sel = 2;
+        else if (cv.equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) sel = 3;
         else if (cv.equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_PRIVATE_ADDR)) sel = 3;
         else if (cv.equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_ADDR)) sel = 4;
 
@@ -3586,6 +3606,9 @@ public class SyncTaskEditor extends DialogFragment {
         final TextView dlg_msg = (TextView) mDialog.findViewById(R.id.edit_sync_task_msg);
         dlg_msg.setTextColor(mGp.themeColorList.text_color_error);
         dlg_msg.setVisibility(TextView.GONE);
+
+        final Button btn_ok = (Button) mDialog.findViewById(R.id.edit_profile_sync_dlg_btn_ok);
+        CommonDialog.setViewEnabled(getActivity(), btn_ok, false);
 
         final Button swap_master_target = (Button) mDialog.findViewById(R.id.edit_sync_task_change_master_and_target_btn);
         final Button master_folder_info = (Button) mDialog.findViewById(R.id.edit_sync_task_master_folder_info_btn);
@@ -3736,6 +3759,13 @@ public class SyncTaskEditor extends DialogFragment {
 
         final Spinner spinnerSyncWifiStatus = (Spinner) mDialog.findViewById(R.id.edit_sync_task_option_spinner_wifi_status);
         setSpinnerSyncTaskWifiOption(spinnerSyncWifiStatus, n_sti.getSyncOptionWifiStatusOption());
+
+        if ((n_sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)||n_sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) &&
+                n_sti.getSyncOptionWifiStatusOption().equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) {
+            mUtil.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_permission_ap_list_no_longer_available_dialog_title),
+                    mContext.getString(R.string.msgs_main_permission_ap_list_no_longer_available_dialog_msg), null);
+        }
+
         if (n_sti.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB) || n_sti.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
             ll_wifi_condition_view.setVisibility(LinearLayout.VISIBLE);
             ll_advanced_network_option_view.setVisibility(LinearLayout.VISIBLE);
@@ -4247,8 +4277,6 @@ public class SyncTaskEditor extends DialogFragment {
 
         CommonDialog.setDlgBoxSizeLimit(mDialog, true);
 
-        final Button btn_ok = (Button) mDialog.findViewById(R.id.edit_profile_sync_dlg_btn_ok);
-
         et_sync_main_task_name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -4702,7 +4730,6 @@ public class SyncTaskEditor extends DialogFragment {
             }
         });
         // OKボタンの指定
-        CommonDialog.setViewEnabled(getActivity(), btn_ok, false);
         btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 final SyncTaskItem new_stli = buildSyncTaskListItem(mDialog, n_sti);
@@ -4739,7 +4766,7 @@ public class SyncTaskEditor extends DialogFragment {
                         mUtil.addDebugMsg(1,"I","editSyncTask edit saved, type="+type+", task="+new_stli.getSyncTaskName());
                         ((ActivityMain)getActivity()).refreshOptionMenu();
 
-                        checkLocationServiceWarning(getActivity(), mGp, mUtil);
+//                        checkLocationServiceWarning(getActivity(), mGp, mUtil);
 
                     }
                     @Override
@@ -5853,6 +5880,30 @@ public class SyncTaskEditor extends DialogFragment {
             objectOutput.writeUTF(zip_enc_method);
             objectOutput.writeUTF(zip_file_name);
             objectOutput.writeUTF(zip_file_password);
+        }
+    }
+
+    private class AdapterWifiOption extends CustomSpinnerAdapter {
+        private Activity a;
+        public AdapterWifiOption(Activity c, int textViewResourceId) {
+            super(c, textViewResourceId);
+            a=c;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            return position!=2;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            final TextView text=(TextView)super.getDropDownView(position, convertView, parent);
+            if (position==2) {
+                CommonDialog.setViewEnabled(a, text, false);
+            } else {
+                CommonDialog.setViewEnabled(a, text, true);
+            }
+            return text;
         }
     }
 }

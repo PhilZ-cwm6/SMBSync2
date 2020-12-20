@@ -2,7 +2,7 @@ package com.sentaroh.android.SMBSync2;
 
 /*
 The MIT License (MIT)
-Copyright (c) 2011-2018 Sentaroh
+Copyright (c) 2011 Sentaroh
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal 
@@ -49,7 +49,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationCompat.Builder;
+import android.util.DisplayMetrics;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -78,6 +80,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import jcifs.util.LogStream;
 
+import static android.content.Context.WINDOW_SERVICE;
 import static com.sentaroh.android.SMBSync2.Constants.APPLICATION_TAG;
 import static com.sentaroh.android.SMBSync2.Constants.LOG_FILE_NAME;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_ALWAYS;
@@ -95,7 +98,6 @@ public class GlobalParameters extends CommonGlobalParms {
 
     public boolean activityIsFinished = true;
     public boolean activityRestartRequired=false;
-    public boolean logCatActive=false;
 
     public boolean externalStorageIsMounted = false;
     public boolean externalStorageAccessIsPermitted = false;
@@ -126,9 +128,6 @@ public class GlobalParameters extends CommonGlobalParms {
 
     public boolean sampleProfileCreateRequired = false;
 
-    public boolean wifiIsActive = false;
-    public String wifiSsid = "";
-
 //    public boolean themeIsLight = true;
     public String settingScreenTheme =SMBSYNC2_SCREEN_THEME_STANDARD;
     public int applicationTheme = -1;
@@ -151,7 +150,6 @@ public class GlobalParameters extends CommonGlobalParms {
     public String settingMgtFileDir = "", settingLogMsgFilename = LOG_FILE_NAME;
     public boolean settingLogOption = false;
     public int settingLogFileMaxSize = 1024 * 1024 * 20;
-    public boolean settingPutLogcatOption = false;
 
     public boolean settingWriteSyncResultLog = true;
 
@@ -163,7 +161,7 @@ public class GlobalParameters extends CommonGlobalParms {
             "aac;apk;avi;gif;ico;gz;jar;jpe;jpeg;jpg;m3u;m4a;m4u;mov;movie;mp2;mp3;mpe;mpeg;mpg;mpga;png;qt;ra;ram;svg;tgz;wmv;zip;";
 
     public boolean settingSupressAppSpecifiDirWarning = false;
-    public boolean settingSupressLocationServiceWarning =false;
+//    public boolean settingSupressLocationServiceWarning =false;
     public boolean settingSuppressShortcutWarning = true;
     public boolean settingFixDeviceOrientationToPortrait = false;
     public boolean settingForceDeviceTabletViewInLandscape = false;
@@ -192,6 +190,8 @@ public class GlobalParameters extends CommonGlobalParms {
     public int settingNotificationVolume = 100;
 
     public boolean settingScheduleSyncEnabled=true;
+
+    public ArrayList<String> forceUsbUuidList =new ArrayList<String>();
 
     public Handler uiHandler = null;
 
@@ -426,15 +426,18 @@ public class GlobalParameters extends CommonGlobalParms {
     public void refreshMediaDir(Context c) {
         if (safMgr == null) {
             safMgr = new SafManager(c, settingDebugLevel > 1);
+            safMgr.setUsbUuidList(forceUsbUuidList);
+            safMgr.loadSafFile();
         } else {
             safMgr.setDebugEnabled(settingDebugLevel > 1);
+            safMgr.setUsbUuidList(forceUsbUuidList);
             safMgr.loadSafFile();
         }
     }
 
     public void setLogParms(Context c, GlobalParameters gp) {
         setDebugLevel(gp.settingDebugLevel);
-        setLogcatEnabled(gp.settingPutLogcatOption);
+//        setLogcatEnabled(gp.settingPutLogcatOption);
         setLogLimitSize(10 * 1024 * 1024);
         setLogMaxFileCount(gp.settingLogMaxFileCount);
         setLogEnabled(gp.settingLogOption);
@@ -508,6 +511,10 @@ public class GlobalParameters extends CommonGlobalParms {
 
         if (!prefs.contains(c.getString(R.string.settings_wifi_lock)))
             prefs.edit().putBoolean(c.getString(R.string.settings_wifi_lock), true).commit();
+
+        if (!prefs.contains(c.getString(R.string.settings_display_font_scale_factor)))
+            prefs.edit().putString(c.getString(R.string.settings_display_font_scale_factor), FONT_SCALE_FACTOR_NORMAL).commit();
+
     }
 
     public void setSettingOptionLogEnabled(Context c, boolean enabled) {
@@ -537,7 +544,7 @@ public class GlobalParameters extends CommonGlobalParms {
             slf4jLog.setLogOption(false, true, true, false, false);
         } else if (settingDebugLevel==2) {
             LogStream.setLevel(5);
-            slf4jLog.setLogOption(true, true, true, true, true);
+            slf4jLog.setLogOption(true, true, true, false, true);
         } else if (settingDebugLevel==3) {
             LogStream.setLevel(5);
             slf4jLog.setLogOption(true, true, true, true, true);
@@ -547,7 +554,7 @@ public class GlobalParameters extends CommonGlobalParms {
         settingLogMaxFileCount = Integer.valueOf(prefs.getString(c.getString(R.string.settings_log_file_max_count), "5"));
         settingMgtFileDir = prefs.getString(c.getString(R.string.settings_mgt_dir), getManagementDirectory());
         settingLogOption = prefs.getBoolean(c.getString(R.string.settings_log_option), false);
-        settingPutLogcatOption = prefs.getBoolean(c.getString(R.string.settings_put_logcat_option), false);
+//        settingPutLogcatOption = prefs.getBoolean(c.getString(R.string.settings_put_logcat_option), false);
         settingErrorOption = prefs.getBoolean(c.getString(R.string.settings_error_option), false);
         settingWifiLockRequired = prefs.getBoolean(c.getString(R.string.settings_wifi_lock), true);
 
@@ -563,7 +570,6 @@ public class GlobalParameters extends CommonGlobalParms {
         settingVibrateWhenSyncEnded = prefs.getString(c.getString(R.string.settings_vibrate_when_sync_ended), "0");
         settingExportedProfileEncryptRequired = prefs.getBoolean(c.getString(R.string.settings_exported_profile_encryption), true);
         settingSupressAppSpecifiDirWarning = prefs.getBoolean(c.getString(R.string.settings_suppress_warning_app_specific_dir), false);
-        settingSupressLocationServiceWarning = prefs.getBoolean(c.getString(R.string.settings_suppress_warning_location_service_disabled), false);
 
         settingScreenTheme =prefs.getString(c.getString(R.string.settings_screen_theme), SMBSYNC2_SCREEN_THEME_STANDARD);
         if (prefs.contains("settings_use_light_theme")) {
@@ -583,6 +589,7 @@ public class GlobalParameters extends CommonGlobalParms {
 //            applicationTheme = R.style.MainBlack;
 //        }
         loadLanguagePreference(c);
+        setDisplayFontScale(c);
 
         settingForceDeviceTabletViewInLandscape = prefs.getBoolean(c.getString(R.string.settings_device_orientation_landscape_tablet), false);
 
@@ -608,7 +615,26 @@ public class GlobalParameters extends CommonGlobalParms {
 
         settingScheduleSyncEnabled=prefs.getBoolean(SCHEDULER_ENABLED_KEY, true);
 
+        String uuid_list=prefs.getString(FORCE_USB_UUID_LIST_KEY, "");
+        forceUsbUuidList.clear();
+        if (!uuid_list.equals("")) {
+            String[]uuid_array=uuid_list.split(";");
+            for(String item:uuid_array) {
+                if (!item.equals("")) forceUsbUuidList.add(item);
+            }
+        }
     }
+    final static public String FORCE_USB_UUID_LIST_KEY="force_usb_uuid_list";
+
+    public void saveForceUsbUuidList(Context c) {
+        String out="";
+        for(String item:forceUsbUuidList) {
+            out+=item+";";
+        }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+        prefs.edit().putString(FORCE_USB_UUID_LIST_KEY, out).commit();
+    }
+
 
     public String getManagementDirectory() {
         return internalRootDirectory + "/" + APPLICATION_TAG;
@@ -619,6 +645,64 @@ public class GlobalParameters extends CommonGlobalParms {
         settingScheduleSyncEnabled=enabled;
         prefs.edit().putBoolean(SCHEDULER_ENABLED_KEY, enabled).commit();
     }
+
+    public static final String FONT_SCALE_FACTOR_SMALL="0";
+    public static final float FONT_SCALE_FACTOR_SMALL_VALUE=0.8f;
+    public static final String FONT_SCALE_FACTOR_NORMAL="1";
+    public static final float FONT_SCALE_FACTOR_NORMAL_VALUE=1.0f;
+    public static final String FONT_SCALE_FACTOR_LARGE="2";
+    public static final float FONT_SCALE_FACTOR_LARGE_VALUE=1.2f;
+    public static final String FONT_SCALE_FACTOR_LARGEST="3";
+    public static final float FONT_SCALE_FACTOR_LARGEST_VALUE=1.6f;
+    static public String getFontScaleFactor(Context c) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+        String fs=prefs.getString(c.getString(R.string.settings_display_font_scale_factor), FONT_SCALE_FACTOR_NORMAL);
+        return fs;
+    }
+
+    static public float getFontScaleFactorValue(Context c) {
+        String fs=getFontScaleFactor(c);
+        float fs_value=getFontScaleFactorValue(c, fs);
+        return fs_value;
+    }
+
+    static public float getFontScaleFactorValue(Context c, String fs) {
+        float fs_value=1.0f;
+        if (fs.equals(GlobalParameters.FONT_SCALE_FACTOR_SMALL)) {
+            fs_value=FONT_SCALE_FACTOR_SMALL_VALUE;
+        } else if (fs.equals(GlobalParameters.FONT_SCALE_FACTOR_NORMAL)) {
+            fs_value=FONT_SCALE_FACTOR_NORMAL_VALUE;
+        } else if (fs.equals(GlobalParameters.FONT_SCALE_FACTOR_LARGE)) {
+            fs_value=FONT_SCALE_FACTOR_LARGE_VALUE;
+        } else if (fs.equals(GlobalParameters.FONT_SCALE_FACTOR_LARGEST)) {
+            fs_value=FONT_SCALE_FACTOR_LARGEST_VALUE;
+        }
+        return fs_value;
+    }
+
+    static public void setDisplayFontScale(Context c) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+        String fs=prefs.getString(c.getString(R.string.settings_display_font_scale_factor), FONT_SCALE_FACTOR_NORMAL);
+        setDisplayFontScale(c, fs);
+    }
+
+    static public void setDisplayFontScale(Context c, String fs) {
+        float fs_value=getFontScaleFactorValue(c, fs);
+        setDisplayFontScale(c, fs_value);
+    }
+
+    static public void setDisplayFontScale(Context c, float scale) {
+        Configuration configuration=c.getResources().getConfiguration();
+        configuration.fontScale = scale;
+        DisplayMetrics metrics = c.getResources().getDisplayMetrics();
+        WindowManager wm = (WindowManager) c.getSystemService(WINDOW_SERVICE);
+
+        wm.getDefaultDisplay().getMetrics(metrics);
+        metrics.scaledDensity = configuration.fontScale * metrics.density;
+        c.getResources().updateConfiguration(configuration, metrics);
+
+    }
+
 
     //+ To use createConfigurationContext() non deprecated method:
     //  - set LANGUAGE_LOCALE_USE_NEW_API to true
