@@ -2014,7 +2014,8 @@ public class SyncTaskUtil {
                 ArrayList<TreeFilelistItem> rfl = (ArrayList<TreeFilelistItem>) o[0];
 
                 for (int i = 0; i < rfl.size(); i++) {
-                    if (rfl.get(i).isDir() && rfl.get(i).canRead()) rows.add(rfl.get(i));
+//                    if (rfl.get(i).isDir() && rfl.get(i).canRead())
+                        rows.add(rfl.get(i));
                 }
                 Collections.sort(rows);
                 NotifyEvent ntfy_sel=new NotifyEvent(mContext);
@@ -2132,7 +2133,8 @@ public class SyncTaskUtil {
                                 ArrayList<TreeFilelistItem> rfl = (ArrayList<TreeFilelistItem>) o[0];
                                 ArrayList<TreeFilelistItem> new_tfl = new ArrayList<TreeFilelistItem>();
                                 for (int i = 0; i < rfl.size(); i++) {
-                                    if (rfl.get(i).isDir() && rfl.get(i).canRead()) new_tfl.add(rfl.get(i));
+//                                    if (rfl.get(i).isDir() && rfl.get(i).canRead())
+                                        new_tfl.add(rfl.get(i));
                                 }
                                 Collections.sort(new_tfl);
                                 if (new_tfl.size()==0) {
@@ -7925,12 +7927,24 @@ public class SyncTaskUtil {
             }
 
             if (!parm[97].equals("") && !parm[97].equals("end")) {
-                if (parm[97].length() <= 5 && TextUtils.isDigitsOnly(parm[97]) && Integer.parseInt(parm[97]) > 0) { //max 5 digits allowed and value > 1
-                    stli.setSyncFilterFileSizeValue(parm[97]);
-                } else {
-                    stli.setSyncFilterFileSizeValue(SyncTaskItem.FILTER_FILE_SIZE_VALUE_DEFAULT);
-                    stli.setSyncFilterFileSizeType(SyncTaskItem.FILTER_FILE_SIZE_TYPE_DEFAULT);
-                    putTaskListValueErrorMessage(util, "Filter File Size Value", SyncTaskItem.FILTER_FILE_SIZE_VALUE_DEFAULT);
+                if (stli.getSyncFilterFileSizeType().equals(SyncTaskItem.FILTER_FILE_SIZE_TYPE_DEFAULT)) {
+                    //NOP
+                } else if (stli.getSyncFilterFileSizeType().equals(SyncTaskItem.FILTER_FILE_SIZE_TYPE_LESS_THAN)) {
+                    if (parm[97].length() <= 5 && TextUtils.isDigitsOnly(parm[97]) && Integer.parseInt(parm[97]) > 0) { //max 5 digits allowed and value > 1
+                        stli.setSyncFilterFileSizeValue(parm[97]);
+                    } else {
+                        stli.setSyncFilterFileSizeValue(SyncTaskItem.FILTER_FILE_SIZE_VALUE_DEFAULT_LESS_THAN);
+                        stli.setSyncFilterFileSizeType(SyncTaskItem.FILTER_FILE_SIZE_TYPE_DEFAULT);
+                        putTaskListValueErrorMessage(util, "Filter File Size Value", SyncTaskItem.FILTER_FILE_SIZE_VALUE_DEFAULT_LESS_THAN);
+                    }
+                } else if (stli.getSyncFilterFileSizeType().equals(SyncTaskItem.FILTER_FILE_SIZE_TYPE_GREATER_THAN)) {
+                    if (parm[97].length() <= 5 && TextUtils.isDigitsOnly(parm[97]) && Integer.parseInt(parm[97]) >= 0) { //max 5 digits allowed and value >= 0
+                        stli.setSyncFilterFileSizeValue(parm[97]);
+                    } else {
+                        stli.setSyncFilterFileSizeValue(SyncTaskItem.FILTER_FILE_SIZE_VALUE_DEFAULT_GREATER_THAN);
+                        stli.setSyncFilterFileSizeType(SyncTaskItem.FILTER_FILE_SIZE_TYPE_DEFAULT);
+                        putTaskListValueErrorMessage(util, "Filter File Size Value", SyncTaskItem.FILTER_FILE_SIZE_VALUE_DEFAULT_GREATER_THAN);
+                    }
                 }
             }
 
