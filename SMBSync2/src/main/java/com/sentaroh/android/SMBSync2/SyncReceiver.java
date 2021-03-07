@@ -45,10 +45,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.sentaroh.android.SMBSync2.Constants.QUERY_SYNC_TASK_INTENT;
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_AUTO_SYNC_INTENT;
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SERVICE_HEART_BEAT;
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_START_SYNC_INTENT;
 import static com.sentaroh.android.SMBSync2.ScheduleConstants.SCHEDULER_INTENT_SET_TIMER;
 import static com.sentaroh.android.SMBSync2.ScheduleConstants.SCHEDULER_INTENT_SET_TIMER_IF_NOT_SET;
 import static com.sentaroh.android.SMBSync2.ScheduleConstants.SCHEDULER_INTENT_TIMER_EXPIRED;
@@ -97,22 +93,6 @@ public class SyncReceiver extends BroadcastReceiver {
                 for (ScheduleItem si : mSchedList) si.scheduleLastExecTime = System.currentTimeMillis();
                 ScheduleUtil.saveScheduleData(c, mGp, mSchedList, true);//Use apply by shared preference edit
                 setTimer();
-            } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED) ||
-                    action.equals(Intent.ACTION_MEDIA_EJECT) ||
-                    action.equals(Intent.ACTION_MEDIA_REMOVED) ||
-                    action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
-                mLog.addDebugMsg(1, "I", "Receiver action=" + action);
-                Intent in = new Intent(mContext, SyncService.class);
-                in.setAction(action);
-                in.setData(received_intent.getData());
-                if (received_intent.getExtras() != null) in.putExtras(received_intent.getExtras());
-                try {
-                    mContext.startService(in);
-                } catch(Exception e) {
-//                    e.printStackTrace();
-                    mLog.addDebugMsg(1,"E", "startService filed, action="+action+", error=" + e.getMessage());
-                    mLog.addDebugMsg(1,"E", MiscUtil.getStackTraceString(e));
-                }
             } else if (action.equals(SCHEDULER_INTENT_SET_TIMER)) {
                 mLog.addDebugMsg(1, "I", "Receiver action=" + action);
                 setTimer();
@@ -126,7 +106,11 @@ public class SyncReceiver extends BroadcastReceiver {
                     send_intent.setAction(SCHEDULER_INTENT_TIMER_EXPIRED);
                     send_intent.putExtra(SCHEDULER_SCHEDULE_NAME_KEY, received_intent.getStringExtra(SCHEDULER_SCHEDULE_NAME_KEY));
                     try {
-                        mContext.startService(send_intent);
+                        if (Build.VERSION.SDK_INT>=26) {
+                            mContext.startForegroundService(send_intent);
+                        } else {
+                            mContext.startService(send_intent);
+                        }
                     } catch(Exception e) {
 //                        e.printStackTrace();
                         mLog.addDebugMsg(1,"E", "startService filed, action="+action+", error=" + e.getMessage());
@@ -141,45 +125,6 @@ public class SyncReceiver extends BroadcastReceiver {
                     ScheduleUtil.saveScheduleData(c, mGp, mSchedList);
                     setTimer();
                 }
-            } else if (action.equals(SMBSYNC2_START_SYNC_INTENT)) {
-                mLog.addDebugMsg(1, "I", "Receiver action=" + action);
-                Intent in = new Intent(mContext, SyncService.class);
-                in.setAction(SMBSYNC2_START_SYNC_INTENT);
-                if (received_intent.getExtras() != null) in.putExtras(received_intent.getExtras());
-                try {
-                    mContext.startService(in);
-                } catch(Exception e) {
-                    mLog.addDebugMsg(1,"E", "Start intent error=" + e.getMessage());
-                    mLog.addDebugMsg(1,"E", MiscUtil.getStackTraceString(e));
-                }
-            } else if (action.equals(SMBSYNC2_AUTO_SYNC_INTENT)) {
-                mLog.addDebugMsg(1, "I", "Receiver action=" + action);
-                Intent in = new Intent(mContext, SyncService.class);
-                in.setAction(SMBSYNC2_AUTO_SYNC_INTENT);
-                if (received_intent.getExtras() != null) in.putExtras(received_intent.getExtras());
-                try {
-                    mContext.startService(in);
-                } catch(Exception e) {
-                    mLog.addDebugMsg(1,"E", "Start intent error=" + e.getMessage());
-                    mLog.addDebugMsg(1,"E", MiscUtil.getStackTraceString(e));
-                }
-            } else if (action.equals(QUERY_SYNC_TASK_INTENT)) {
-                mLog.addDebugMsg(1, "I", "Receiver action=" + action);
-                Intent in = new Intent(mContext, SyncService.class);
-                in.setAction(QUERY_SYNC_TASK_INTENT);
-                if (received_intent.getExtras() != null) in.putExtras(received_intent.getExtras());
-                try {
-                    mContext.startService(in);
-                } catch(Exception e) {
-                    mLog.addDebugMsg(1,"E", "Start intent error=" + e.getMessage());
-                    mLog.addDebugMsg(1,"E", MiscUtil.getStackTraceString(e));
-                }
-            } else if (action.equals(SMBSYNC2_SERVICE_HEART_BEAT)) {
-                mLog.addDebugMsg(3, "I", "Receiver action=" + action);
-                Intent in = new Intent(mContext, SyncService.class);
-                in.setAction(SMBSYNC2_SERVICE_HEART_BEAT);
-                if (received_intent.getExtras() != null) in.putExtras(received_intent.getExtras());
-                mContext.startService(in);
             } else {
                 mLog.addDebugMsg(1, "I", "Receiver action=" + action);
             }

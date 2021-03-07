@@ -24,8 +24,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -42,6 +40,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
+import android.os.SystemClock;
 
 import com.sentaroh.android.SMBSync2.Log.LogUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
@@ -50,21 +49,14 @@ import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import static com.sentaroh.android.SMBSync2.Constants.QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE;
-import static com.sentaroh.android.SMBSync2.Constants.QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_ALL;
-import static com.sentaroh.android.SMBSync2.Constants.QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_AUTO;
-import static com.sentaroh.android.SMBSync2.Constants.QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_MANUAL;
-import static com.sentaroh.android.SMBSync2.Constants.QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_TEST;
-import static com.sentaroh.android.SMBSync2.Constants.QUERY_SYNC_TASK_INTENT;
-import static com.sentaroh.android.SMBSync2.Constants.REPLY_SYNC_TASK_EXTRA_PARM_SYNC_ARRAY;
-import static com.sentaroh.android.SMBSync2.Constants.REPLY_SYNC_TASK_EXTRA_PARM_SYNC_COUNT;
-import static com.sentaroh.android.SMBSync2.Constants.REPLY_SYNC_TASK_INTENT;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_AUTO_SYNC_INTENT;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_EXTRA_PARM_SYNC_PROFILE;
+import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_ALWAYS;
+import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_ERROR;
+import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_SUCCESS;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_RINGTONE_NOTIFICATION_ALWAYS;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_RINGTONE_NOTIFICATION_ERROR;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_RINGTONE_NOTIFICATION_SUCCESS;
-import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SERVICE_HEART_BEAT;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_START_SYNC_INTENT;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SYNC_REQUEST_ACTIVITY;
 import static com.sentaroh.android.SMBSync2.Constants.SMBSYNC2_SYNC_REQUEST_EXTERNAL;
@@ -88,6 +80,7 @@ public class SyncService extends Service {
     private Context mContext = null;
 
     private SleepReceiver mSleepReceiver = new SleepReceiver();
+    private MediaStatusChangeReceiver mMediaStatusChangeReceiver = new MediaStatusChangeReceiver();
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -123,6 +116,15 @@ public class SyncService extends Service {
         int_filter.addAction(Intent.ACTION_SCREEN_ON);
         int_filter.addAction(Intent.ACTION_USER_PRESENT);
         registerReceiver(mSleepReceiver, int_filter);
+
+        IntentFilter media_filter = new IntentFilter();
+        media_filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        media_filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+        media_filter.addAction(Intent.ACTION_MEDIA_EJECT);
+        media_filter.addAction(Intent.ACTION_MEDIA_REMOVED);
+        media_filter.addDataScheme("file");
+        registerReceiver(mMediaStatusChangeReceiver, media_filter);
+
     }
 
     private String getApplVersionName() {
@@ -137,91 +139,32 @@ public class SyncService extends Service {
         return result;
     }
 
-    private boolean mHeartBeatActive = false;
-
-    private void setHeartBeat() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (Build.VERSION.SDK_INT >= 23) {
-                String packageName = mContext.getPackageName();
-                PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-                if (pm.isIgnoringBatteryOptimizations(packageName)) {
-                    mUtil.addDebugMsg(1, "I", "HeartBeat cancelled because ignoring battery optimizations enabled");
-                    return;
-                }
-            }
-            mHeartBeatActive = true;
-            long time = System.currentTimeMillis() + 1000 * 300;
-            Intent in = new Intent();
-            in.setAction(SMBSYNC2_SERVICE_HEART_BEAT);
-            PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, in, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-            if (Build.VERSION.SDK_INT >= 23)
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pi);
-            else am.set(AlarmManager.RTC_WAKEUP, time, pi);
-        }
-    }
-
-    private void cancelHeartBeat() {
-        mHeartBeatActive = false;
-        Intent in = new Intent();
-        in.setAction(SMBSYNC2_SERVICE_HEART_BEAT);
-        PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, in, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        am.cancel(pi);
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         WakeLock wl = ((PowerManager) getSystemService(Context.POWER_SERVICE))
-                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
-                                | PowerManager.ACQUIRE_CAUSES_WAKEUP
-                        , "SMBSync-Service-1");
+                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "SMBSync2-Service-onStartCommand");
         wl.acquire(1000);
+        startForegroundCompat();
+        if (!mGp.activityIsBackground || mGp.syncThreadActive) stopForegroundCompat();
         String action = "";
         if (intent != null) if (intent.getAction() != null) action = intent.getAction();
+        mUtil.addDebugMsg(1, "I", "onStartCommand entered, action=" + action+", mGp.activityIsBackground="+mGp.activityIsBackground);
         if (action.equals(SCHEDULER_INTENT_TIMER_EXPIRED)) {
-            mUtil.addDebugMsg(1, "I", "onStartCommand entered, action=" + action);
-            if (mGp.settingScheduleSyncEnabled) startSyncByScheduler(intent);
-            else {
+            if (mGp.settingScheduleSyncEnabled) {
+                startSyncByScheduler(intent);
+            } else {
                 mUtil.addDebugMsg(1,"I","Schedule sync request is ignored because scheuler is disabled");
             }
         } else if (action.equals(SMBSYNC2_START_SYNC_INTENT)) {
-            mUtil.addDebugMsg(1, "I", "onStartCommand entered, action=" + action);
             startSyncByAnotherAppl(intent);
         } else if (action.equals(SMBSYNC2_AUTO_SYNC_INTENT)) {
-            mUtil.addDebugMsg(1, "I", "onStartCommand entered, action=" + action);
             startSyncByShortcut(intent);
-        } else if (action.equals(QUERY_SYNC_TASK_INTENT)) {
-            mUtil.addDebugMsg(1, "I", "onStartCommand entered, action=" + action);
-            processQuerySyncTask(intent);
-        } else if (action.equals(SMBSYNC2_SERVICE_HEART_BEAT)) {
-//			mUtil.addDebugMsg(0,"I","onStartCommand entered, action="+action);
-            if (mHeartBeatActive) setHeartBeat();
-        } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED) || action.equals(Intent.ACTION_MEDIA_UNMOUNTED) ||
-                action.equals(Intent.ACTION_MEDIA_EJECT)) {
-            String path = intent.getDataString();
-            mUtil.addDebugMsg(1, "I", "onStartCommand entered, action=" + action+", Path="+path);
-            final String sdcard = mGp.safMgr.getSdcardRootPath();
-            final String usb_flash = mGp.safMgr.getUsbRootPath();
-            Thread th = new Thread() {
-                @Override
-                public void run() {
-                    mGp.refreshMediaDir(mContext);
-                    mUtil.addDebugMsg(1, "I", "Media directory, SDCARD=" + mGp.safMgr.getSdcardRootPath() );
-                    mUtil.addDebugMsg(1, "I", "Media directory, USB=" + mGp.safMgr.getUsbRootPath());
-                    if (mGp.callbackStub != null && (!sdcard.equals(mGp.safMgr.getSdcardRootPath()) || !usb_flash.equals(mGp.safMgr.getUsbRootPath()))) {
-                        try {
-                            mGp.callbackStub.cbMediaStatusChanged();
-                        } catch (RemoteException e) {
-                            mUtil.addDebugMsg(1, "I", "Media directory refresh callback failed, error="+e.getMessage());
-                        }
-                    }
-                }
-            };
-            th.start();
         } else {
-            mUtil.addDebugMsg(2, "I", "onStartCommand entered, action=" + action);
+            if (isServiceToBeStopped()) {
+                stopForegroundCompat();
+                stopSelf();
+            }
         }
         return START_STICKY;
     }
@@ -240,15 +183,42 @@ public class SyncService extends Service {
         return super.onUnbind(intent);
     }
 
-    private void issueStopForeground() {
-        mGp.notificationManager.cancel(R.string.app_name);
-        stopForeground(false);
-        mUtil.addDebugMsg(1, "I", "stopForeground(false) issued");
+    private void stopForegroundCompat() {
+        if (Build.VERSION.SDK_INT>=26) {
+            stopForeground(Service.STOP_FOREGROUND_DETACH);
+            SystemClock.sleep(50);
+            stopForeground(Service.STOP_FOREGROUND_REMOVE);
+            mGp.notificationManager.cancel(R.string.app_name);
+            mUtil.addDebugMsg(1, "I", "stopForeground(Service.STOP_FOREGROUND_DETACH&REMOVE) issued");
+        } else {
+            stopForeground(true);
+            mUtil.addDebugMsg(1, "I", "stopForeground(true) issued");
+        }
+        mStartForegroundActive =false;
     }
 
-    private void issueStartForeground() {
-        startForeground(R.string.app_name, mGp.notification);
-        mUtil.addDebugMsg(1, "I", "startForeground(R.string.app_name, mGp.notification) issued");
+//    private void stopForegroundCompatRemoveX() {
+//        if (Build.VERSION.SDK_INT>=26) {
+//            stopForeground(Service.STOP_FOREGROUND_REMOVE);
+//            mGp.notificationManager.cancel(R.string.app_name);
+//            mUtil.addDebugMsg(1, "I", "stopForeground(Service.STOP_FOREGROUND_REMOVE) issued");
+//        } else {
+//            stopForeground(true);
+//            mUtil.addDebugMsg(1, "I", "stopForeground(true) issued");
+//        }
+//        mStartForegroundActive =false;
+//    }
+
+    private boolean mStartForegroundActive =false;
+
+    private void startForegroundCompat() {
+        if (!mStartForegroundActive) {
+            mStartForegroundActive =true;
+            startForeground(R.string.app_name, mGp.notification);
+            mUtil.addDebugMsg(1, "I", "startForeground(R.string.app_name, mGp.notification) issued.");
+        } else {
+            mUtil.addDebugMsg(1, "I", "startForeground() already issued.");
+        }
     }
 
     @Override
@@ -256,13 +226,11 @@ public class SyncService extends Service {
         super.onDestroy();
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
         unregisterReceiver(mSleepReceiver);
-//        unregisterReceiver(mUsbReceiver);
-//        hideOngoingMessage();
+        unregisterReceiver(mMediaStatusChangeReceiver);
         if (mGp.notificationLastShowedMessage != null && !mGp.notificationLastShowedMessage.equals("")) {
             showSyncEndNotificationMessage();
             mGp.notificationLastShowedMessage = null;
         }
-        cancelHeartBeat();
         mGp.releaseWakeLock(mUtil);
         mUtil.addLogMsgFromUI("I",mContext.getString(R.string.msgs_terminate_application));
         LogUtil.closeLog(mContext, mGp);
@@ -316,71 +284,36 @@ public class SyncService extends Service {
         return null;
     }
 
-    private void processQuerySyncTask(Intent in) {
-        String reply_list="", sep="";
-        String task_type=QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_AUTO;
-        if (in.getStringExtra(QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE)!=null) task_type=in.getStringExtra(QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE);
-        mUtil.addDebugMsg(1,"I","extra="+in.getExtras()+", str="+in.getStringExtra(QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE));
-        int reply_count=0;
-        if (mGp.syncTaskList.size()>0) {
-            for(int i=0;i<mGp.syncTaskList.size();i++) {
-                SyncTaskItem sti=mGp.syncTaskList.get(i);
-                if (task_type.toLowerCase().equals(QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_TEST.toLowerCase())) {
-                    if (sti.isSyncTestMode()) {
-                        reply_list+=sep+sti.getSyncTaskName();
-                        sep=SYNC_TASK_LIST_SEPARATOR;
-                        reply_count++;
-                    }
-                } else if (task_type.toLowerCase().equals(QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_AUTO.toLowerCase())) {
-                    if (sti.isSyncTaskAuto()) {
-                        reply_list+=sep+sti.getSyncTaskName();
-                        sep=SYNC_TASK_LIST_SEPARATOR;
-                        reply_count++;
-                    }
-                } else if (task_type.toLowerCase().equals(QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_MANUAL.toLowerCase())) {
-                    if (!sti.isSyncTaskAuto()) {
-                        reply_list+=sep+sti.getSyncTaskName();
-                        sep=SYNC_TASK_LIST_SEPARATOR;
-                        reply_count++;
-                    }
-                } else if (task_type.toLowerCase().equals(QUERY_SYNC_TASK_EXTRA_PARM_TASK_TYPE_ALL.toLowerCase())) {
-                    reply_list+=sep+sti.getSyncTaskName();
-                    sep=SYNC_TASK_LIST_SEPARATOR;
-                    reply_count++;
-                }
-            }
-        }
-        Intent reply=new Intent(REPLY_SYNC_TASK_INTENT);
-        reply.putExtra(REPLY_SYNC_TASK_EXTRA_PARM_SYNC_COUNT, reply_count);
-        reply.putExtra(REPLY_SYNC_TASK_EXTRA_PARM_SYNC_ARRAY, reply_list);
-        mContext.sendBroadcast(reply);
-    }
-
     private void startSyncByScheduler(Intent in) {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
 
         mUtil.addLogMsg("I", mContext.getString(R.string.msgs_svc_received_start_request_from_scheduler));
 
+        boolean task_queued=false;
         if (in.getExtras().containsKey(SCHEDULER_SCHEDULE_NAME_KEY)) {
             String schedule_name_list = in.getStringExtra(SCHEDULER_SCHEDULE_NAME_KEY);
             mUtil.addDebugMsg(1,"I", "Schedule information, name=" + schedule_name_list);
             String[] schedule_list=schedule_name_list.split(SYNC_TASK_LIST_SEPARATOR);
 
-            startSyncByScheduler(schedule_list);
+            task_queued=startSyncByScheduler(schedule_list);
 
         }
-//        mUtil.addLogMsg("I", mContext.getString(R.string.msgs_svc_received_start_request_from_scheduler));
-        if (isServiceToBeStopped()) stopSelf();
+        if (isServiceToBeStopped()) {
+            stopForegroundCompat();
+            showSyncEndNotificationMessage();
+            stopSelf();
+        }
     }
 
-    private void startSyncByScheduler(String[] schedule_list) {
+    private boolean startSyncByScheduler(String[] schedule_list) {
+        boolean task_queued=false;
         ArrayList<ScheduleItem> scheduleInfoList = ScheduleUtil.loadScheduleData(mContext, mGp);
         for(String schedule_name:schedule_list) {
             mUtil.addDebugMsg(1, "I", "Schedule start, name=" + schedule_name);
             ScheduleItem si = getScheduleInformation(scheduleInfoList, schedule_name);
             if (si!=null) {
                 if (si.syncAutoSyncTask) {
-                    queueAutoSyncTask(SMBSYNC2_SYNC_REQUEST_SCHEDULE, si);
+                    task_queued=queueAutoSyncTask(SMBSYNC2_SYNC_REQUEST_SCHEDULE, si);
                 } else {
                     if (si.syncTaskList != null && si.syncTaskList.length() > 0) {
                         String[] pl = si.syncTaskList.split(SYNC_TASK_LIST_SEPARATOR);
@@ -395,7 +328,7 @@ public class SyncService extends Service {
                         }
                         if (!n_tl.equals("")) {
                             String[] n_pl = n_tl.split(SYNC_TASK_LIST_SEPARATOR);
-                            queueSpecificSyncTask(n_pl, SMBSYNC2_SYNC_REQUEST_SCHEDULE, si);
+                            task_queued=queueSpecificSyncTask(n_pl, SMBSYNC2_SYNC_REQUEST_SCHEDULE, si);
                         } else {
                             mUtil.addLogMsg("E", mContext.getString(R.string.msgs_svc_received_start_request_from_scheduler_no_task_list));
                         }
@@ -407,13 +340,14 @@ public class SyncService extends Service {
                 mUtil.addLogMsg("W","Specified schedule name was not found, name=",schedule_name);
             }
         }
-        if (!mGp.syncThreadActive) {
+        if (task_queued && !mGp.syncThreadActive) {
             startSyncThread();
         }
-
+        return task_queued;
     }
 
-    private void startSyncByAnotherAppl(Intent in) {
+    private boolean startSyncByAnotherAppl(Intent in) {
+        boolean task_queued=false;
         mUtil.addLogMsg("I", mContext.getString(R.string.msgs_svc_received_start_request_from_external));
         Bundle bundle = in.getExtras();
         if (bundle != null) {
@@ -436,11 +370,10 @@ public class SyncService extends Service {
                     if (pl.size() > 0) {
                         String[] nspl = new String[pl.size()];
                         for (int i = 0; i < pl.size(); i++) nspl[i] = pl.get(i);
-                        queueSpecificSyncTask(nspl, SMBSYNC2_SYNC_REQUEST_EXTERNAL);
-//                        if (!mGp.syncThreadActive) {
-//                            sendStartNotificationIntent();
-//                            startSyncThread();
-//                        }
+                        task_queued=queueSpecificSyncTask(nspl, SMBSYNC2_SYNC_REQUEST_EXTERNAL);
+                        if (task_queued && !mGp.syncThreadActive) {
+                            startSyncThread();
+                        }
                     } else {
                         mUtil.addLogMsg("W",
                                 mContext.getString(R.string.msgs_svc_received_start_request_from_external_no_task_list));
@@ -460,12 +393,17 @@ public class SyncService extends Service {
             }
         } else {
             mUtil.addLogMsg("I", mContext.getString(R.string.msgs_svc_received_start_request_from_external_auto_task));
-            queueAutoSyncTask(SMBSYNC2_SYNC_REQUEST_EXTERNAL);
-            if (!mGp.syncThreadActive) {
+            task_queued=queueAutoSyncTask(SMBSYNC2_SYNC_REQUEST_EXTERNAL);
+            if (task_queued && !mGp.syncThreadActive) {
                 startSyncThread();
             }
         }
-        if (isServiceToBeStopped()) stopSelf();
+        if (isServiceToBeStopped()) {
+            stopForegroundCompat();
+            showSyncEndNotificationMessage();
+            stopSelf();
+        }
+        return task_queued;
     }
 
     private void startSyncByShortcut(Intent in) {
@@ -474,7 +412,11 @@ public class SyncService extends Service {
         if (!mGp.syncThreadActive) {
             startSyncThread();
         }
-        if (isServiceToBeStopped()) stopSelf();
+        if (isServiceToBeStopped()) {
+            stopForegroundCompat();
+            showSyncEndNotificationMessage();
+            stopSelf();
+        }
     }
 
     final private ISvcClient.Stub mSvcClientStub = new ISvcClient.Stub() {
@@ -509,7 +451,11 @@ public class SyncService extends Service {
 
         @Override
         public void aidlStartSpecificSyncTask(String[] job_name) throws RemoteException {
-            queueSpecificSyncTask(job_name, SMBSYNC2_SYNC_REQUEST_ACTIVITY);
+            boolean task_queued=false;
+            task_queued=queueSpecificSyncTask(job_name, SMBSYNC2_SYNC_REQUEST_ACTIVITY);
+            if (task_queued && !mGp.syncThreadActive) {
+                startSyncThread();
+            }
         }
 
         @Override
@@ -519,8 +465,9 @@ public class SyncService extends Service {
 
         @Override
         public void aidlStartAutoSyncTask() throws RemoteException {
-            queueAutoSyncTask(SMBSYNC2_SYNC_REQUEST_ACTIVITY);
-            if (!mGp.syncThreadActive) {
+            boolean task_queued=false;
+            task_queued=queueAutoSyncTask(SMBSYNC2_SYNC_REQUEST_ACTIVITY);
+            if (task_queued && !mGp.syncThreadActive) {
                 startSyncThread();
             }
         }
@@ -550,7 +497,7 @@ public class SyncService extends Service {
     private void setActivityForeground() {
         mGp.activityIsBackground = false;
         NotificationUtil.setNotificationEnabled(mGp, false);
-        issueStopForeground();
+        stopForegroundCompat();
         NotificationUtil.clearNotification(mGp, mUtil);
     }
 
@@ -558,7 +505,7 @@ public class SyncService extends Service {
         mGp.activityIsBackground = true;
         NotificationUtil.setNotificationEnabled(mGp, true);
         if (mGp.syncThreadActive) {
-            issueStartForeground();
+            startForegroundCompat();
         }
     }
 
@@ -592,7 +539,8 @@ public class SyncService extends Service {
         return result;
     }
 
-    private void queueSpecificSyncTask(String job_name[], String req_id, ScheduleItem si) {
+    private boolean queueSpecificSyncTask(String job_name[], String req_id, ScheduleItem si) {
+        boolean task_queued=false;
         SyncRequestItem sri = new SyncRequestItem();
         sri.schedule_name=si.scheduleName;
         sri.wifi_off_after_sync_ended = si.syncWifiOffAfterEnd;
@@ -628,6 +576,7 @@ public class SyncService extends Service {
                                 mUtil.addLogMsg("I", String.format(mContext.getString(R.string.msgs_svc_received_start_sync_task_request_accepted_schedule),
                                         sri.schedule_name, job_name[i], sri.request_id_display));
                             }
+                            task_queued=true;
                         }
                     } else {
                         mUtil.addLogMsg("W",
@@ -646,22 +595,23 @@ public class SyncService extends Service {
         } else {
 //            mUtil.addLogMsg("E", mContext.getString(R.string.msgs_main_sync_specified_sync_task_not_scheduled));
         }
+        return task_queued;
     }
 
-    private void queueSpecificSyncTask(String job_name[], String req_id) {
+    private boolean queueSpecificSyncTask(String job_name[], String req_id) {
+        boolean task_queued=false;
         ScheduleItem si=new ScheduleItem();
         si.scheduleName="";
         si.syncWifiOnBeforeStart=false;
         si.syncDelayAfterWifiOn=0;
         si.syncWifiOffAfterEnd=false;
         si.syncOverrideOptionCharge=ScheduleItem.OVERRIDE_SYNC_OPTION_DO_NOT_CHANGE;
-        queueSpecificSyncTask(job_name, req_id, si);
-        if (!mGp.syncThreadActive) {
-            startSyncThread();
-        }
+        task_queued=queueSpecificSyncTask(job_name, req_id, si);
+        return task_queued;
     }
 
-    private void queueAutoSyncTask(String req_id, ScheduleItem si) {
+    private boolean queueAutoSyncTask(String req_id, ScheduleItem si) {
+        boolean task_queued=false;
         int cnt = 0;
         SyncRequestItem sri = new SyncRequestItem();
         sri.schedule_name=si.scheduleName;
@@ -705,19 +655,23 @@ public class SyncService extends Service {
                 NotificationUtil.showOngoingMsg(mGp, mUtil, System.currentTimeMillis(),
                         mContext.getString(R.string.msgs_active_sync_prof_not_found));
             } else {
+                task_queued=true;
                 mGp.syncRequestQueue.add(sri);
             }
         }
+        return task_queued;
     }
 
-    private void queueAutoSyncTask(String req_id) {
+    private boolean queueAutoSyncTask(String req_id) {
+        boolean task_queued=false;
         ScheduleItem si=new ScheduleItem();
         si.scheduleName="";
         si.syncWifiOnBeforeStart=false;
         si.syncDelayAfterWifiOn=0;
         si.syncWifiOffAfterEnd=false;
         si.syncOverrideOptionCharge=ScheduleItem.OVERRIDE_SYNC_OPTION_DO_NOT_CHANGE;
-        queueAutoSyncTask(req_id, si);
+        task_queued=queueAutoSyncTask(req_id, si);
+        return task_queued;
     }
 
     private void startSyncThread() {
@@ -728,7 +682,7 @@ public class SyncService extends Service {
             return;
         }
         if (NotificationUtil.isNotificationEnabled(mGp)) {
-            issueStartForeground();
+            startForegroundCompat();
         }
         if (mGp.syncRequestQueue.size() > 0) {
             mGp.acquireWakeLock(mContext, mUtil);
@@ -737,16 +691,15 @@ public class SyncService extends Service {
                 @Override
                 public void positiveResponse(Context c, Object[] o) {
                     mSyncThreadResult = (int) o[0];
-                    cancelHeartBeat();
                     mGp.releaseWakeLock(mUtil);
                     hideDialogWindow();
                     synchronized (mGp.syncRequestQueue) {
                         if (mGp.syncRequestQueue.size() > 0) {
-                            issueStopForeground();
+                            stopForegroundCompat();
                             showSyncEndNotificationMessage();
                             startSyncThread();
                         } else {
-                            issueStopForeground();
+                            stopForegroundCompat();
                             showSyncEndNotificationMessage();
                             mGp.notificationLastShowedMessage = "";
                             if (mGp.callbackStub == null) {
@@ -759,12 +712,11 @@ public class SyncService extends Service {
                 @Override
                 public void negativeResponse(Context c, Object[] o) {
                     mSyncThreadResult = SyncTaskItem.SYNC_STATUS_ERROR;
-                    cancelHeartBeat();
                     mGp.releaseWakeLock(mUtil);
                     hideDialogWindow();
                     synchronized (mGp.syncRequestQueue) {
                         mGp.syncRequestQueue.clear();
-                        issueStopForeground();
+                        stopForegroundCompat();
                         showSyncEndNotificationMessage();
                         mGp.notificationLastShowedMessage = "";
                         if (mGp.callbackStub == null) {
@@ -780,12 +732,9 @@ public class SyncService extends Service {
             tm.setName("SyncThread");
             tm.setPriority(Thread.MIN_PRIORITY);
             tm.start();
-
-            cancelHeartBeat();
-            setHeartBeat();
         } else {
             mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " task has not started, queued task does not exist");
-            issueStopForeground();
+            stopForegroundCompat();
         }
     }
 
@@ -807,7 +756,31 @@ public class SyncService extends Service {
             if (mGp.settingVibrateWhenSyncEnded.equals(SMBSYNC2_VIBRATE_WHEN_SYNC_ENDED_ALWAYS) ||
                     mGp.settingVibrateWhenSyncEnded.equals(SMBSYNC2_VIBRATE_WHEN_SYNC_ENDED_ERROR)) vibration=true;
         }
-        NotificationUtil.showNoticeMsg(mContext, mGp, mUtil, mGp.notificationLastShowedMessage, sound, vibration);
+
+        boolean is_notice_message_showed=false;
+        if (mGp.activityIsBackground) {
+            if (mSyncThreadResult == SyncTaskItem.SYNC_STATUS_SUCCESS || mSyncThreadResult == SyncTaskItem.SYNC_STATUS_CANCEL) {
+                if (mGp.settingNotificationMessageWhenSyncEnded.equals(SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_ALWAYS) ||
+                        mGp.settingNotificationMessageWhenSyncEnded.equals(SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_SUCCESS)) {
+                    NotificationUtil.showNoticeMsg(mContext, mGp, mUtil, mGp.notificationLastShowedMessage, sound, vibration);
+                    is_notice_message_showed=true;
+                }
+            } else if (mSyncThreadResult == SyncTaskItem.SYNC_STATUS_ERROR) {
+                if (mGp.settingNotificationMessageWhenSyncEnded.equals(SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_ALWAYS) ||
+                        mGp.settingNotificationMessageWhenSyncEnded.equals(SMBSYNC2_NOTIFICATION_MESSAGE_WHEN_SYNC_ENDED_ERROR)) {
+                    NotificationUtil.showNoticeMsg(mContext, mGp, mUtil, mGp.notificationLastShowedMessage, sound, vibration);
+                    is_notice_message_showed=true;
+                }
+            }
+        }
+        if (!is_notice_message_showed) {
+            Intent na=new Intent(mContext, ActivityNotification.class);
+            na.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            na.putExtra("SOUND", sound);
+            na.putExtra("SOUND_VOLUME", mGp.settingNotificationVolume);
+            na.putExtra("VIBRATE", vibration);
+            startActivity(na);
+        }
     }
 
     private void showDialogWindow() {
@@ -850,6 +823,29 @@ public class SyncService extends Service {
                 }
             }
         }
+    }
+
+    final private class MediaStatusChangeReceiver extends BroadcastReceiver {
+        @Override
+        final public void onReceive(Context c, Intent in) {
+            String action = in.getAction();
+            mUtil.addDebugMsg(1, "I", "Media status change receiver, action=" + action);
+            if (action.equals(Intent.ACTION_MEDIA_MOUNTED) || action.equals(Intent.ACTION_MEDIA_UNMOUNTED)
+                    || action.equals(Intent.ACTION_MEDIA_EJECT) || action.equals(Intent.ACTION_MEDIA_REMOVED)) {
+                if (action.equals(Intent.ACTION_MEDIA_EJECT)) SystemClock.sleep(1000);
+                mGp.refreshMediaDir(c);
+                try {
+                    if (mGp.callbackStub != null) {
+                        mGp.callbackStub.cbMediaStatusChanged();
+                        mUtil.addDebugMsg(1, "I", "Media status change was notified to activity");
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                mUtil.addDebugMsg(1, "I", "Media status change process ended, path=" + in.getDataString());
+            }
+        }
+
     }
 
 }
